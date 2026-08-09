@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>AXIS//SHIFT — Rule Proof</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="./styles.css" />
+    <script type="module" src="./game.mjs"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#controls">게임 조작으로 건너뛰기</a>
+
+    <main class="shell" id="app">
+      <header class="masthead">
+        <div>
+          <p class="eyebrow">M00 · RULE PROOF</p>
+          <h1 class="wordmark" aria-label="AXIS SHIFT">
+            <span>AXIS</span><b aria-hidden="true">//</b>SHIFT
+          </h1>
+        </div>
+        <p class="fixture-label" id="fixture-label">M00-MAIN-v1</p>
+      </header>
+
+      <section class="briefing" aria-labelledby="briefing-title">
+        <div class="briefing-index" aria-hidden="true">01</div>
+        <div>
+          <h2 id="briefing-title">신호를 맞추세요</h2>
+          <p>
+            목표 신호와 현재 신호를 같게 만드세요. 위에서 열을, 왼쪽에서 행을 하나 이상 고른 뒤
+            <strong>PULSE</strong>를 누르면 교차점이 반전되고, 같은 칸에 신호가 다시 닿으면 원래 상태로 돌아갈 수 있습니다.
+          </p>
+        </div>
+      </section>
+
+      <section class="stage-selector" aria-labelledby="stage-current">
+        <div class="stage-selector-head">
+          <div>
+            <p class="panel-kicker">STAGE SELECT</p>
+            <h2 id="stage-current" tabindex="-1">1단계 · 쉬움 — 기본 신호</h2>
+          </div>
+          <p class="stage-position" id="stage-position" aria-label="전체 3단계 중 1단계">1 / 3</p>
+        </div>
+        <div
+          class="stage-buttons"
+          id="stage-buttons"
+          role="group"
+          aria-label="난이도 스테이지 선택"
+        ></div>
+        <p class="sr-only" id="stage-status" role="status" aria-live="polite" aria-atomic="true"></p>
+      </section>
+
+      <div class="play-layout">
+        <aside class="target-card" aria-labelledby="target-title">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-kicker">REFERENCE</p>
+              <h2 id="target-title">목표 신호</h2>
+            </div>
+            <span class="goal-chip" id="goal-chip">PAR 2</span>
+          </div>
+          <div
+            class="target-grid"
+            id="target-grid"
+            role="img"
+            aria-label="목표 신호 4행 4열 패턴"
+          ></div>
+          <p class="target-caption"><span aria-hidden="true">◇</span> 다이아몬드가 목표의 켜진 셀입니다.</p>
+        </aside>
+
+        <section class="console" id="controls" aria-labelledby="current-title">
+          <div class="console-head">
+            <div>
+              <p class="panel-kicker">LIVE MATRIX</p>
+              <h2 id="current-title">현재 신호</h2>
+            </div>
+            <div class="move-counter" aria-live="polite">
+              <span>이동</span>
+              <strong id="move-count">0</strong>
+            </div>
+          </div>
+
+          <div class="board-stage" id="board-stage" data-phase="ready">
+            <div class="axis-corner" aria-hidden="true">×</div>
+            <div class="col-rail" id="col-rail" role="group" aria-label="열 선택"></div>
+            <div class="row-rail" id="row-rail" role="group" aria-label="행 선택"></div>
+            <div
+              class="current-grid"
+              id="current-grid"
+              role="img"
+              aria-label="현재 신호 보드"
+              aria-describedby="board-help"
+            ></div>
+          </div>
+
+          <p class="sr-only" id="board-help">보드 셀은 직접 조작하지 않습니다. 위의 열 버튼과 왼쪽의 행 버튼을 선택하세요.</p>
+          <p class="sr-only" id="board-status" role="status" aria-live="polite" aria-atomic="true"></p>
+
+          <div class="selection-readout" aria-live="polite">
+            <span class="selection-icon" aria-hidden="true">⌗</span>
+            <div>
+              <span class="selection-label">선택 상태</span>
+              <strong id="selection-summary">행과 열을 선택하세요</strong>
+            </div>
+          </div>
+
+          <button
+            class="pulse-button"
+            id="pulse-button"
+            type="button"
+            disabled
+            aria-describedby="pulse-status"
+          >
+            <span class="pulse-bracket" aria-hidden="true">[</span>
+            <span>
+              <strong>PULSE</strong>
+              <small id="pulse-count">LOCKED</small>
+            </span>
+            <span class="pulse-bracket" aria-hidden="true">]</span>
+          </button>
+          <p class="pulse-status" id="pulse-status" role="status">행과 열을 선택하세요.</p>
+
+          <div class="secondary-actions">
+            <button class="secondary-button" id="undo-button" type="button" disabled>
+              <span aria-hidden="true">↶</span> Undo
+            </button>
+            <button class="secondary-button" id="reset-button" type="button" disabled>
+              <span aria-hidden="true">⟲</span> Reset
+            </button>
+          </div>
+
+          <section class="result-panel" id="result-panel" aria-labelledby="result-title" hidden>
+            <p class="result-kicker">SIGNAL ALIGNED</p>
+            <h2 id="result-title" tabindex="-1">패턴 일치</h2>
+            <p class="result-summary"><strong id="result-moves">0</strong>번의 PULSE로 목표 신호를 완성했습니다.</p>
+            <button class="next-stage-button" id="next-stage-button" type="button">
+              다음 단계 · 보통
+            </button>
+          </section>
+        </section>
+      </div>
+
+      <footer class="prototype-footer">
+        <span>STATIC PROTOTYPE</span>
+        <span aria-hidden="true">·</span>
+        <span>NO DATA SAVED</span>
+      </footer>
+    </main>
+
+    <dialog class="reset-dialog" id="reset-dialog" aria-labelledby="reset-title">
+      <form method="dialog">
+        <p class="dialog-kicker">RESET MATRIX?</p>
+        <h2 id="reset-title">처음 상태로 돌아갈까요?</h2>
+        <p>현재 선택과 모든 PULSE 기록이 초기화됩니다.</p>
+        <div class="dialog-actions">
+          <button class="secondary-button" value="cancel">취소</button>
+          <button class="danger-button" id="confirm-reset" value="confirm">초기화</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog class="reset-dialog stage-dialog" id="stage-dialog" aria-labelledby="stage-dialog-title">
+      <form method="dialog">
+        <p class="dialog-kicker">CHANGE STAGE?</p>
+        <h2 id="stage-dialog-title">현재 진행을 끝내고 이동할까요?</h2>
+        <p>
+          현재 선택과 PULSE 기록이 초기화됩니다.
+          <strong id="stage-dialog-target">2단계 · 보통</strong>으로 이동합니다.
+        </p>
+        <div class="dialog-actions">
+          <button class="secondary-button" id="cancel-stage-change" value="cancel">취소</button>
+          <button class="danger-button" id="confirm-stage-change" value="confirm">이동</button>
+        </div>
+      </form>
+    </dialog>
+
+    <noscript>이 프로토타입은 JavaScript가 필요합니다.</noscript>
+  </body>
+</html>
