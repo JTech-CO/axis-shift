@@ -207,6 +207,22 @@ screenshot=<PROJECT_ROOT>\AXIS_SHIFT_Harness_KR\evidence\M00\browser-smoke-stage
 
 Easy·Normal·Hard의 canonical move 수 2·3·4, 예비 회귀 3, 360×640 viewport와 콘솔 오류 0을 함께 확인했다. 이 E2 자동 증거는 난도 stage 구현을 검증하지만 정식 Easy E1 표본을 대체하지 않는다.
 
+### E2 — 공개 GitHub Pages 플레이 스모크
+
+```text
+publish command: git push -u origin main
+application commit: 68f7614659675171fbfbd3535e1d04b08bee931f
+pages source: main /
+pages status: built
+root URL: https://jtech-co.github.io/axis-shift/ (HTTP 200, prototype redirect 확인)
+game URL: https://jtech-co.github.io/axis-shift/prototypes/rule-proof/ (HTTP 200)
+game.mjs: HTTP 200, text/javascript; charset=utf-8
+remote browser smoke exit: 0
+browserAssertions=140 viewport=360x640 easyMoves=2 normalMoves=3 hardMoves=4 backupMoves=3 consoleErrors=0
+```
+
+공개 URL에서도 로컬과 동일한 세 단계 canonical 풀이, 단계 전환, 예비 fixture 회귀와 콘솔 오류 0을 확인했다. 이 배포는 신규 사용자 모집을 위한 M00 프로토타입 공개이며 M01 프로덕션 스캐폴딩 시작이나 DOD-02~07 통과를 뜻하지 않는다.
+
 ### E1 준비 관찰 — 내부 파일럿
 
 - run: 2회, 본 표본 미포함

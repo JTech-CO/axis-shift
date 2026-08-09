@@ -26,6 +26,7 @@
 - [x] M00 내부 파일럿 run 2회 완료 — 본 표본 제외, 관측 최저 3 PULSE·초기 오계산 흐름 4~5 PULSE
 - [x] 폐기형 M00 난도 stage fixture 고정 — Easy Par 2, Normal Par 3, Hard Par 4
 - [x] 다단계 360×640 브라우저 스모크 통과 — 140개 단언, Easy 2수·Normal 3수·Hard 4수·예비 3수, 콘솔 오류 0
+- [x] M00 공개 플레이 링크 배포 — commit `68f7614`, GitHub Pages `built`, 공개 URL 브라우저 140개 단언 통과
 
 ## 다음 할 일
 
@@ -73,6 +74,7 @@
 | 2026-08-09 | M00 | DOD-01 다단계 규칙 정확성 E2 | `node prototypes/rule-proof/verify-fixture.mjs` | stageSequence=easy:2>normal:3>hard:4, assertions=196708, failures=0 | `phases/M00_rule_proof.md` §10 |
 | 2026-08-09 | M00 | 단일-stage 브라우저 스모크 기준선 E2 | `node prototypes/rule-proof/browser-smoke.cjs` | assertions=51, 360×640, main=2, backup=3, consoleErrors=0 | `evidence/M00/browser-smoke-solved-360x640.png` |
 | 2026-08-09 | M00 | 다단계 브라우저 스모크 E2 | `node prototypes/rule-proof/browser-smoke.cjs` | assertions=140, 360×640, easy=2, normal=3, hard=4, backup=3, consoleErrors=0 | `evidence/M00/browser-smoke-stages-360x640.png` |
+| 2026-08-09 | M00 | 공개 Pages 플레이 스모크 E2 | `git push -u origin main` → Pages built → 공개 URL browser smoke | commit=`68f7614`, HTTP 200, assertions=140, consoleErrors=0 | `https://jtech-co.github.io/axis-shift/` |
 | 2026-08-09 | M00 | 내부 파일럿 관찰 | 폐기형 프로토타입 run 2회 | 본 표본 제외; 관측 최저=3 PULSE, 초기 오계산 흐름=4~5 PULSE; 시간·참가자 수·개입 미보고 | `docs/PLAYTEST_PROTOCOL.md` §13 |
 
 ### M00 최신 검증 출력
@@ -95,6 +97,12 @@ current server: node prototypes/rule-proof/serve.cjs
 current command: NODE_PATH=<bundled Playwright node_modules> BROWSER_EXECUTABLE=<Edge executable> node prototypes/rule-proof/browser-smoke.cjs
 current exit: 0
 browserAssertions=140 viewport=360x640 easyMoves=2 normalMoves=3 hardMoves=4 backupMoves=3 consoleErrors=0 screenshot=<PROJECT_ROOT>\AXIS_SHIFT_Harness_KR\evidence\M00\browser-smoke-stages-360x640.png
+
+publish command: git push -u origin main
+published commit: 68f7614659675171fbfbd3535e1d04b08bee931f
+pages status: built
+public URL: https://jtech-co.github.io/axis-shift/
+public browserAssertions=140 viewport=360x640 easyMoves=2 normalMoves=3 hardMoves=4 backupMoves=3 consoleErrors=0
 ```
 
 51개 단언 출력은 다단계 확장 전 단일-stage 역사 기준선으로 보존한다. 현재 140개 단언 스모크는 Easy→Normal→Hard 전환·각 canonical solve·예비 회귀를 포함해 통과했다. 자동 검증과 내부 파일럿은 DOD-02~04의 E1 본 표본을 대체하지 않는다.
