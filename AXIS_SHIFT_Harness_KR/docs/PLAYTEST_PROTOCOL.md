@@ -1,8 +1,8 @@
 # AXIS//SHIFT 플레이테스트 프로토콜
 
 **버전**: 1.0.0  
-**상태**: M00 내부 파일럿 run 2회 완료 · M00 본 표본 및 M06 실행 전  
-**최종 갱신**: 2026-08-09
+**상태**: M00 구현·E2 완료 / formal Easy n≥5·DOD-02~07 판정은 출시 직전 playable beta로 연기
+**최종 갱신**: 2026-08-11
 
 ## 1. 목적
 
@@ -14,6 +14,7 @@
 4. 목표·현재 보드·축·PULSE의 시각적 구분
 5. 모바일·키보드 조작 문제
 6. 결과 공유 의향과 스포일러 인식
+7. 반복 목표의 다양성, sweep 의존도, 시간·PULSE 피드백의 유용성
 
 ## 2. 개인정보·윤리
 
@@ -78,6 +79,8 @@ Viewport or orientation:
 Prior puzzle frequency: low / medium / high
 AI/matrix familiarity: none / basic / advanced
 Pulses used:
+Elapsed seconds:
+Observed strategy: singleton row/column sweep / mixed axes / other
 Recording consent: yes / no
 ```
 
@@ -87,7 +90,7 @@ Recording consent: yes / no
 
 - 모든 참가자에게 같은 4×4 fixture와 같은 시작 상태를 제공한다.
 - 정식 본 표본의 기본 fixture는 `<HARNESS_ROOT>/phases/M00_rule_proof.md` §3.2의 `M00-MAIN-v1` Easy다. stage 선택 화면을 거치지 않고 직접 열어 30초·90초 측정을 시작한다.
-- Normal·Hard는 폐기형 난도 탐색 run에서만 사용하며 M00 본 표본과 합산하지 않는다. `M00-BACKUP-v1`은 Easy 주 fixture 결함이 확인된 뒤 새 test run에서만 사용한다.
+- Normal 4×4·5×5, Hard 4×4·5×5·6×6와 Full Rank 대조군은 폐기형 난도 비교 run에서만 사용하며 M00 본 표본과 합산하지 않는다. legacy `?stage=hard`는 Full Rank 대조군 alias다. `M00-BACKUP-v1`은 Easy 주 fixture 결함이 확인된 뒤 새 test run에서만 사용한다.
 - browser storage를 초기화한다.
 - observer stopwatch와 기록표를 준비한다.
 - 완료한 내부 파일럿 run 2회는 본 표본에서 제외한다. 파일럿 참가자 수·시간·개입은 보고되지 않았으므로 추정하거나 DOD 판정에 사용하지 않는다.
@@ -123,6 +126,22 @@ Recording consent: yes / no
 - 행과 열을 고른다.
 - 교차점이 바뀐다.
 - 이미 켜진 칸도 다시 반전될 수 있다.
+
+### 6.5 폐기형 난도 비교
+
+여섯 난도×크기 profile과 Full Rank 대조군은 같은 참가자가 순서 균형을 바꿔 플레이할 수 있다. 각 run에 다음을 기록하되 Easy DOD-02~04 표본에는 합산하지 않는다.
+
+| 지표 | 기록 | 해석 |
+|---|---|---|
+| 완료시간·PULSE 수 | stage별 실제값 | 완료 가능성과 효율 분리 |
+| singleton-column PULSE 비율 | 전체 PULSE 중 열 하나만 선택한 비율 | 축 순회 의존도 |
+| 첫 복수 열 선택 시점 | PULSE 번호 또는 미발견 | 압축 관계 발견 여부 |
+| Undo·Reset·힌트 | 횟수 | 시행착오 비용 |
+| 사후 난도 순위·이유 | 대조군·A·B 순위와 자유 응답 | 구조 게이트와 체감 난도의 차이 |
+
+구조 게이트 통과만으로 Hard를 승인하지 않는다. 비교 표본과 순서 균형은 실행 전에 고정하고, 후보를 채택하지 않는 결과도 허용한다.
+
+완료된 후속 비교의 참가자 수·시간·기기·입력·순서 균형·개입은 보고되지 않았다. 따라서 그 후기는 크기 풀과 후속 UX 요구를 정하는 정성 근거로만 기록하고, 이 절의 정량 지표나 M00 Easy 본 표본으로 소급 집계하지 않는다.
 
 `tensor`, `XOR`, `rank` 단어는 요구하지 않는다.
 
@@ -229,7 +248,14 @@ Recording consent: yes / no
 
 ## 13. 현재 결과
 
-정식 M00 본 플레이테스트는 아직 실행하지 않았다.
+정식 M00 본 플레이테스트는 아직 실행하지 않았다. 참가자 수·개별 기록을 확인할 지표가 없는 현시점에는 수집하지 않고 출시 직전 playable beta까지 연기한다.
+
+### Formal Easy 실행 시점 결정
+
+- 결정: 출시 직전 동일 playable beta의 build SHA·공개 URL을 고정한 뒤 신규 사용자 n≥5를 모집하고 Easy `M00-MAIN-v1`을 실행한다.
+- 유지 기준: 4/5, 30초 첫 PULSE, 90초 첫 성공, 규칙 회상과 개입 코드를 그대로 사용한다.
+- 판정 경계: 연기는 `PASS`, 면제, 표본 축소가 아니다. DOD-02~07은 beta 증거가 기록될 때까지 미완료다.
+- Git 경계: 별도 오너 지시에 따른 구현 체크포인트 push는 M00 phase 완료나 formal DoD 통과를 뜻하지 않는다.
 
 ### 내부 파일럿 관찰
 
@@ -241,30 +267,58 @@ Recording consent: yes / no
 - 미보고: 참가자 수, 각 run의 시간, 개입 코드, 규칙 회상, 기기 구성
 - Gate result: NOT COUNTED — §3의 n≥5 표본과 DOD-02~04를 충족하지 않음
 
+### 내부 파일럿 후속 제보 — P0-DIFF-001
+
+- 제보: 4×4에서 열 1~4를 차례로 맞추면 어떤 보드도 4 PULSE 이하에 해결되고 당시 Hard에서는 Par 4와 같아짐
+- 재현: 성공. 각 비영 열 `d_j`에 `rowMask=d_j`, `colMask=e_j`를 적용하면 다른 열을 건드리지 않고 해당 열만 맞는다.
+- 영향: 당시 Hard 라벨의 구성 타당성 무효. 코어 PULSE·`Par=rank`·Easy 정식 조건은 정상
+- 채택: 당시 Hard를 Full Rank 대조군으로 재분류하고 5×5 gap 2·6×6 gap 3 후보를 비교 조건으로 구현
+- 후속 판단: 사람 비교 후 난도별 보드 크기 풀은 채택했지만 구조 게이트와 정성 후기만으로 현재 후보를 정식 Hard fixture로 승인하지 않음
+
+### 사람 대상 5×5·6×6 비교 후기 — 비게이트 관찰
+
+- 보고된 체감: 5×5·6×6 모두 4×4보다 생각할 거리가 있으며 지나치게 쉽지 않음
+- 채택한 보드 크기 풀:
+  - Easy: 4×4
+  - Normal: 4×4·5×5
+  - Hard: 4×4·5×5·6×6
+- 해석 경계: 크기 풀 채택이며 개별 목표의 정식 난도 승인과 다름. 현재 4×4 Full Rank 대조군은 sweep 취약성 때문에 Hard가 아님
+- 다양성 요구: 조합당 한 목표만 제공하면 반복성이 부족하므로 완료 후 계속 새로운 목표 신호를 제공함
+- sweep 대응: 단일 행/열 순회로 완료해도 성공은 인정하고 “다른 방법으로도 풀어 보세요”라는 비강제 안내를 표시함
+- 시간·결과 요구: 플레이 중 스톱워치를 표시하고 완료 시 사용 PULSE와 경과 초를 함께 표시함
+- 구현 상태: 새 목표·sweep 안내·visibility-safe 스톱워치와 완료 PULSE·0.1초 표시가 구현됐고 573개 브라우저 단언으로 회귀했다.
+- 미보고: 참가자 수, 완료시간, PULSE 수, 기기·브라우저, 입력 방식, 순서 균형, 개입 코드, 규칙 회상, 원시 기록 위치
+- Gate result: NOT COUNTED — formal Easy n≥5와 DOD-02~07을 충족하지 않으며 beta까지 미판정
+
 ### 자동 준비 증거
 
-다단계 fixture verifier는 다음과 같이 통과했다.
+현재 fixture·난도 verifier는 다음과 같이 통과했다.
 
 ```text
 command: node prototypes/rule-proof/verify-fixture.mjs
 exit: 0
-M00-MAIN-v1 rank=2 bfs=2
-M00-NORMAL-v1 rank=3 bfs=3
-M00-HARD-v1 rank=4 bfs=4
-M00-BACKUP-v1 rank=3 bfs=3
-stageSequence=easy:2>normal:3>hard:4
-assertions=196708 bfsVisited=65536 legalPulseCount=225 failures=0
+difficulty=M00-MAIN-v1 rank=2 sweep=4 gap=2 density=0.6250 hardGate=pass
+difficulty=M00-NORMAL-v1 rank=3 sweep=4 gap=1 density=0.5000 hardGate=fail
+difficulty=M00-NORMAL-5X5-v1 rank=3 sweep=4 gap=1 density=0.5200 hardGate=fail
+difficulty=M00-CANDIDATE-4X4-v1 rank=2 sweep=4 gap=2 density=0.6250 hardGate=pass
+difficulty=M00-CANDIDATE-5X5-v1 rank=3 sweep=5 gap=2 density=0.6400 hardGate=pass
+difficulty=M00-CANDIDATE-6X6-v1 rank=3 sweep=6 gap=3 density=0.5556 hardGate=pass
+difficulty=M00-HARD-v1 rank=4 sweep=4 gap=0 density=0.5625 hardGate=fail
+difficulty=M00-BACKUP-v1 rank=3 sweep=4 gap=1 density=0.6250 hardGate=fail
+generatorRegression=version:m00-seeded-v1 playableProfiles:6 controlProfiles:1 goldenVectors:7 seedsPerProfile:12 maxAttempts:512 density:0.22-0.68 hard4Initial:0.25-0.5
+stageSequence=easy:2>normal:3>normal-5:3>hard-4:2>hard-5:3>hard-6:3
+assertions=200967 bfsVisited=65536 legalPulseCount=225 failures=0
 ```
 
-기존 단일-stage 브라우저 기준선은 51개 단언, 360×640, 주 2수·예비 3수, 콘솔 오류 0으로 보존한다. 최종 다단계 브라우저 스모크도 다음과 같이 통과했다.
+기존 51개 단일-stage와 140개 P0 발견 전 4×4 다단계 출력은 역사 기준선으로만 보존한다. 현재 여섯 profile 반복 UX 브라우저 스모크는 다음과 같이 통과했다.
 
 ```text
 command: node prototypes/rule-proof/browser-smoke.cjs
 exit: 0
-browserAssertions=140 viewport=360x640 easyMoves=2 normalMoves=3 hardMoves=4 backupMoves=3 consoleErrors=0
+browserAssertions=573 viewport=320/360/960 easyMoves=2 normal4Moves=3 normal5Moves=3 hard4Moves=2 hard5Moves=3 hard6Moves=3 backupMoves=3 timer=visibility-safe newTarget=crypto+fallback sweepGuidance=column consoleErrors=0
 evidence: evidence/M00/browser-smoke-stages-360x640.png
 ```
 
-이 자동 결과는 단계 흐름과 fixture 구현의 E2 증거이며 M00 본 표본의 E1 결과로 집계하지 않는다.
+이 자동 결과는 독립 minor·행 루프 oracle, generator golden·fallback, Hard 4×4 initial 노이즈, seed 재현·직전 target 배제, sweep 안내와 visibility-safe 타이머의 E2 증거다. 5×5·6×6의 이동 거리 전수 BFS는 실행하지 않았으며, 구조 게이트 통과를 체감 난도 승인이나 M00 본 표본 E1 결과로 집계하지 않는다.
 
-다음 본 실행은 신규 사용자 n≥5, 표본 구성, 비공개 원시 기록 위치·삭제 예정일을 확정한 뒤 Easy `M00-MAIN-v1`만으로 시작한다. 자동 검증·내부 파일럿·Normal/Hard 탐색 수치는 DOD-02~04의 E1 참가자 결과로 집계하지 않는다.
+다음 본 실행은 출시 직전 playable beta의 SHA·공개 URL, 신규 사용자 n≥5, 표본 구성, 비공개 원시 기록 위치·삭제 예정일을 확정한 뒤 Easy `M00-MAIN-v1`만으로 시작한다. 자동 검증·내부 파일럿·Normal·Full Rank 대조군·비교 후보 수치는 DOD-02~07의 formal E1 판정으로 집계하지 않는다.

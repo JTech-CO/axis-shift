@@ -1,4 +1,11 @@
-import { STAGES, getFixture, getNextStage, getStage } from "./fixtures.mjs";
+import {
+  STAGES,
+  generateStageFixture,
+  getFixture,
+  getNextStage,
+  getStage,
+} from "./fixtures.mjs";
+import { analyzeCompletedRun } from "./play-analysis.mjs";
 import {
   beginPulse,
   commitPulse,
@@ -8,8 +15,18 @@ import {
   toggleRow,
   undoSession,
 } from "./session.mjs";
+import {
+  completeStopwatch,
+  createStopwatch,
+  formatElapsedSeconds,
+  formatStopwatch,
+  pauseStopwatch,
+  readStopwatch,
+  resetStopwatch,
+  startStopwatch,
+} from "./stopwatch.mjs";
 
-const ROW_LABELS = ["A", "B", "C", "D"];
+const ROW_LABELS = ["A", "B", "C", "D", "E", "F", "G", "H"];
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 function requiredElement(id) {
@@ -18,23 +35,33 @@ function requiredElement(id) {
   return element;
 }
 
+function stageFixtureFromParams(stage, params) {
+  const seed = params.get("seed");
+  return seed === null ? stage : generateStageFixture(stage.stageId, seed);
+}
+
 function requestedFixture() {
   const params = new URLSearchParams(window.location.search);
   const requestedStage = params.get("stage");
   if (requestedStage) {
     try {
-      return getStage(requestedStage.toLowerCase());
+      return stageFixtureFromParams(
+        getStage(requestedStage.toLowerCase()),
+        params,
+      );
     } catch {
       // Continue to the legacy fixture route before falling back to Easy.
     }
   }
 
   const value = params.get("fixture");
-  if (!value || value.toLowerCase() === "main") return getStage("easy");
+  if (!value || value.toLowerCase() === "main") {
+    return stageFixtureFromParams(getStage("easy"), params);
+  }
   if (value.toLowerCase() === "backup") return getFixture("M00-BACKUP-v1");
 
   try {
-    return getStage(value.toLowerCase());
+    return stageFixtureFromParams(getStage(value.toLowerCase()), params);
   } catch {
     try {
       return getFixture(value);
@@ -46,8 +73,13 @@ function requestedFixture() {
 
 let fixture = requestedFixture();
 let session = createSession(fixture);
+let stopwatch = createStopwatch();
 let pulseTimer = null;
+let stopwatchFrame = null;
 let pendingStageId = null;
+let fallbackSeedCounter = 0;
+const secureSeedAvailable =
+  typeof globalThis.crypto?.getRandomValues === "function";
 
 const app = requiredElement("app");
 const fixtureLabel = requiredElement("fixture-label");
@@ -63,6 +95,7 @@ const boardStage = requiredElement("board-stage");
 const colRail = requiredElement("col-rail");
 const rowRail = requiredElement("row-rail");
 const moveCount = requiredElement("move-count");
+const elapsedTime = requiredElement("elapsed-time");
 const selectionSummary = requiredElement("selection-summary");
 const pulseButton = requiredElement("pulse-button");
 const pulseCount = requiredElement("pulse-count");
@@ -72,13 +105,96 @@ const resetButton = requiredElement("reset-button");
 const resultPanel = requiredElement("result-panel");
 const resultTitle = requiredElement("result-title");
 const resultMoves = requiredElement("result-moves");
+const resultTime = requiredElement("result-time");
+const resultGuidance = requiredElement("result-guidance");
 const nextStageButton = requiredElement("next-stage-button");
+const newTargetButton = requiredElement("new-target-button");
 const resetDialog = requiredElement("reset-dialog");
 const confirmReset = requiredElement("confirm-reset");
+const newTargetDialog = requiredElement("new-target-dialog");
+const cancelNewTarget = requiredElement("cancel-new-target");
+const confirmNewTarget = requiredElement("confirm-new-target");
 const stageDialog = requiredElement("stage-dialog");
 const stageDialogTarget = requiredElement("stage-dialog-target");
 const cancelStageChange = requiredElement("cancel-stage-change");
 const confirmStageChange = requiredElement("confirm-stage-change");
+
+function nowMs() {
+  return window.performance.now();
+}
+
+function cancelStopwatchFrame() {
+  if (stopwatchFrame === null) return;
+  window.cancelAnimationFrame(stopwatchFrame);
+  stopwatchFrame = null;
+}
+
+function renderStopwatch(now = nowMs()) {
+  const elapsedMs = readStopwatch(stopwatch, now);
+  elapsedTime.textContent = formatStopwatch(elapsedMs);
+  elapsedTime.dateTime =
+    "PT" + (Math.floor(elapsedMs / 100) / 10).toFixed(1) + "S";
+  resultTime.textContent = formatElapsedSeconds(elapsedMs);
+  app.dataset.elapsedMs = String(Math.floor(elapsedMs));
+  app.dataset.timerState =
+    stopwatch.completedMs !== null
+      ? "completed"
+      : stopwatch.runningSince !== null
+        ? "running"
+        : stopwatch.hasStarted
+          ? "paused"
+          : "idle";
+}
+
+function queueStopwatchFrame() {
+  if (
+    stopwatchFrame !== null ||
+    stopwatch.runningSince === null ||
+    document.visibilityState === "hidden"
+  ) {
+    return;
+  }
+  stopwatchFrame = window.requestAnimationFrame(() => {
+    stopwatchFrame = null;
+    renderStopwatch();
+    queueStopwatchFrame();
+  });
+}
+
+function setStopwatch(nextStopwatch) {
+  stopwatch = nextStopwatch;
+  cancelStopwatchFrame();
+  renderStopwatch();
+  queueStopwatchFrame();
+}
+
+function startGameStopwatch() {
+  if (stopwatch.hasStarted) return;
+  const now = nowMs();
+  let next = startStopwatch(stopwatch, now);
+  if (document.visibilityState === "hidden") {
+    next = pauseStopwatch(next, now);
+  }
+  setStopwatch(next);
+}
+
+function resumeGameStopwatch() {
+  if (!stopwatch.hasStarted || session.phase === "solved") return;
+  const now = nowMs();
+  let next = startStopwatch(stopwatch, now);
+  if (document.visibilityState === "hidden") {
+    next = pauseStopwatch(next, now);
+  }
+  setStopwatch(next);
+}
+
+function completeGameStopwatch() {
+  setStopwatch(completeStopwatch(stopwatch, nowMs()));
+}
+
+function resetGameStopwatch() {
+  setStopwatch(resetStopwatch());
+}
 
 function isOn(rows, row, col) {
   return ((rows[row] >> col) & 1) === 1;
@@ -102,9 +218,22 @@ function activeStage() {
   return STAGES.find((stage) => stage.stageId === fixture.stageId) ?? null;
 }
 
+function generatedSeed() {
+  return fixture.baseFixtureId === undefined ? null : fixture.seed;
+}
+
+function seedSource() {
+  const seed = generatedSeed();
+  if (seed === null) return "catalog";
+  return seed.startsWith("fallback-") ? "fallback" : "crypto";
+}
+
 function nextStage() {
-  const current = activeStage();
-  return current ? getNextStage(current.stageId) : getStage("easy");
+  try {
+    return getNextStage(fixture.stageId);
+  } catch {
+    return getStage("easy");
+  }
 }
 
 function targetDescription(rows) {
@@ -128,14 +257,24 @@ function boardDifferenceCount(rows) {
 function announceBoard(action) {
   const description = targetDescription(session.currentRows);
   const remaining = boardDifferenceCount(session.currentRows);
-  currentGrid.setAttribute("aria-label", `현재 신호. ${description}`);
+  currentGrid.setAttribute(
+    "aria-label",
+    `현재 신호 ${fixture.size}행 ${fixture.size}열. ${description}`,
+  );
   boardStatus.textContent = `${action}. 현재 신호는 ${description}. 목표와 다른 셀 ${remaining}개.`;
 }
 
 function createTargetGrid() {
   targetGrid.replaceChildren();
   targetGrid.dataset.rows = fixture.targetRows.join(",");
-  targetGrid.setAttribute("aria-label", `목표 신호. ${targetDescription(fixture.targetRows)}`);
+  targetGrid.dataset.initialRows = fixture.initialRows.join(",");
+  targetGrid.dataset.seed = generatedSeed() ?? "";
+  targetGrid.dataset.puzzleKey = generatedSeed() === null ? "" : fixture.puzzleKey;
+  targetGrid.dataset.seedSource = seedSource();
+  targetGrid.setAttribute(
+    "aria-label",
+    `목표 신호 ${fixture.size}행 ${fixture.size}열. ${targetDescription(fixture.targetRows)}`,
+  );
 
   for (let row = 0; row < fixture.size; row += 1) {
     for (let col = 0; col < fixture.size; col += 1) {
@@ -173,7 +312,16 @@ function createAxisButton(kind, index, visibleLabel) {
   button.append(label, marker);
 
   button.addEventListener("click", () => {
-    session = kind === "row" ? toggleRow(session, index) : toggleCol(session, index);
+    const nextSession =
+      kind === "row" ? toggleRow(session, index) : toggleCol(session, index);
+    if (
+      nextSession !== session &&
+      !stopwatch.hasStarted &&
+      (nextSession.rowMask !== 0 || nextSession.colMask !== 0)
+    ) {
+      startGameStopwatch();
+    }
+    session = nextSession;
     render();
   });
   return button;
@@ -210,37 +358,53 @@ function createStageButton(stage) {
   return button;
 }
 
-const colButtons = Array.from({ length: fixture.size }, (_, index) =>
-  createAxisButton("col", index, String(index + 1)),
-);
-const rowButtons = Array.from({ length: fixture.size }, (_, index) =>
-  createAxisButton("row", index, ROW_LABELS[index]),
-);
-colRail.append(...colButtons);
-rowRail.append(...rowButtons);
-
-const boardCells = Array.from({ length: fixture.size }, (_, row) =>
-  Array.from({ length: fixture.size }, (_, col) => {
-    const cell = document.createElement("div");
-    cell.className = "current-cell";
-    cell.setAttribute("aria-hidden", "true");
-
-    const signal = document.createElement("span");
-    signal.className = "current-signal";
-    signal.setAttribute("aria-hidden", "true");
-
-    const preview = document.createElement("span");
-    preview.className = "preview-glyph";
-    preview.setAttribute("aria-hidden", "true");
-
-    cell.append(signal, preview);
-    currentGrid.append(cell);
-    return { cell, preview };
-  }),
-);
+let colButtons = [];
+let rowButtons = [];
+let boardCells = [];
 
 const stageButtons = STAGES.map(createStageButton);
 stageButtonsContainer.append(...stageButtons);
+
+function rebuildBoard() {
+  app.dataset.boardSize = String(fixture.size);
+  app.style.setProperty("--board-size", String(fixture.size));
+  boardStage.dataset.size = String(fixture.size);
+
+  colRail.replaceChildren();
+  rowRail.replaceChildren();
+  currentGrid.replaceChildren();
+
+  colButtons = Array.from({ length: fixture.size }, (_, index) =>
+    createAxisButton("col", index, String(index + 1)),
+  );
+  rowButtons = Array.from({ length: fixture.size }, (_, index) =>
+    createAxisButton("row", index, ROW_LABELS[index]),
+  );
+  colRail.append(...colButtons);
+  rowRail.append(...rowButtons);
+
+  boardCells = Array.from({ length: fixture.size }, (_, row) =>
+    Array.from({ length: fixture.size }, (_, col) => {
+      const cell = document.createElement("div");
+      cell.className = "current-cell";
+      cell.setAttribute("aria-hidden", "true");
+
+      const signal = document.createElement("span");
+      signal.className = "current-signal";
+      signal.setAttribute("aria-hidden", "true");
+
+      const preview = document.createElement("span");
+      preview.className = "preview-glyph";
+      preview.setAttribute("aria-hidden", "true");
+
+      cell.append(signal, preview);
+      currentGrid.append(cell);
+      return { cell, preview };
+    }),
+  );
+
+  createTargetGrid();
+}
 
 function selectionMessage(rowMask, colMask) {
   const rows = selectedLabels(rowMask, ROW_LABELS);
@@ -282,6 +446,10 @@ function renderStageMetadata() {
     : `TEST · ${fixture.label}`;
   app.dataset.fixture = fixture.id;
   app.dataset.stage = fixture.stageId;
+  app.dataset.seed = generatedSeed() ?? "";
+  app.dataset.puzzleKey = generatedSeed() === null ? "" : fixture.puzzleKey;
+  app.dataset.generated = String(generatedSeed() !== null);
+  app.dataset.seedSource = seedSource();
   goalChip.textContent = `PAR ${fixture.par}`;
 
   if (current) {
@@ -303,6 +471,12 @@ function renderStageMetadata() {
   }
 
   nextStageButton.dataset.stage = next.stageId;
+  newTargetButton.setAttribute(
+    "aria-label",
+    current
+      ? `${current.label} 새 목표 신호 생성`
+      : "플레이 단계에서 새 목표 신호 생성",
+  );
 }
 
 function renderStageButtons() {
@@ -350,12 +524,16 @@ function render() {
     session.moves.length > 0 ||
     session.rowMask !== 0 ||
     session.colMask !== 0 ||
-    session.phase === "solved";
+    session.phase === "solved" ||
+    stopwatch.hasStarted;
 
   app.dataset.phase = session.phase;
   boardStage.dataset.phase = session.phase;
   currentGrid.dataset.rows = session.currentRows.join(",");
-  currentGrid.setAttribute("aria-label", `현재 신호. ${targetDescription(session.currentRows)}`);
+  currentGrid.setAttribute(
+    "aria-label",
+    `현재 신호 ${fixture.size}행 ${fixture.size}열. ${targetDescription(session.currentRows)}`,
+  );
   moveCount.textContent = String(session.moves.length);
 
   renderStageMetadata();
@@ -380,10 +558,25 @@ function render() {
   undoButton.disabled = session.phase === "pulsing" || session.moves.length === 0;
   resetButton.disabled = session.phase === "pulsing" || !hasResettableState;
 
+  const canGenerateTarget = activeStage() !== null;
+  newTargetButton.disabled = session.phase === "pulsing" || !canGenerateTarget;
+  newTargetButton.title = canGenerateTarget
+    ? secureSeedAvailable
+      ? ""
+      : "비보안 로컬 seed로 새 목표를 생성합니다."
+    : "플레이 단계에서 사용할 수 있습니다.";
+
   const solved = session.phase === "solved";
+  const completedRun = solved
+    ? analyzeCompletedRun(session.moves)
+    : { kind: "none", shouldShowSweepGuidance: false };
   resultPanel.hidden = !solved;
   resultMoves.textContent = String(session.moves.length);
+  resultGuidance.hidden = !solved || !completedRun.shouldShowSweepGuidance;
+  resultGuidance.dataset.sweepKind = completedRun.kind;
+  app.dataset.completionKind = completedRun.kind;
   nextStageButton.disabled = !solved;
+  renderStopwatch();
 }
 
 function hasUnfinishedProgress() {
@@ -392,27 +585,27 @@ function hasUnfinishedProgress() {
     (session.moves.length > 0 ||
       session.rowMask !== 0 ||
       session.colMask !== 0 ||
-      session.pendingMove !== null)
+      session.pendingMove !== null ||
+      stopwatch.hasStarted)
   );
 }
 
-function replaceStageInUrl(stageId) {
+function replaceRouteInUrl(stageId, seed = null) {
   const url = new URL(window.location.href);
   url.searchParams.delete("fixture");
   url.searchParams.set("stage", stageId);
+  if (seed === null) {
+    url.searchParams.delete("seed");
+  } else {
+    url.searchParams.set("seed", seed);
+  }
   window.history.replaceState({}, "", url);
 }
 
-function activateStage(stageId, { focus = "button" } = {}) {
-  const nextFixture = getStage(stageId);
-  if (
-    nextFixture.size !== rowButtons.length ||
-    nextFixture.size !== colButtons.length ||
-    nextFixture.size !== boardCells.length
-  ) {
-    throw new RangeError("M00 stage transition requires a shared board size");
-  }
-
+function activateFixture(
+  nextFixture,
+  { focus = "button", startMessage = null } = {},
+) {
   if (pulseTimer !== null) {
     window.clearTimeout(pulseTimer);
     pulseTimer = null;
@@ -421,21 +614,102 @@ function activateStage(stageId, { focus = "button" } = {}) {
   fixture = nextFixture;
   session = createSession(fixture);
   pendingStageId = null;
-  createTargetGrid();
+  resetGameStopwatch();
+  rebuildBoard();
   render();
-  replaceStageInUrl(stageId);
+  replaceRouteInUrl(fixture.stageId, generatedSeed());
 
-  const startMessage = `${fixture.stageNumber}단계 ${fixture.label} 시작`;
-  stageStatus.textContent = `${startMessage}. ${fixture.title}. 이동 기록과 선택이 초기화되었습니다.`;
-  announceBoard(startMessage);
+  const announcement =
+    startMessage ?? `${fixture.stageNumber}단계 ${fixture.label} 시작`;
+  stageStatus.textContent = `${announcement}. ${fixture.title}. 이동 기록과 선택, 시간이 초기화되었습니다.`;
+  announceBoard(announcement);
 
   window.requestAnimationFrame(() => {
     if (focus === "heading") {
       stageCurrent.focus();
       return;
     }
-    stageButtons.find((button) => button.dataset.stage === stageId)?.focus();
+    if (focus === "target") {
+      newTargetButton.focus();
+      return;
+    }
+    stageButtons
+      .find((button) => button.dataset.stage === fixture.stageId)
+      ?.focus();
   });
+}
+
+function activateStage(stageId, options = {}) {
+  activateFixture(getStage(stageId), options);
+}
+
+function sameRows(leftRows, rightRows) {
+  return (
+    leftRows.length === rightRows.length &&
+    leftRows.every((row, index) => row === rightRows[index])
+  );
+}
+
+function createTargetSeed() {
+  if (secureSeedAvailable) {
+    const values = new Uint32Array(4);
+    globalThis.crypto.getRandomValues(values);
+    return (
+      "crypto-" +
+      Array.from(values, (value) =>
+        value.toString(16).padStart(8, "0"),
+      ).join("")
+    );
+  }
+
+  fallbackSeedCounter += 1;
+  const wallClock = Date.now().toString(36);
+  const monotonicClock = Math.floor(nowMs() * 1000).toString(36);
+  return `fallback-${wallClock}-${monotonicClock}-${fallbackSeedCounter.toString(36)}`;
+}
+
+function generateDifferentTargetFixture() {
+  const stage = activeStage();
+  if (!stage) throw new Error("New targets require a playable stage");
+
+  for (let attempt = 0; attempt < 32; attempt += 1) {
+    const nextFixture = generateStageFixture(stage.stageId, createTargetSeed());
+    if (!sameRows(nextFixture.targetRows, fixture.targetRows)) {
+      return nextFixture;
+    }
+  }
+  throw new Error("Could not generate a different target");
+}
+
+function activateNewTarget() {
+  try {
+    const nextFixture = generateDifferentTargetFixture();
+    activateFixture(nextFixture, {
+      focus: "target",
+      startMessage: `${nextFixture.label} 새 목표 신호 시작`,
+    });
+  } catch {
+    stageStatus.textContent =
+      "새 목표 신호를 만들지 못했습니다. 잠시 후 다시 시도해 주세요.";
+    window.requestAnimationFrame(() => newTargetButton.focus());
+  }
+}
+
+function requestNewTarget() {
+  if (
+    session.phase === "pulsing" ||
+    activeStage() === null
+  ) {
+    return;
+  }
+
+  if (hasUnfinishedProgress()) {
+    newTargetDialog.returnValue = "";
+    newTargetDialog.showModal();
+    return;
+  }
+
+  activateNewTarget();
 }
 
 function requestStageChange(stageId) {
@@ -463,6 +737,9 @@ pulseButton.addEventListener("click", () => {
   pulseTimer = window.setTimeout(() => {
     session = commitPulse(session);
     pulseTimer = null;
+    if (session.phase === "solved") {
+      completeGameStopwatch();
+    }
     render();
     announceBoard(session.phase === "solved" ? "PULSE 완료. 목표와 일치했습니다" : "PULSE 완료");
     if (session.phase === "solved") {
@@ -472,7 +749,11 @@ pulseButton.addEventListener("click", () => {
 });
 
 undoButton.addEventListener("click", () => {
+  const wasSolved = session.phase === "solved";
   session = undoSession(session);
+  if (wasSolved && session.phase !== "solved") {
+    resumeGameStopwatch();
+  }
   render();
   announceBoard("Undo 완료");
 });
@@ -487,6 +768,7 @@ confirmReset.addEventListener("click", () => {
     pulseTimer = null;
   }
   session = resetSession(session);
+  resetGameStopwatch();
   render();
   announceBoard("Reset 완료");
   window.requestAnimationFrame(() => colButtons[0].focus());
@@ -512,6 +794,39 @@ nextStageButton.addEventListener("click", () => {
   activateStage(nextStage().stageId, { focus: "heading" });
 });
 
-createTargetGrid();
+newTargetButton.addEventListener("click", requestNewTarget);
+
+cancelNewTarget.addEventListener("click", () => {
+  window.requestAnimationFrame(() => newTargetButton.focus());
+});
+
+newTargetDialog.addEventListener("cancel", () => {
+  window.requestAnimationFrame(() => newTargetButton.focus());
+});
+
+confirmNewTarget.addEventListener("click", (event) => {
+  event.preventDefault();
+  newTargetDialog.close("confirm");
+  activateNewTarget();
+});
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") {
+    setStopwatch(pauseStopwatch(stopwatch, nowMs()));
+    return;
+  }
+
+  if (
+    stopwatch.hasStarted &&
+    stopwatch.completedMs === null &&
+    session.phase !== "solved"
+  ) {
+    resumeGameStopwatch();
+    return;
+  }
+  renderStopwatch();
+});
+
+rebuildBoard();
 render();
 announceBoard("게임 시작");

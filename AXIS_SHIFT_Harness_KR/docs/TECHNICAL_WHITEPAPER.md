@@ -215,6 +215,9 @@ loading/ready ───────────────→ error → recover
 - Lab·Daily 타이머는 최초 행/열 선택 시 시작한다.
 - 일반 모드에서는 탭이 `hidden` 상태가 된 시간을 제외한다.
 - Sprint는 `sessionEndAt` 절대 시각으로 계산하여 백그라운드 전환으로 시간이 늘어나지 않게 한다.
+- M00 폐기형 프로토타입은 `performance.now()` 기반 스톱워치를 사용한다. 첫 축 선택에서 시작하고, 문서가 `hidden`이면 일시정지하며, 다시 보이면 미해결 세션만 재개한다.
+- M00의 완료 시각은 보드 잠금과 함께 고정한다. Reset·stage 전환·새 목표 전환은 선택·이동·타이머를 함께 초기화하고, 결과에는 PULSE 수와 0.1초 단위 경과 시간을 표시한다.
+- 이 M00 계약은 브라우저 가시성 전환과 반복 목표 UX를 검증하기 위한 경계다. Sprint의 절대 종료 시각·점수 계산은 M04에서 별도로 검증한다.
 - 결과 등급은 아래를 기본값으로 사용하며 플레이테스트 후 조정할 수 있다.
 
 | 등급 | 조건 |
@@ -725,14 +728,14 @@ export function gf2Rank(inputRows: readonly number[], width: number): number {
 
 #### 4.3.5. 최적 펄스 분해
 
-1. 차이 행렬의 독립 행 집합을 찾는다.
-2. 랭크가 `q`라면 `q`개의 기저 행을 선택한다.
-3. 각 원본 행을 기저 행들의 XOR 조합으로 표현한다.
-4. 기저 행 `k`를 `colMask_k`로 사용한다.
-5. 해당 기저가 포함되는 원본 행 인덱스를 모아 `rowMask_k`로 사용한다.
-6. `q`개의 `(rowMask_k, colMask_k)`가 최적 펄스 분해다.
+1. 차이 행렬의 열을 화면 왼쪽에서 오른쪽 순서로 읽는다.
+2. 현재 열 기저에 새 열을 추가했을 때 랭크가 증가하면 기저로 채택한다.
+3. 랭크가 `q`라면 정확히 `q`개의 기저 열이 선택된다.
+4. 각 원본 열을 기저 열들의 XOR 조합으로 결정적으로 표현한다.
+5. 기저 열 `k`를 `rowMask_k`로 사용하고, 해당 기저의 계수가 1인 원본 열 인덱스를 모아 `colMask_k`로 사용한다.
+6. `q`개의 `(rowMask_k, colMask_k)`가 canonical 최적 펄스 분해다.
 
-보드가 최대 6×6이므로 각 원본 행의 기저 조합을 `2^q` 전수 탐색해도 충분히 빠르다. 여러 독립 행 집합이 가능한 경우 다음 비용 함수를 최소화하는 정규 해답을 선택한다.
+보드가 최대 6×6이므로 각 원본 열의 기저 조합을 `2^q` 전수 탐색해도 충분히 빠르다. 왼쪽부터 채택하는 기저 순서와 최초 일치 계수 조합을 공개 결정성 계약으로 유지한다. `gestureCost`는 canonical 해답을 다시 선택하는 최적화 함수가 아니라 생성 후보의 난도 보조 지표로 계산한다.
 
 ```text
 gestureCost = Σ(popcount(rowMask) + popcount(colMask))
@@ -766,7 +769,9 @@ export function isSolved(current: readonly number[], target: readonly number[]):
 - `dispersionIndex`: 켜진 셀의 공간적 분산도
 - `noiseRatio`: 초기 상태가 빈 보드가 아닌 경우의 혼잡도
 - `symmetryScore`: 수평·수직·회전 대칭성. 대칭이 높으면 대체로 인지 부담이 낮다.
-- `gestureCost`: 최적해의 총 행·열 선택 수
+- `gestureCost`: canonical 최적해의 총 행·열 선택 수
+- `sweepBound`: 비영 행 수와 비영 열 수 중 작은 값. 한 축씩 순회하는 국소 해법의 상한
+- `compressionGap`: `sweepBound - rankFactor`. 축 순회와 비교해 최적해가 절약하는 PULSE 수이자 플레이어가 찾아야 할 압축량
 
 ```text
 complexityScore =
@@ -780,6 +785,8 @@ complexityScore =
 ```
 
 이 점수는 자동 필터와 초기 배치용이며 최종 Lab 난도는 사람 플레이테스트로 재분류한다.
+
+`rankFactor`는 최소 행동 수이지 체감 난도의 단조 대리값이 아니다. 특히 `N×N` full-rank 보드는 열 또는 행을 하나씩 맞추는 `N`회 순회가 곧 Par이므로, `compressionGap = 0`인 후보를 Hard로 승인하지 않는다. Hard 자동 후보는 Par 일치, 모든 행·열 비영, `compressionGap >= 2`를 anti-sweep 구조 게이트로 삼은 뒤 overlap·dispersion·symmetry·gestureCost와 사람 플레이테스트로 최종 분류한다. 이 구조 게이트는 Easy도 통과할 수 있으므로 난도 승인 자체가 아니다.
 
 ### 4.4. 결정적 퍼즐 생성기 (Deterministic Generator)
 
@@ -805,12 +812,12 @@ prngSeed  = hash 앞 32비트
 | 월 | 4×4 | 2 | 짧고 대칭적인 시작 |
 | 화 | 5×5 | 3 | 희소 패턴 |
 | 수 | 5×5 | 3 | 중첩 중심 |
-| 목 | 5×5 | 4 | 일반 도전 |
-| 금 | 6×6 | 4 | 넓은 패턴 |
-| 토 | 6×6 | 5 | 주간 최고 난도 |
-| 일 | 5×5 | 4 | 시각적 특수 패턴 |
+| 목 | 5×5 | 3 | gap 2 일반 도전 |
+| 금 | 6×6 | 3 | 넓은 압축 패턴 |
+| 토 | 6×6 | 4 | gap 2 이상 주간 최고 난도 |
+| 일 | 5×5 | 2~3 | 시각적 특수 패턴 |
 
-난도는 날짜 해시로 일부 변형하되 목표 랭크 범위를 벗어나지 않는다.
+난도는 날짜 해시로 일부 변형하되 목표 랭크 범위를 벗어나지 않는다. 이 표의 랭크는 단독 난도 순서가 아니며, Hard 성격의 후보는 `sweepBound-rank >= 2` 구조 게이트를 별도로 만족해야 한다.
 
 #### 4.4.3. 생성 절차
 
@@ -820,7 +827,7 @@ prngSeed  = hash 앞 32비트
 3. 서로 독립인 row vector와 column vector 쌍 생성
 4. rank-1 외적을 XOR 합성해 차이 행렬 생성
 5. 실제 GF(2) 랭크가 목표와 같은지 검증
-6. 밀도·빈 행/열·대칭·gestureCost 조건 검사
+6. 밀도·비영 행/열·`sweepBound`·`compressionGap`·대칭·gestureCost 조건 검사
 7. 초기 보드 생성 후 target = initial XOR diff 계산
 8. 정규 최적 분해 재구성 검증
 9. 통과 시 PuzzleDefinition 반환
@@ -833,6 +840,8 @@ prngSeed  = hash 앞 32비트
 - 모든 셀이 OFF 또는 ON인 목표 제외
 - 튜토리얼 외에는 차이 행렬이 한 행 또는 한 열에만 몰린 문제 제한
 - 목표 랭크와 실제 랭크 일치
+- 난도 후보마다 `sweepBound`와 `compressionGap` 재계산
+- Hard 후보는 모든 행·열 비영, `compressionGap >= 2`
 - 정규 해답의 각 `rowMask`, `colMask`가 0이 아님
 - 최적 분해 재합성 결과가 차이 행렬과 일치
 - 연속 Daily 간 동일 목표 패턴 해시 중복 방지
@@ -844,6 +853,19 @@ prngSeed  = hash 앞 32비트
 - 실패 시 난도별 정적 fallback 풀에서 날짜 해시로 선택
 - fallback 사용 여부는 개발 로그에만 남기며 사용자에게 오류로 표시하지 않는다.
 - CI에서 향후 3,650일 분량을 샘플 생성하여 실패율과 중복률을 검사한다.
+
+#### 4.4.6. M00 반복 목표 생성 경계
+
+M00 폐기형 프로토타입의 반복 목표는 프로덕션 Daily 생성기가 아니다. 규칙·난도 구조·반복 UX를 검증하기 위한 `m00-seeded-v1` 생성기로 다음 경계를 고정한다.
+
+- seed 문자열은 NFKC 정규화한 뒤 profile ID·generator version과 함께 32비트 결정적 PRNG의 입력으로 사용한다. 같은 `stage`·`seed`는 같은 initial·target·canonical factorization을 만든다.
+- 플레이 가능한 profile은 Easy 4×4, Normal 4×4·5×5, Hard 4×4·5×5·6×6의 여섯 조합이다. Full Rank 4×4는 난도 stage가 아닌 대조군이며 legacy `?stage=hard`는 이 대조군 alias로만 남긴다.
+- 각 profile은 고정 Par와 `compressionGap` 조건, 목표 밀도 22%~68%, 비영 축 조건을 검증한다. 최대 512회 생성 실패 뒤에는 validator를 통과한 정적 fallback을 사용하며, golden vector와 fallback round-trip을 verifier에서 고정한다.
+- Hard 4×4는 initial 밀도 25%~50%의 결정적 비영 노이즈를 사용해 initial이 항상 0인 Easy와 시각적으로 구분한다. 차이 행렬의 Par 2·gap 2 구조는 유지되지만, 이 조치는 정식 사람 대상 Hard 승인이나 난도 확정을 뜻하지 않는다.
+- 브라우저는 Web Crypto로 새 seed를 만들고 `?stage=<id>&seed=<seed>`를 URL에 기록한다. Web Crypto를 사용할 수 없는 환경의 로컬 fallback seed도 URL에 기록하므로 생성된 링크의 reload 결과는 재현된다.
+- 새 목표 요청은 현재 target과 최대 32회 비교해 직전 목표를 제외한다. 미완료 이동·선택·타이머가 있으면 확인을 거치고, 성공 시 세션 전체와 URL을 원자적으로 전환한다. 32회 안에 다른 target을 만들지 못하면 현재 퍼즐을 보존하고 오류를 알린다.
+
+프로덕션 Daily의 UTC 날짜 seed, 생성기 버전 보존, 장기 중복 감사와 migration은 ADR-0003 및 M03 계약을 따른다. M00 구현을 그 대체물로 승격하지 않는다.
 
 ### 4.5. 콘텐츠 파이프라인
 
@@ -1510,8 +1532,10 @@ Codex가 제안하거나 생성한 변경
 
 ### Phase 0 — Rule Proof
 
-- 4×4 단일 화면 프로토타입
+- Easy 정식 조건은 4×4로 고정하고, 생산 코드가 아닌 폐기형 화면에서 4×4 대조군·5×5·6×6 비교 후보를 함께 검증
 - 펄스·랭크·최적 분해
+- `sweepBound`·`compressionGap` 구조 게이트와 사람 난도 비교
+- 여섯 난도×크기 profile의 seed 재현·새 목표 중복 배제·Hard 4×4 initial 노이즈·sweep 안내·visibility-safe 스톱워치 검증
 - 5명 이상 규칙 이해 테스트
 
 ### Phase 1 — Core Product

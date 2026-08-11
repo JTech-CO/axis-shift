@@ -5,8 +5,8 @@
 ## 현재 상태
 
 - **현재 phase**: M00 — Rule Proof & Scope Lock
-- **상태**: 진행 중 — 내부 파일럿 2회·다단계 자동 검증 완료 / Easy 본 플레이테스트 게이트 대기
-- **마지막 갱신**: 2026-08-09 / Easy·Normal·Hard 360×640 브라우저 스모크 통과
+- **상태**: 진행 중 — M00 구현·E2 완료 / formal Easy E1·관련 DoD 판정은 출시 직전 playable beta로 연기
+- **마지막 갱신**: 2026-08-11 / formal Easy n≥5 베타 연기와 구현 체크포인트·M00 완료의 경계 기록
 - **목표 릴리스**: OpenAI Game Builders Seoul Track 1 제출 빌드
 - **제출 접수 종료**: 2026-08-26
 
@@ -24,23 +24,37 @@
 - [x] M00 DOD-01 E2 확장 verifier 통과 — 196,708개 단언, 전체 65,536 상태, 225개 합법 PULSE
 - [x] 단일-stage 360×640 브라우저 스모크 기준선 — 51개 단언, 주 2수·예비 3수, 콘솔 오류 0
 - [x] M00 내부 파일럿 run 2회 완료 — 본 표본 제외, 관측 최저 3 PULSE·초기 오계산 흐름 4~5 PULSE
-- [x] 폐기형 M00 난도 stage fixture 고정 — Easy Par 2, Normal Par 3, Hard Par 4
-- [x] 다단계 360×640 브라우저 스모크 통과 — 140개 단언, Easy 2수·Normal 3수·Hard 4수·예비 3수, 콘솔 오류 0
+- [x] 초기 폐기형 M00 4×4 stage fixture 고정 — Easy Par 2, Normal Par 3, 당시 Hard Par 4
+- [x] P0 발견 전 4×4 다단계 360×640 브라우저 스모크 — 140개 단언, Easy 2수·Normal 3수·당시 Hard 4수·예비 3수, 콘솔 오류 0
 - [x] M00 공개 플레이 링크 배포 — commit `68f7614`, GitHub Pages `built`, 공개 URL 브라우저 140개 단언 통과
+- [x] `P0-DIFF-001` 재현·판정 — 4×4 full-rank에서 행/열 단일 축 순회 4회가 Par 4 최적해가 되어 기존 Hard 난도 라벨의 구성 타당성이 무너짐
+- [x] `m00-seeded-v1` 난도 검증기와 여섯 playable profile 구현 — Easy 4×4, Normal 4×4·5×5, Hard 4×4·5×5·6×6; Full Rank는 대조군으로 분리
+- [x] 생성기·fixture 최종 verifier — 독립 minor·행 루프 oracle, 7 golden vectors, fallback·밀도·Hard 4×4 initial 노이즈 포함 200,967개 단언·실패 0
+- [x] 반복 UX 구현 — URL seed 재현, 직전 target 최대 32회 제외, 진행 확인·실패 시 보드 보존, sweep 대안 안내, visibility-safe 스톱워치와 PULSE·0.1초 결과
+- [x] 여섯 profile·대조군 최종 Edge 스모크 — 573개 단언, 320/360/960px, canonical 2·3·3·2·3·3수, 예비 3수, crypto+fallback·타이머·sweep·콘솔 오류 0
+- [x] 사람 대상 폐기형 난도 비교 관찰 — 5×5·6×6 모두 4×4보다 생각할 거리가 있고 지나치게 쉽지 않다는 후기 확보; 표본 메타데이터 미보고로 Easy 본 표본·DOD 수치에는 미합산
+- [x] 난도별 보드 크기 풀 결정 — Easy=4×4, Normal=4×4·5×5, Hard=4×4·5×5·6×6
+- [x] formal Easy E1 실행 시점 결정 — 참가자·개별 기록을 확인할 수 없는 현재는 수집하지 않고 출시 직전 playable beta에서 n≥5로 실행
 
 ## 다음 할 일
 
-1. 파일럿 또는 자동 검증에서 발견한 P0 문제가 있으면 한 변수만 수정하고 verifier·browser smoke를 재실행한다.
-2. 플레이 가능한 빌드를 기준으로 서로 다른 신규 사용자 5명 이상을 모집한다.
-3. 참가자 구성과 비공개 원시 기록 위치·삭제 예정일을 확인한 뒤 Easy `M00-MAIN-v1` 본 플레이테스트 실행 게이트를 연다.
-4. n≥5와 4/5 임계치를 그대로 적용해 본 테스트를 실행하고, M00 증거·Scope Lock을 기록한 뒤 마일스톤을 commit·push한다. Normal·Hard 탐색 결과는 이 표본에 합산하지 않는다.
+1. 현재 M00 구현·E2 증거를 상태 인계하되 formal Easy E1 표본이나 관련 DoD 통과를 주장하지 않는다.
+2. 오너의 별도 지시가 있으면 현재 구현을 체크포인트로 commit·push하고 공개 URL을 재스모크한다. 이 체크포인트는 M00 phase 완료나 DoD 통과 태그가 아니다.
+3. 출시 직전 playable beta의 build SHA·공개 URL이 고정되면 신규 사용자 n≥5, 표본 구성, 비공개 원시 기록 위치·삭제 예정일을 확정한다.
+4. 동일 베타 빌드의 Easy 조건에서 n≥5와 4/5 임계치를 그대로 적용해 DOD-02~05를 판정하고, 결과를 반영해 DOD-06~07과 M00 formal gate를 판정한다.
+
+### Formal Easy 게이트 연기 경계
+
+- 2026-08-10 프로젝트 오너 결정으로 참가자 수·개별 기록을 검증할 지표가 없는 현시점의 formal Easy 자료 수집을 출시 직전 playable beta까지 연기한다.
+- 연기는 `PASS`, 면제, 표본 축소가 아니다. n≥5, 4/5, 30초 첫 PULSE, 90초 첫 성공, 규칙 회상 기준은 바꾸지 않는다.
+- verifier 200,967개 단언과 Edge 573개 단언은 구현·구조 E2 완료 증거일 뿐 사람 대상 E1을 대체하지 않는다.
+- DOD-02~05와 그 결론에 의존하는 DOD-06~07은 베타 증거가 기록될 때까지 미완료다. 별도 지시에 따른 구현 체크포인트 push와 M00 phase 완료·마일스톤 DoD push는 서로 다른 상태다.
 
 ## 현재 미결 질문 / 사용자 결정 대기
 
 - 공개 저장소 라이선스: MIT를 권장하나 최종 결정 필요.
 - 최종 프로덕션 URL: GitHub Pages 경로와 별도 도메인 사용 여부.
 - 앱 표시 기본 언어: 브라우저 언어 자동 감지 후 한국어/영어 폴백 순서 확인.
-- M00 본 테스트 실행 대기: 참가자 5명 이상 확정, 기기 구성 확인, 원시 기록 보관 위치와 삭제 예정일 확정. 내부 파일럿 2회는 본 표본에 포함하지 않는다.
 - 기술 백서의 “10초 내 행·열 선택과 교차점 반전 관계 이해”를 M00 통과 게이트로 볼지 별도 관찰 지표로 볼지.
 - Sprint의 정확한 점수식과 동점 처리 우선순위. 기술 백서는 지표만 정의하고 산식은 정의하지 않음.
 - Daily Archive 공개 시작일 또는 표시 하한.
@@ -51,7 +65,7 @@
 
 | Phase | 이름 | 상태 | 핵심 출구 게이트 |
 |---|---|---|---|
-| M00 | Rule Proof & Scope Lock | 진행 중 — 내부 파일럿·다단계 E2 완료 / Easy 본 표본 대기 | 5명 중 4명 이상 90초 내 첫 성공 |
+| M00 | Rule Proof & Scope Lock | 진행 중 — 구현·E2 완료 / formal E1은 출시 직전 베타로 연기 | 베타 n≥5에서 4/5 기준 판정; 현재 미완료 |
 | M01 | Production Scaffolding | 미시작 | build/lint/type/test + 실제 경계 위반 차단 |
 | M02 | Board & GF(2) Core | 미시작 | 3×3 전수에서 brute-force = rank |
 | M03 | Generator & Content Pipeline | 미시작 | 10년 Daily 감사, 54개 정적 레벨 검증 |
@@ -71,41 +85,62 @@
 | 2026-08-09 | 문서 준비 | Harness completeness | 파일 구조·내부 참조 검증 | 생성 완료 | 이 패키지 `MANIFEST.sha256` |
 | 2026-08-09 | M00 | DoR fixture readiness | Node 4×4 전체 상태 BFS 준비 계산 | main rank/BFS=2/2, backup=3/3 | `AXIS_SHIFT_Harness_KR/phases/M00_rule_proof.md` §3.2 |
 | 2026-08-09 | M00 | Workspace root contract | GitHub metadata + `git init -b main` + origin 연결 | root=`AXIS SHIFT (Tensor)`, remote public/main/empty, push 없음 | 루트 `AGENTS.md` |
-| 2026-08-09 | M00 | DOD-01 다단계 규칙 정확성 E2 | `node prototypes/rule-proof/verify-fixture.mjs` | stageSequence=easy:2>normal:3>hard:4, assertions=196708, failures=0 | `phases/M00_rule_proof.md` §10 |
+| 2026-08-09 | M00 | DOD-01 초기 4×4 다단계 E2 | `node prototypes/rule-proof/verify-fixture.mjs` | stageSequence=easy:2>normal:3>hard:4, assertions=196708, failures=0 | `phases/M00_rule_proof.md` §10 역사 로그 |
 | 2026-08-09 | M00 | 단일-stage 브라우저 스모크 기준선 E2 | `node prototypes/rule-proof/browser-smoke.cjs` | assertions=51, 360×640, main=2, backup=3, consoleErrors=0 | `evidence/M00/browser-smoke-solved-360x640.png` |
-| 2026-08-09 | M00 | 다단계 브라우저 스모크 E2 | `node prototypes/rule-proof/browser-smoke.cjs` | assertions=140, 360×640, easy=2, normal=3, hard=4, backup=3, consoleErrors=0 | `evidence/M00/browser-smoke-stages-360x640.png` |
+| 2026-08-09 | M00 | 초기 4×4 다단계 브라우저 스모크 E2 | `node prototypes/rule-proof/browser-smoke.cjs` | assertions=140, 360×640, easy=2, normal=3, hard=4, backup=3, consoleErrors=0 | `phases/M00_rule_proof.md` §10 역사 로그; 캡처는 최신 E2로 교체됨 |
 | 2026-08-09 | M00 | 공개 Pages 플레이 스모크 E2 | `git push -u origin main` → Pages built → 공개 URL browser smoke | commit=`68f7614`, HTTP 200, assertions=140, consoleErrors=0 | `https://jtech-co.github.io/axis-shift/` |
 | 2026-08-09 | M00 | 내부 파일럿 관찰 | 폐기형 프로토타입 run 2회 | 본 표본 제외; 관측 최저=3 PULSE, 초기 오계산 흐름=4~5 PULSE; 시간·참가자 수·개입 미보고 | `docs/PLAYTEST_PROTOCOL.md` §13 |
+| 2026-08-09 | M00 | P0-DIFF-001 난도 진단 | 4×4 차이 행렬을 단일 행·열 외적의 합으로 분해 | Easy/Normal/Full Rank 대조군 `compressionGap=2/1/0`; 기존 Hard 라벨 무효, PULSE·Par 계약은 정상 | `phases/M00_rule_proof.md` §3.3, `docs/PUZZLE_MATH.md` §7.3 |
+| 2026-08-09 | M00 | seed 생성기·여섯 profile 최종 E2 | `node prototypes/rule-proof/verify-fixture.mjs` | assertions=200967; profiles=6+control 1; golden=7; sequence=2·3·3·2·3·3; failures=0 | `phases/M00_rule_proof.md` §10 |
+| 2026-08-09 | M00 | 반복 UX 최종 Edge E2 | `node prototypes/rule-proof/browser-smoke.cjs` | assertions=573; 320/360/960px; timer=visibility-safe; newTarget=crypto+fallback; sweepGuidance=column; consoleErrors=0 | `evidence/M00/browser-smoke-stages-360x640.png` |
+| 2026-08-09 | M00 | 비게이트 난도 비교 관찰 | 사람 대상 5×5·6×6 비교 플레이 후기 | 둘 다 4×4보다 생각할 거리가 있고 지나치게 쉽지 않음; 난도별 크기 풀 채택; 참가자 수·시간·기기·개입 미보고로 DOD 미집계 | `docs/PLAYTEST_PROTOCOL.md` §13 |
+| 2026-08-10 | M00 | formal Easy E1 일정 결정 | 프로젝트 오너 결정 | 출시 직전 playable beta까지 자료 수집·DOD-02~07 판정 연기; PASS·면제 아님 | `phases/M00_rule_proof.md` §3.1, `docs/PLAYTEST_PROTOCOL.md` §13 |
 
 ### M00 최신 검증 출력
 
 ```text
-command: node prototypes/rule-proof/verify-fixture.mjs
+current command: node prototypes/rule-proof/verify-fixture.mjs
 exit: 0
-M00-MAIN-v1 rank=2 bfs=2
-M00-NORMAL-v1 rank=3 bfs=3
-M00-HARD-v1 rank=4 bfs=4
-M00-BACKUP-v1 rank=3 bfs=3
-stageSequence=easy:2>normal:3>hard:4
-assertions=196708 bfsVisited=65536 legalPulseCount=225 failures=0
+fixture=M00-MAIN-v1 size=4 rank=2 bfs=2
+difficulty=M00-MAIN-v1 rank=2 sweep=4 gap=2 density=0.6250 hardGate=pass
+fixture=M00-NORMAL-v1 size=4 rank=3 bfs=3
+difficulty=M00-NORMAL-v1 rank=3 sweep=4 gap=1 density=0.5000 hardGate=fail
+fixture=M00-NORMAL-5X5-v1 size=5 rank=3 bfs=not-run
+difficulty=M00-NORMAL-5X5-v1 rank=3 sweep=4 gap=1 density=0.5200 hardGate=fail
+fixture=M00-CANDIDATE-4X4-v1 size=4 rank=2 bfs=2
+difficulty=M00-CANDIDATE-4X4-v1 rank=2 sweep=4 gap=2 density=0.6250 hardGate=pass
+fixture=M00-CANDIDATE-5X5-v1 size=5 rank=3 bfs=not-run
+difficulty=M00-CANDIDATE-5X5-v1 rank=3 sweep=5 gap=2 density=0.6400 hardGate=pass
+fixture=M00-CANDIDATE-6X6-v1 size=6 rank=3 bfs=not-run
+difficulty=M00-CANDIDATE-6X6-v1 rank=3 sweep=6 gap=3 density=0.5556 hardGate=pass
+fixture=M00-HARD-v1 size=4 rank=4 bfs=4
+difficulty=M00-HARD-v1 rank=4 sweep=4 gap=0 density=0.5625 hardGate=fail
+fixture=M00-BACKUP-v1 size=4 rank=3 bfs=3
+difficulty=M00-BACKUP-v1 rank=3 sweep=4 gap=1 density=0.6250 hardGate=fail
+generatorRegression=version:m00-seeded-v1 playableProfiles:6 controlProfiles:1 goldenVectors:7 seedsPerProfile:12 maxAttempts:512 density:0.22-0.68 hard4Initial:0.25-0.5
+stageSequence=easy:2>normal:3>normal-5:3>hard-4:2>hard-5:3>hard-6:3
+assertions=200967 bfsVisited=65536 legalPulseCount=225 failures=0
 
 historical baseline server: node prototypes/rule-proof/serve.cjs
 historical baseline command: NODE_PATH=<bundled Playwright node_modules> BROWSER_EXECUTABLE=<Edge executable> node prototypes/rule-proof/browser-smoke.cjs
 historical baseline exit: 0
 browserAssertions=51 viewport=360x640 mainMoves=2 backupMoves=3 consoleErrors=0
 current server: node prototypes/rule-proof/serve.cjs
-current command: NODE_PATH=<bundled Playwright node_modules> BROWSER_EXECUTABLE=<Edge executable> node prototypes/rule-proof/browser-smoke.cjs
-current exit: 0
-browserAssertions=140 viewport=360x640 easyMoves=2 normalMoves=3 hardMoves=4 backupMoves=3 consoleErrors=0 screenshot=<PROJECT_ROOT>\AXIS_SHIFT_Harness_KR\evidence\M00\browser-smoke-stages-360x640.png
+current browser command: NODE_PATH=<bundled Playwright node_modules> BROWSER_EXECUTABLE=<Edge executable> node prototypes/rule-proof/browser-smoke.cjs
+current browser exit: 0
+browserAssertions=573 viewport=320/360/960 easyMoves=2 normal4Moves=3 normal5Moves=3 hard4Moves=2 hard5Moves=3 hard6Moves=3 backupMoves=3 timer=visibility-safe newTarget=crypto+fallback sweepGuidance=column consoleErrors=0 screenshot=<PROJECT_ROOT>\AXIS_SHIFT_Harness_KR\evidence\M00\browser-smoke-stages-360x640.png
 
 publish command: git push -u origin main
 published commit: 68f7614659675171fbfbd3535e1d04b08bee931f
 pages status: built
 public URL: https://jtech-co.github.io/axis-shift/
 public browserAssertions=140 viewport=360x640 easyMoves=2 normalMoves=3 hardMoves=4 backupMoves=3 consoleErrors=0
+
 ```
 
-51개 단언 출력은 다단계 확장 전 단일-stage 역사 기준선으로 보존한다. 현재 140개 단언 스모크는 Easy→Normal→Hard 전환·각 canonical solve·예비 회귀를 포함해 통과했다. 자동 검증과 내부 파일럿은 DOD-02~04의 E1 본 표본을 대체하지 않는다.
+51개·140개 단언 출력은 단일-stage와 P0 발견 전 4×4 다단계의 역사 기준선으로 보존한다. 동일 캡처 경로는 현재 573개 단언 E2 이미지로 교체됐다. `hardGate`는 anti-sweep 구조 적격성만 뜻하며 Easy도 통과하므로 체감 Hard 승인이 아니다. 5×5·6×6의 `bfs=not-run`은 이동 거리 전수 BFS를 큰 보드에 적용하지 않았다는 범위 표기다. 자동 검증과 내부 파일럿은 DOD-02~04의 E1 본 표본을 대체하지 않는다.
+
+현재 200,967·573 E2는 로컬 작업트리의 구현 완료 증거이며 아직 commit·push하지 않았다. 공개 GitHub Pages는 위 `68f7614`·140개 단언 스냅샷을 유지한다. 오너 지시에 따른 구현 체크포인트 push가 이뤄져도 formal Easy E1과 DOD-02~07은 출시 직전 beta에서 별도 판정하며, 그 push 자체를 M00 완료로 해석하지 않는다.
 
 ## 활성 위험
 
@@ -118,6 +153,7 @@ public browserAssertions=140 viewport=360x640 easyMoves=2 normalMoves=3 hardMove
 | R-05 | 모바일 6×6에서 축 타깃과 PULSE가 겹침 | 중 | 높음 | 360×640 fixture와 실기기 테스트 | M05·M10 |
 | R-06 | 공유 서명이 정답/이동을 간접 노출 | 낮음 | 높음 | 금지 필드 invariant, payload snapshot, 수동 검토 | M09 |
 | R-07 | 기능 범위가 일정 안에 과도함 | 중 | 매우 높음 | phase gate, 8/21 scope freeze, P0/P1 우선 | 전역 |
+| R-08 | rank/Par만으로 난도를 정하면 단일 축 순회가 최적 또는 준최적이 됨 | 높음 | 매우 높음 | `sweepBound`·`compressionGap` 검증, full-rank를 난도 stage가 아닌 대조군으로 분리, 사람 비교 | M00·M03·M06 |
 
 ## 막힘 기록
 
@@ -149,5 +185,11 @@ STOP 발동 시 아래 형식으로 추가한다.
 - ADR-0007: 로컬 전용 데이터와 런타임 AI API 없음 원칙을 채택한다.
 - Workspace-2026-08-09: 부모 `AXIS SHIFT (Tensor)`를 Git·구현 루트로, `AXIS_SHIFT_Harness_KR`를 가이드·증거 폴더로 유지한다.
 - 2026-08-09: 내부 파일럿 run 2회에서 Easy stage의 관측 최저는 3 PULSE였고, 초기 계산이 어긋난 흐름은 4~5 PULSE까지 이어질 수 있었다. 이는 수학적 Par 2를 바꾸지 않으며 참가자 수·시간·개입은 미보고로 둔다.
-- 2026-08-09: M00 정식 조건은 `M00-MAIN-v1` Easy 하나로 유지하고 Normal·Hard는 폐기형 난도 탐색 stage로만 추가한다. 날짜당 한 문제 제한은 Daily 모드에만 적용하며, Wordle 유사성은 간결한 SNS 공유 결과 레이아웃에만 한정한다.
+- 2026-08-09: M00 정식 조건은 `M00-MAIN-v1` Easy 하나로 유지하고 Normal·당시 Hard는 폐기형 난도 탐색 stage로 추가했다. 이후 당시 Hard는 `P0-DIFF-001`에 따라 Full Rank 대조군으로 재분류했다. 날짜당 한 문제 제한은 Daily 모드에만 적용하며, Wordle 유사성은 간결한 SNS 공유 결과 레이아웃에만 한정한다.
 - 2026-08-09: 프로젝트 오너 결정으로 참가자 모집은 플레이 가능한 M00 프로토타입과 내부 파일럿 이후 진행한다. 본 테스트의 n≥5 및 4/5 통과 기준은 유지한다.
+- 2026-08-09: `P0-DIFF-001`을 난도 구성 타당성 결함으로 등록한다. 4×4 full-rank 차이 행렬은 단일 열 또는 행 순회 4회가 Par 4 최적해이므로 기존 Hard 라벨을 폐기하고 `4×4 Full Rank 대조군`으로 재분류한다. 코어 PULSE, INV-005·INV-006, ADR-0002의 `Par=rank_GF2` 계약은 변경하지 않는다.
+- 2026-08-09: 난도 보조 지표를 `sweepBound=min(nonzeroRows, nonzeroCols)`, `compressionGap=sweepBound-rank`로 정의한다. Easy 본 테스트는 유지하되 5×5·6×6 난도 실험과 검증 증거가 끝날 때까지 DOD-06 Scope Lock과 M00 완료를 보류한다.
+- 2026-08-09: 사람 대상 폐기형 비교에서 5×5·6×6 모두 4×4보다 생각할 거리가 있고 지나치게 쉽지 않다는 후기를 근거로 보드 크기 풀을 Easy=4×4, Normal=4×4·5×5, Hard=4×4·5×5·6×6으로 채택한다. 이는 크기 조합 결정이며 현재 4×4 Full Rank 대조군을 Hard fixture로 복귀시키는 결정이 아니다.
+- 2026-08-09: `m00-seeded-v1` 여섯 profile과 URL seed 재현, 직전 target 최대 32회 제외, 실패 시 현재 보드 보존을 구현했다. 단일 행/열 sweep 완료는 성공으로 인정하되 다른 풀이를 권하고, visibility-safe 스톱워치와 완료 PULSE·0.1초를 제공한다. verifier 200,967개·Edge 573개 단언으로 회귀했으며 코어 PULSE와 Par 계약은 바꾸지 않는다.
+- 2026-08-09: 위 난도 비교의 참가자 수·시간·기기·개입·DOD-02~04 지표는 보고되지 않았다. 이를 추정하거나 Easy 본 표본에 합산하지 않으며 M00 완료와 DOD-06 Scope Lock은 계속 보류한다.
+- 2026-08-10: 참가자 수·개별 기록을 검증할 지표가 없는 현시점에는 formal Easy n≥5 자료를 수집하지 않는다. 출시 직전 동일 playable beta 빌드에서 §3.1 표본·보관 게이트를 먼저 충족한 뒤 DOD-02~05와 그 결론에 의존하는 DOD-06~07을 판정한다. 이는 PASS·면제·임계치 완화가 아니며, 별도 구현 체크포인트 push도 M00 phase 완료를 뜻하지 않는다.

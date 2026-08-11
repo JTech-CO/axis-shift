@@ -8,12 +8,13 @@
 
 ## 1. 목적
 
-이 문서는 다음 네 항목의 단일 기준이다.
+이 문서는 다음 다섯 항목의 단일 기준이다.
 
 1. PULSE가 어떤 셀을 바꾸는가.
 2. 왜 차이 행렬의 `GF(2)` 랭크가 최소 PULSE 수인가.
 3. rank개 PULSE로 실제 해답을 어떻게 결정적으로 구성하는가.
 4. 구현이 정리를 잘못 사용하지 않았는지 독립 오라클로 어떻게 검증하는가.
+5. Par와 별개로 단일 축 순회 전략을 어떻게 탐지하는가.
 
 사용자에게 첫 플레이부터 이 수학을 설명하지 않는다. 게임 화면에서는 “행과 열을 고르면 교차점이 반전된다”와 “Par는 증명된 최소 PULSE 수”만 사용한다. 상세 설명은 About 또는 기술 문서에서 제공한다.
 
@@ -236,6 +237,34 @@ minimumPulses <= r
 minimumPulses = r
 ```
 
+### 7.3 축 순회 상한과 난도 보조 지표
+
+차이 행렬 `D`의 j번째 열을 `d_j`, j번째 단위벡터를 `e_j`라 하면 다음 분해는 항상 성립한다.
+
+```text
+D = Σ_j d_j e_j^T
+```
+
+비영 열마다 `rowMask=d_j`, `colMask=e_j`인 PULSE를 한 번 실행하면 그 열을 목표와 맞출 수 있다. 따라서 왼쪽부터 열을 하나씩 처리하는 해법은 비영 열 수 이하에 끝난다. 전치한 논리로 위에서부터 행을 하나씩 처리하는 해법은 비영 행 수 이하에 끝난다.
+
+```text
+nonzeroRows(D) = 1을 하나 이상 포함한 행 수
+nonzeroCols(D) = 1을 하나 이상 포함한 열 수
+sweepBound(D) = min(nonzeroRows(D), nonzeroCols(D))
+
+rank_GF2(D) <= sweepBound(D) <= N
+```
+
+Par보다 축 순회가 얼마나 더 비효율적인지를 다음처럼 기록한다.
+
+```text
+compressionGap(D) = sweepBound(D) - rank_GF2(D)
+```
+
+`compressionGap=0`이면 단일 행 또는 열 순회가 최적해다. 특히 정방 N×N full-rank 행렬은 모든 행과 열이 비영이고 rank가 N이므로 `sweepBound=N`, `compressionGap=0`이다. 즉 N=4에서 다른 rank 4 fixture로 교체해도 단일 축 4회 최적해는 사라지지 않는다.
+
+이 지표는 ADR-0002의 Par를 대체하지 않는 콘텐츠 진단값이다. `compressionGap>0`은 단일 축 순회가 최적이 아님만 보장하며, 겹침 추론의 복잡도나 최적해 수처럼 사람이 느끼는 난도를 단독으로 증명하지 않는다. 난도 라벨은 최소 gap 기준, 추가 구조 지표, 사람 플레이 관찰을 함께 사용한다.
+
 ## 8. Canonical factorization 계약
 
 최적해가 여러 개일 수 있으므로 Hint와 snapshot이 환경별로 달라지지 않게 하나의 결정적 해답을 선택한다.
@@ -456,6 +485,19 @@ rankMismatch=0
 factorizationMismatch=0
 ```
 
+### 12.6 큰 보드 fixture의 독립 minor 오라클
+
+4×4보다 큰 고정 fixture는 이동 거리 전수 BFS가 비현실적이므로 rank 구현과 독립인 minor 오라클을 함께 사용한다. 행·열 조합을 고르고 모든 순열의 곱을 XOR하는 Leibniz parity로 determinant를 계산한다. `GF(2)`에서는 부호가 사라지므로 Gaussian elimination을 재사용하지 않는다.
+
+```text
+existsNonzeroMinor(D, declaredPar) == true
+existsNonzeroMinor(D, declaredPar + 1) == false  # declaredPar < N
+canonicalSolution.length == declaredPar
+applyAll(initial, canonicalSolution) == target
+```
+
+첫 두 조건은 exact rank를 독립 확인하고, 뒤의 두 조건은 실제 Par회 해법 상한을 확인한다. M00 5×5·6×6 후보의 `bfs=not-run`은 이동 거리 전수 BFS 범위만 뜻하며 exact rank 3은 이 minor 오라클로 검증한다.
+
 ## 13. Hint와 현재 상태
 
 Hint는 최초 퍼즐의 Par를 재사용하지 않고 현재 보드에서 다시 계산한다.
@@ -490,6 +532,23 @@ applyAll(initial, solution) == target
 
 JSON의 `canonicalSolution`은 신뢰 원본이 아니라 검증·캐시 가능한 산출물이다.
 
+난도 후보에 대해서는 정답 계약과 별도로 다음 진단값도 재계산한다.
+
+```text
+nonzeroRows = count(rows of D containing at least one 1)
+nonzeroCols = count(columns of D containing at least one 1)
+sweepBound = min(nonzeroRows, nonzeroCols)
+compressionGap = sweepBound - rank
+density = popcount(D) / (N * N)
+parMatchesRank = declaredPar == rank
+hardCandidatePassed = parMatchesRank
+                      && nonzeroRows == N
+                      && nonzeroCols == N
+                      && compressionGap >= 2
+```
+
+validator는 `0 <= compressionGap <= N-rank`, `0 < density <= 1`, Par 일치와 난도별 구조 정책을 확인한다. `hardCandidatePassed`는 단일 축 순회를 최적해에서 배제할 구조 적격성일 뿐 체감 Hard 승인이 아니며 Easy도 통과할 수 있다. rank나 이 불리언 하나로 쉬움·보통·어려움 라벨을 자동 결정하지 않고 사람 플레이테스트로 최종 분류한다.
+
 ## 15. 성능과 수치 안전성
 
 - N<=8이므로 행·열 마스크는 8비트다.
@@ -510,6 +569,7 @@ JSON의 `canonicalSolution`은 신뢰 원본이 아니라 검증·캐시 가능�
 | 저장된 Par 불일치 | 콘텐츠/저장 거부, 런타임에 잘못된 등급 표시 금지 |
 | 비정사각 행렬 | v1 비목표. 후속 ADR 필요 |
 | 다중 상태 셀 | `GF(2)` 정리 범위 밖. 별도 모드로 분리 |
+| full-rank 정방행렬을 높은 난도로 사용 | Par는 정확하지만 단일 축 순회가 최적이다. 난도 stage가 아닌 규칙·성능 대조군으로 분류 |
 
 ## 17. 변경 관리
 
@@ -523,3 +583,5 @@ JSON의 `canonicalSolution`은 신뢰 원본이 아니라 검증·캐시 가능�
 - Par를 rank 외 다른 값으로 표시
 
 기존 v1 규칙과 결과는 유지하고 새 실험은 별도 mode/version으로 구현한다.
+
+`sweepBound`·`compressionGap`처럼 기존 PULSE와 `Par=rank`를 바꾸지 않는 파생 진단값의 추가는 ADR-0002 대체 사유가 아니다. 다만 이 지표로 공개 난도 라벨이나 콘텐츠 수용 기준을 변경하면 해당 phase 문서와 콘텐츠 검증 증거를 함께 갱신한다.

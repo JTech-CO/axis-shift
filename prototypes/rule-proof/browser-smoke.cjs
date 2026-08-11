@@ -1,6 +1,7 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
+const { pathToFileURL } = require("node:url");
 const { chromium } = require("playwright");
 
 const baseUrl = process.env.M00_BASE_URL || "http://127.0.0.1:4173/";
@@ -11,46 +12,20 @@ const screenshotPath =
     "../../AXIS_SHIFT_Harness_KR/evidence/M00/browser-smoke-stages-360x640.png",
   );
 
-const STAGES = Object.freeze({
-  easy: Object.freeze({
-    label: "쉬움",
-    targetRows: "11,6,13,6",
-    pulses: Object.freeze([
-      Object.freeze({ rowMask: 5, colMask: 13 }),
-      Object.freeze({ rowMask: 11, colMask: 6 }),
-    ]),
-  }),
-  normal: Object.freeze({
-    label: "보통",
-    targetRows: "5,9,6,3",
-    pulses: Object.freeze([
-      Object.freeze({ rowMask: 11, colMask: 9 }),
-      Object.freeze({ rowMask: 12, colMask: 10 }),
-      Object.freeze({ rowMask: 5, colMask: 12 }),
-    ]),
-  }),
-  hard: Object.freeze({
-    label: "어려움",
-    targetRows: "6,9,10,13",
-    pulses: Object.freeze([
-      Object.freeze({ rowMask: 10, colMask: 1 }),
-      Object.freeze({ rowMask: 5, colMask: 2 }),
-      Object.freeze({ rowMask: 9, colMask: 4 }),
-      Object.freeze({ rowMask: 14, colMask: 8 }),
-    ]),
-  }),
-});
-
-const BACKUP = Object.freeze({
-  targetRows: "15,6,5,10",
-  pulses: Object.freeze([
-    Object.freeze({ rowMask: 5, colMask: 9 }),
-    Object.freeze({ rowMask: 11, colMask: 10 }),
-    Object.freeze({ rowMask: 7, colMask: 12 }),
-  ]),
-});
+const STAGE_IDS = Object.freeze([
+  "easy",
+  "normal",
+  "normal-5",
+  "hard-4",
+  "hard-5",
+  "hard-6",
+]);
+let STAGES;
+let BACKUP;
+let FULL_RANK;
 
 let assertionCount = 0;
+let browser;
 
 function check(value, message) {
   assert.ok(value, message);
@@ -73,7 +48,8 @@ async function activate(page, locator) {
 }
 
 async function selectMask(page, axis, mask) {
-  for (let index = 0; index < 4; index += 1) {
+  const axisCount = await page.locator('.axis-button[data-axis="' + axis + '"]').count();
+  for (let index = 0; index < axisCount; index += 1) {
     if (((mask >> index) & 1) === 1) {
       await activate(
         page,
@@ -119,7 +95,7 @@ async function waitForStage(page, stageId) {
 }
 
 async function expectCleanStage(page, stageId, context) {
-  const stage = STAGES[stageId];
+  const stage = STAGES.get(stageId);
   equal(
     await page.locator("#app").getAttribute("data-stage"),
     stageId,
@@ -137,8 +113,62 @@ async function expectCleanStage(page, stageId, context) {
   );
   equal(
     await page.locator("#current-grid").getAttribute("data-rows"),
-    "0,0,0,0",
+    stage.initialRows.join(","),
     context + ": initial board",
+  );
+  equal(
+    await page.locator("#target-grid").getAttribute("data-initial-rows"),
+    stage.initialRows.join(","),
+    context + ": initial board validation surface",
+  );
+  equal(
+    await page.locator("#target-grid").getAttribute("data-rows"),
+    stage.targetRows.join(","),
+    context + ": target validation surface",
+  );
+  equal(
+    await page.locator("#app").getAttribute("data-board-size"),
+    String(stage.size),
+    context + ": app board size",
+  );
+  equal(
+    await page.locator("#board-stage").getAttribute("data-size"),
+    String(stage.size),
+    context + ": board stage size",
+  );
+  equal(
+    await page.locator('.axis-button[data-axis="col"]').count(),
+    stage.size,
+    context + ": column controls rebuilt",
+  );
+  equal(
+    await page.locator('.axis-button[data-axis="row"]').count(),
+    stage.size,
+    context + ": row controls rebuilt",
+  );
+  equal(
+    await page.locator(".current-cell").count(),
+    stage.size * stage.size,
+    context + ": current cells rebuilt",
+  );
+  equal(
+    await page.locator(".target-cell").count(),
+    stage.size * stage.size,
+    context + ": target cells rebuilt",
+  );
+  const sizeLabel = stage.size + "행 " + stage.size + "열";
+  check(
+    (await page.locator("#target-grid").getAttribute("aria-label")).includes(sizeLabel),
+    context + ": target accessible name includes board size",
+  );
+  check(
+    (await page.locator("#current-grid").getAttribute("aria-label")).includes(sizeLabel),
+    context + ": current accessible name includes board size",
+  );
+  equal(
+    await page.locator('.axis-button[data-axis="row"] .axis-label').last().textContent(),
+    String.fromCharCode(64 + stage.size),
+    context + ": final row label",
   );
   equal(
     await page.locator("#move-count").textContent(),
@@ -155,17 +185,79 @@ async function expectCleanStage(page, stageId, context) {
     true,
     context + ": history isolated",
   );
+  equal(
+    await page.locator("#elapsed-time").textContent(),
+    "00:00.0",
+    context + ": timer reset",
+  );
+  equal(
+    await page.locator("#app").getAttribute("data-timer-state"),
+    "idle",
+    context + ": timer idle",
+  );
+  equal(
+    await page.locator("#app").getAttribute("data-generated"),
+    "false",
+    context + ": catalog target is not a generated route",
+  );
+  equal(
+    await page.locator("#app").getAttribute("data-seed"),
+    "",
+    context + ": catalog target has no route seed",
+  );
+  equal(
+    await page.locator("#app").getAttribute("data-seed-source"),
+    "catalog",
+    context + ": catalog seed source is explicit",
+  );
   check(
     (await page.locator("#fixture-label").textContent()).includes(stage.label),
     context + ": visible " + stage.label + " label",
   );
+  const mobileMetrics = await page.evaluate(() => {
+    const sizes = [...document.querySelectorAll(".axis-button")].map((button) => {
+      const rect = button.getBoundingClientRect();
+      return { width: rect.width, height: rect.height };
+    });
+    const stageSizes = [...document.querySelectorAll(".stage-button")].map((button) => {
+      const rect = button.getBoundingClientRect();
+      return { width: rect.width, height: rect.height };
+    });
+    const board = document.querySelector("#board-stage").getBoundingClientRect();
+    return {
+      viewportWidth: window.innerWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+      boardLeft: board.left,
+      boardRight: board.right,
+      minimumAxisWidth: Math.min(...sizes.map((size) => size.width)),
+      minimumAxisHeight: Math.min(...sizes.map((size) => size.height)),
+      minimumStageWidth: Math.min(...stageSizes.map((size) => size.width)),
+      minimumStageHeight: Math.min(...stageSizes.map((size) => size.height)),
+    };
+  });
+  check(
+    mobileMetrics.scrollWidth <= mobileMetrics.viewportWidth,
+    context + ": no horizontal overflow",
+  );
+  check(
+    mobileMetrics.boardLeft >= -0.5 && mobileMetrics.boardRight <= mobileMetrics.viewportWidth + 0.5,
+    context + ": board stays inside viewport",
+  );
+  check(
+    mobileMetrics.minimumAxisWidth >= 44 && mobileMetrics.minimumAxisHeight >= 44,
+    context + ": axis targets stay at least 44px",
+  );
+  check(
+    mobileMetrics.minimumStageWidth >= 44 && mobileMetrics.minimumStageHeight >= 44,
+    context + ": stage targets stay at least 44px",
+  );
 }
 
 async function expectSolvedStage(page, stageId) {
-  const stage = STAGES[stageId];
+  const stage = STAGES.get(stageId);
   equal(
     await page.locator("#current-grid").getAttribute("data-rows"),
-    stage.targetRows,
+    stage.targetRows.join(","),
     stage.label + ": target reached",
   );
   equal(
@@ -175,7 +267,7 @@ async function expectSolvedStage(page, stageId) {
   );
   equal(
     await page.locator("#move-count").textContent(),
-    String(stage.pulses.length),
+    String(stage.canonicalPulses.length),
     stage.label + ": canonical move count",
   );
   equal(
@@ -186,42 +278,186 @@ async function expectSolvedStage(page, stageId) {
   await page.waitForFunction(() => document.activeElement?.id === "result-title");
   equal(
     await page.locator("#result-moves").textContent(),
-    String(stage.pulses.length),
+    String(stage.canonicalPulses.length),
     stage.label + ": result move count",
   );
+  equal(
+    await page.locator("#result-guidance").isHidden(),
+    true,
+    stage.label + ": canonical solve does not trigger sweep guidance",
+  );
+  equal(
+    await page.locator("#app").getAttribute("data-completion-kind"),
+    "none",
+    stage.label + ": canonical solve is classified as non-sweep",
+  );
+  equal(
+    await page.locator("#app").getAttribute("data-timer-state"),
+    "completed",
+    stage.label + ": solve freezes timer",
+  );
+  check(
+    /^\d+\.\d초$/.test(await page.locator("#result-time").textContent()),
+    stage.label + ": result time uses tenths of a second",
+  );
+  const completedMs = Number(
+    await page.locator("#app").getAttribute("data-elapsed-ms"),
+  );
+  await page.waitForTimeout(140);
+  equal(
+    Number(await page.locator("#app").getAttribute("data-elapsed-ms")),
+    completedMs,
+    stage.label + ": completed timer remains frozen",
+  );
+}
+
+function columnSweepPulses(stage) {
+  const moves = [];
+  for (let col = 0; col < stage.size; col += 1) {
+    let rowMask = 0;
+    for (let row = 0; row < stage.size; row += 1) {
+      const difference = stage.initialRows[row] ^ stage.targetRows[row];
+      if (((difference >> col) & 1) === 1) rowMask |= 1 << row;
+    }
+    if (rowMask !== 0) moves.push({ rowMask, colMask: 1 << col });
+  }
+  return moves;
 }
 
 async function advanceWithNextCta(page, fromStageId, toStageId) {
   const button = page.locator("#next-stage-button");
   equal(await button.isVisible(), true, fromStageId + ": next-stage CTA visible");
-  check(
-    (await button.textContent()).includes(STAGES[toStageId].label),
-    fromStageId + ": CTA names " + STAGES[toStageId].label,
-  );
+  const buttonText = await button.textContent();
+  if (STAGES.get(toStageId).stageNumber === 1) {
+    check(buttonText.includes("다시 플레이"), fromStageId + ": CTA names catalog replay");
+  } else {
+    check(
+      buttonText.includes(STAGES.get(toStageId).label),
+      fromStageId + ": CTA names " + STAGES.get(toStageId).label,
+    );
+  }
   await activate(page, button);
   await waitForStage(page, toStageId);
   await page.waitForFunction(() => document.activeElement?.id === "stage-current");
+  equal(
+    new URL(page.url()).searchParams.get("stage"),
+    toStageId,
+    fromStageId + ": URL advances to " + toStageId,
+  );
   await expectCleanStage(page, toStageId, fromStageId + " -> " + toStageId);
 }
 
 async function currentInteractionSnapshot(page) {
   return page.evaluate(() => ({
     stage: document.querySelector("#app").dataset.stage,
+    seed: document.querySelector("#app").dataset.seed,
+    puzzleKey: document.querySelector("#app").dataset.puzzleKey,
+    targetRows: document.querySelector("#target-grid").dataset.rows,
     rows: document.querySelector("#current-grid").dataset.rows,
     moves: document.querySelector("#move-count").textContent,
+    timerState: document.querySelector("#app").dataset.timerState,
     selectedAxes: [...document.querySelectorAll('.axis-button[aria-pressed="true"]')]
       .map((button) => button.dataset.axis + ":" + button.dataset.index)
       .sort(),
   }));
 }
 
+async function expectGeneratedFixture(page, expected, context) {
+  equal(
+    await page.locator("#app").getAttribute("data-stage"),
+    expected.stageId,
+    context + ": generated stage",
+  );
+  equal(
+    await page.locator("#app").getAttribute("data-generated"),
+    "true",
+    context + ": generated marker",
+  );
+  equal(
+    await page.locator("#app").getAttribute("data-seed"),
+    expected.seed,
+    context + ": normalized seed surface",
+  );
+  check(
+    ["crypto", "fallback"].includes(
+      await page.locator("#app").getAttribute("data-seed-source"),
+    ),
+    context + ": seed source surface",
+  );
+  equal(
+    await page.locator("#app").getAttribute("data-puzzle-key"),
+    expected.puzzleKey,
+    context + ": puzzle key surface",
+  );
+  equal(
+    await page.locator("#target-grid").getAttribute("data-rows"),
+    expected.targetRows.join(","),
+    context + ": generated target",
+  );
+  equal(
+    await page.locator("#target-grid").getAttribute("data-initial-rows"),
+    expected.initialRows.join(","),
+    context + ": generated initial rows surface",
+  );
+  equal(
+    await page.locator("#current-grid").getAttribute("data-rows"),
+    expected.initialRows.join(","),
+    context + ": generated initial board",
+  );
+  equal(
+    new URL(page.url()).searchParams.get("seed"),
+    expected.seed,
+    context + ": URL seed",
+  );
+  equal(await page.locator("#move-count").textContent(), "0", context + ": fresh history");
+  equal(await page.locator("#elapsed-time").textContent(), "00:00.0", context + ": fresh timer");
+  equal(
+    await page.locator("#app").getAttribute("data-timer-state"),
+    "idle",
+    context + ": timer idle",
+  );
+}
+
 (async () => {
+  const fixtureModule = await import(
+    pathToFileURL(path.resolve(__dirname, "fixtures.mjs")).href
+  );
+  deepEqual(
+    fixtureModule.STAGES.map((stage) => stage.stageId),
+    STAGE_IDS,
+    "six-stage order",
+  );
+  deepEqual(
+    fixtureModule.STAGES.map((stage) => stage.size),
+    [4, 4, 5, 4, 5, 6],
+    "mixed board sizes",
+  );
+  deepEqual(
+    fixtureModule.STAGES.map((stage) => stage.par),
+    [2, 3, 3, 2, 3, 3],
+    "canonical stage move counts",
+  );
+  STAGES = new Map(
+    fixtureModule.STAGES.map((stage) => [stage.stageId, stage]),
+  );
+  BACKUP = fixtureModule.getFixture("M00-BACKUP-v1");
+  FULL_RANK = fixtureModule.getStage("hard");
+  equal(fixtureModule.getStage("hard").stageId, "full-rank", "legacy hard alias");
+  equal(FULL_RANK.difficulty, "control", "Full Rank is a hidden control");
+  equal(STAGES.get("hard-4").difficulty, "hard", "4x4 is reclassified Hard");
+  equal(STAGES.get("hard-5").difficulty, "hard", "5x5 is playable Hard");
+  equal(STAGES.get("hard-6").difficulty, "hard", "6x6 is playable Hard");
+  check(
+    STAGES.get("hard-4").initialRows.some((row) => row !== 0),
+    "Hard 4x4 catalog starts from deterministic nonzero noise",
+  );
+
   const launchOptions = { headless: true };
   if (process.env.BROWSER_EXECUTABLE) {
     launchOptions.executablePath = process.env.BROWSER_EXECUTABLE;
   }
 
-  const browser = await chromium.launch(launchOptions);
+  browser = await chromium.launch(launchOptions);
   const context = await browser.newContext({
     viewport: { width: 360, height: 640 },
     reducedMotion: "reduce",
@@ -237,19 +473,34 @@ async function currentInteractionSnapshot(page) {
 
   await page.goto(baseUrl, { waitUntil: "networkidle" });
   equal(await page.title(), "AXIS//SHIFT — Rule Proof", "document title");
-  equal(await page.locator(".stage-button").count(), 3, "three playable stages");
+  equal(await page.locator(".stage-button").count(), 6, "six playable stages");
   check(
     await page.locator(".stage-button").evaluateAll((buttons) =>
       buttons.every((button) => button.tagName === "BUTTON" && button.type === "button"),
     ),
-    "stage choices are three actual buttons",
+    "stage choices are six actual buttons",
   );
   equal(
     await page.locator("#stage-buttons").getAttribute("role"),
     "group",
     "stage buttons use a group",
   );
+  equal(
+    await stageButton(page, "full-rank").count(),
+    0,
+    "Full Rank control is not a playable stage button",
+  );
   await expectCleanStage(page, "easy", "initial load");
+  equal(
+    await page.locator("#stage-position").textContent(),
+    "1 / 6",
+    "initial stage position exposes six-stage catalog",
+  );
+  equal(
+    await page.locator("#stage-position").getAttribute("aria-label"),
+    "전체 6단계 중 1단계",
+    "initial stage position accessible name exposes six stages",
+  );
   equal(
     await page.locator(".briefing p").count(),
     1,
@@ -332,13 +583,74 @@ async function currentInteractionSnapshot(page) {
   );
 
   const rowA = page.locator('.axis-button[data-axis="row"][data-index="0"]');
+  equal(
+    await page.locator("#app").getAttribute("data-timer-state"),
+    "idle",
+    "timer waits for first axis selection",
+  );
   await activate(page, rowA);
+  await page.waitForTimeout(160);
+  equal(
+    await page.locator("#app").getAttribute("data-timer-state"),
+    "running",
+    "first axis selection starts timer",
+  );
+  const firstSelectionElapsed = Number(
+    await page.locator("#app").getAttribute("data-elapsed-ms"),
+  );
+  check(firstSelectionElapsed >= 100, "running timer advances in tenths");
   equal(
     await page.locator("#pulse-button").isDisabled(),
     true,
     "row-only selection keeps PULSE disabled",
   );
   await activate(page, rowA);
+  await page.waitForTimeout(130);
+  check(
+    Number(await page.locator("#app").getAttribute("data-elapsed-ms")) >
+      firstSelectionElapsed,
+    "timer continues after deselecting every axis",
+  );
+
+  await page.evaluate(() => {
+    Object.defineProperty(document, "visibilityState", {
+      configurable: true,
+      value: "hidden",
+    });
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  equal(
+    await page.locator("#app").getAttribute("data-timer-state"),
+    "paused",
+    "hidden document pauses timer",
+  );
+  const hiddenElapsed = Number(
+    await page.locator("#app").getAttribute("data-elapsed-ms"),
+  );
+  await page.waitForTimeout(170);
+  equal(
+    Number(await page.locator("#app").getAttribute("data-elapsed-ms")),
+    hiddenElapsed,
+    "hidden time is excluded",
+  );
+  await page.evaluate(() => {
+    Object.defineProperty(document, "visibilityState", {
+      configurable: true,
+      value: "visible",
+    });
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  await page.waitForTimeout(130);
+  equal(
+    await page.locator("#app").getAttribute("data-timer-state"),
+    "running",
+    "visible document resumes timer",
+  );
+  check(
+    Number(await page.locator("#app").getAttribute("data-elapsed-ms")) >
+      hiddenElapsed,
+    "timer advances again after visibility resumes",
+  );
 
   await selectMask(page, "col", 13);
   await selectMask(page, "row", 5);
@@ -404,7 +716,11 @@ async function currentInteractionSnapshot(page) {
     "live status reports exact match",
   );
 
+  const solvedElapsed = Number(
+    await page.locator("#app").getAttribute("data-elapsed-ms"),
+  );
   await activate(page, page.locator("#undo-button"));
+  await page.waitForTimeout(140);
   equal(
     await page.locator("#current-grid").getAttribute("data-rows"),
     "13,0,13,0",
@@ -412,6 +728,16 @@ async function currentInteractionSnapshot(page) {
   );
   equal(await page.locator("#move-count").textContent(), "1", "Undo restores move count");
   equal(await page.locator("#result-panel").isHidden(), true, "Undo leaves result");
+  equal(
+    await page.locator("#app").getAttribute("data-timer-state"),
+    "running",
+    "Undo from solved resumes timer",
+  );
+  check(
+    Number(await page.locator("#app").getAttribute("data-elapsed-ms")) >
+      solvedElapsed,
+    "resumed timer advances after Undo",
+  );
   check(
     (await page.locator("#board-status").textContent()).startsWith("Undo 완료"),
     "Undo is announced",
@@ -437,9 +763,17 @@ async function currentInteractionSnapshot(page) {
   await activate(page, page.locator("#reset-button"));
   await activate(page, page.locator("#confirm-reset"));
   await page.waitForFunction(
-    () => document.querySelector("#current-grid").dataset.rows === "0,0,0,0",
+    (expectedRows) =>
+      document.querySelector("#current-grid").dataset.rows === expectedRows,
+    STAGES.get("easy").initialRows.join(","),
   );
   equal(await page.locator("#move-count").textContent(), "0", "Reset clears move count");
+  equal(await page.locator("#elapsed-time").textContent(), "00:00.0", "Reset clears timer");
+  equal(
+    await page.locator("#app").getAttribute("data-timer-state"),
+    "idle",
+    "Reset returns timer to idle",
+  );
   await page.waitForFunction(
     () =>
       document.activeElement?.dataset.axis === "col" &&
@@ -505,18 +839,171 @@ async function currentInteractionSnapshot(page) {
   );
   await expectCleanStage(page, "normal", "confirmed stage change");
 
+  const stableSeed = "smoke-stable-seed";
+  const stableFixture = fixtureModule.generateStageFixture("normal", stableSeed);
+  await page.goto(
+    new URL("?stage=normal&seed=" + encodeURIComponent(stableSeed), baseUrl).href,
+    { waitUntil: "networkidle" },
+  );
+  await expectGeneratedFixture(page, stableFixture, "stable seed first load");
+  const stableSnapshot = await currentInteractionSnapshot(page);
+  await page.reload({ waitUntil: "networkidle" });
+  await expectGeneratedFixture(page, stableFixture, "stable seed reload");
+  deepEqual(
+    await currentInteractionSnapshot(page),
+    stableSnapshot,
+    "same stage and seed reproduce the same puzzle",
+  );
+
+  const stableTargetRows = stableFixture.targetRows.join(",");
+  await activate(page, page.locator("#new-target-button"));
+  await page.waitForFunction(
+    (previousSeed) =>
+      document.querySelector("#app").dataset.seed !== previousSeed &&
+      !document.querySelector("#new-target-dialog").open,
+    stableFixture.seed,
+  );
+  const cleanSeed = new URL(page.url()).searchParams.get("seed");
+  const cleanFixture = fixtureModule.generateStageFixture("normal", cleanSeed);
+  await expectGeneratedFixture(page, cleanFixture, "clean new target");
+  check(
+    cleanFixture.targetRows.join(",") !== stableTargetRows,
+    "clean new target differs from the immediately previous target",
+  );
+  await page.reload({ waitUntil: "networkidle" });
+  await expectGeneratedFixture(page, cleanFixture, "clean target seed reload");
+
+  await activate(
+    page,
+    page.locator('.axis-button[data-axis="row"][data-index="0"]'),
+  );
+  await page.waitForTimeout(120);
+  const beforeNewTargetCancel = await currentInteractionSnapshot(page);
+  await activate(page, page.locator("#new-target-button"));
+  equal(
+    await page.locator("#new-target-dialog").evaluate((dialog) => dialog.open),
+    true,
+    "progress opens new-target confirmation",
+  );
+  await activate(page, page.locator("#cancel-new-target"));
+  await page.waitForFunction(() => !document.querySelector("#new-target-dialog").open);
+  deepEqual(
+    await currentInteractionSnapshot(page),
+    beforeNewTargetCancel,
+    "new-target cancel preserves target, board, history, selection, and timer state",
+  );
+  await page.waitForFunction(
+    () => document.activeElement?.id === "new-target-button",
+  );
+
+  await activate(page, page.locator("#new-target-button"));
+  await activate(page, page.locator("#confirm-new-target"));
+  await page.waitForFunction(
+    (previousSeed) =>
+      document.querySelector("#app").dataset.seed !== previousSeed &&
+      !document.querySelector("#new-target-dialog").open,
+    cleanFixture.seed,
+  );
+  const confirmedSeed = new URL(page.url()).searchParams.get("seed");
+  const confirmedFixture = fixtureModule.generateStageFixture(
+    "normal",
+    confirmedSeed,
+  );
+  await expectGeneratedFixture(page, confirmedFixture, "confirmed new target");
+  check(
+    confirmedFixture.targetRows.join(",") !== cleanFixture.targetRows.join(","),
+    "confirmed new target differs from the immediately previous target",
+  );
+  await page.waitForFunction(
+    () => document.activeElement?.id === "new-target-button",
+  );
+
+  await solve(page, confirmedFixture.canonicalPulses);
+  equal(
+    await page.locator("#current-grid").getAttribute("data-rows"),
+    confirmedFixture.targetRows.join(","),
+    "generated target solves from generated initial board",
+  );
+  equal(
+    await page.locator("#app").getAttribute("data-phase"),
+    "solved",
+    "generated target reaches solved phase",
+  );
+  await page.waitForFunction(() => document.activeElement?.id === "result-title");
+  const solvedGeneratedSeed = confirmedFixture.seed;
+  const solvedGeneratedTarget = confirmedFixture.targetRows.join(",");
+  await activate(page, page.locator("#new-target-button"));
+  await page.waitForFunction(
+    (previousSeed) =>
+      document.querySelector("#app").dataset.seed !== previousSeed &&
+      !document.querySelector("#new-target-dialog").open,
+    solvedGeneratedSeed,
+  );
+  const solvedReplacementSeed = new URL(page.url()).searchParams.get("seed");
+  const solvedReplacement = fixtureModule.generateStageFixture(
+    "normal",
+    solvedReplacementSeed,
+  );
+  await expectGeneratedFixture(page, solvedReplacement, "solved new target");
+  check(
+    solvedReplacement.targetRows.join(",") !== solvedGeneratedTarget,
+    "solved new target differs without a confirmation dialog",
+  );
+  equal(
+    await page.locator("#result-panel").isHidden(),
+    true,
+    "solved new target clears result panel",
+  );
+
+  await page.goto(baseUrl, { waitUntil: "networkidle" });
+  const sweepMoves = columnSweepPulses(STAGES.get("easy"));
+  check(sweepMoves.length >= 2, "synthetic column sweep has multiple moves");
+  await solve(page, sweepMoves);
+  equal(
+    await page.locator("#current-grid").getAttribute("data-rows"),
+    STAGES.get("easy").targetRows.join(","),
+    "synthetic column sweep reaches target",
+  );
+  equal(
+    await page.locator("#result-guidance").isVisible(),
+    true,
+    "synthetic column sweep shows guidance",
+  );
+  equal(
+    await page.locator("#result-guidance").getAttribute("data-sweep-kind"),
+    "column",
+    "synthetic column sweep is classified as column",
+  );
+  equal(
+    await page.locator("#app").getAttribute("data-completion-kind"),
+    "column",
+    "column sweep classification is exposed on app",
+  );
+
   await page.goto(baseUrl, { waitUntil: "networkidle" });
   await expectCleanStage(page, "easy", "canonical chain start");
-  await solve(page, STAGES.easy.pulses);
+  await solve(page, STAGES.get("easy").canonicalPulses);
   await expectSolvedStage(page, "easy");
   await advanceWithNextCta(page, "easy", "normal");
 
-  await solve(page, STAGES.normal.pulses);
+  await solve(page, STAGES.get("normal").canonicalPulses);
   await expectSolvedStage(page, "normal");
-  await advanceWithNextCta(page, "normal", "hard");
+  await advanceWithNextCta(page, "normal", "normal-5");
 
-  await solve(page, STAGES.hard.pulses);
-  await expectSolvedStage(page, "hard");
+  await solve(page, STAGES.get("normal-5").canonicalPulses);
+  await expectSolvedStage(page, "normal-5");
+  await advanceWithNextCta(page, "normal-5", "hard-4");
+
+  await solve(page, STAGES.get("hard-4").canonicalPulses);
+  await expectSolvedStage(page, "hard-4");
+  await advanceWithNextCta(page, "hard-4", "hard-5");
+
+  await solve(page, STAGES.get("hard-5").canonicalPulses);
+  await expectSolvedStage(page, "hard-5");
+  await advanceWithNextCta(page, "hard-5", "hard-6");
+
+  await solve(page, STAGES.get("hard-6").canonicalPulses);
+  await expectSolvedStage(page, "hard-6");
   fs.mkdirSync(path.dirname(screenshotPath), { recursive: true });
   await page.locator("#stage-current").scrollIntoViewIfNeeded();
   await page.screenshot({ path: screenshotPath, animations: "disabled" });
@@ -524,12 +1011,58 @@ async function currentInteractionSnapshot(page) {
     fs.existsSync(screenshotPath) && fs.statSync(screenshotPath).size > 0,
     "stage screenshot written",
   );
-  await advanceWithNextCta(page, "hard", "easy");
+  await advanceWithNextCta(page, "hard-6", "easy");
   equal(
     await page.locator("#result-panel").isHidden(),
     true,
-    "Hard-to-Easy wrap leaves solved result",
+    "6x6-to-Easy wrap leaves solved result",
   );
+
+  await page.goto(new URL("?stage=hard", baseUrl).href, { waitUntil: "networkidle" });
+  equal(
+    await page.locator("#app").getAttribute("data-stage"),
+    "full-rank",
+    "legacy hard alias resolves to Full Rank control",
+  );
+  equal(
+    await page.locator("#current-grid").getAttribute("data-rows"),
+    FULL_RANK.initialRows.join(","),
+    "Full Rank control uses fixture initial board",
+  );
+  equal(
+    await page.locator("#target-grid").getAttribute("data-rows"),
+    FULL_RANK.targetRows.join(","),
+    "Full Rank control target remains addressable",
+  );
+  equal(
+    await page.locator('.stage-button[aria-pressed="true"]').count(),
+    0,
+    "hidden Full Rank control does not select a playable stage button",
+  );
+  equal(
+    await page.locator("#new-target-button").isDisabled(),
+    true,
+    "hidden Full Rank control cannot generate catalog targets",
+  );
+  equal(
+    await page.locator("#app").getAttribute("data-timer-state"),
+    "idle",
+    "Full Rank control timer starts idle",
+  );
+  equal(
+    new URL(page.url()).searchParams.get("stage"),
+    "hard",
+    "legacy hard query remains addressable",
+  );
+  check(
+    (await page.locator("#stage-current").textContent()).includes(FULL_RANK.title),
+    "legacy hard route identifies the Full Rank control",
+  );
+
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.goto(new URL("?stage=hard-6", baseUrl).href, { waitUntil: "networkidle" });
+  await expectCleanStage(page, "hard-6", "320px 6x6 route");
+  await page.setViewportSize({ width: 360, height: 640 });
 
   await page.goto(new URL("?fixture=backup", baseUrl).href, {
     waitUntil: "networkidle",
@@ -539,10 +1072,10 @@ async function currentInteractionSnapshot(page) {
     "TEST · 예비",
     "backup fixture route remains compatible",
   );
-  await solve(page, BACKUP.pulses);
+  await solve(page, BACKUP.canonicalPulses);
   equal(
     await page.locator("#current-grid").getAttribute("data-rows"),
-    BACKUP.targetRows,
+    BACKUP.targetRows.join(","),
     "backup target reached",
   );
   equal(
@@ -571,17 +1104,94 @@ async function currentInteractionSnapshot(page) {
     desktopMetrics.targetLeft < desktopMetrics.consoleLeft,
     "desktop uses two-column layout",
   );
+
+  const fallbackContext = await browser.newContext({
+    viewport: { width: 360, height: 640 },
+    reducedMotion: "reduce",
+  });
+  await fallbackContext.addInitScript(() => {
+    Object.defineProperty(globalThis.crypto, "getRandomValues", {
+      configurable: true,
+      value: undefined,
+    });
+  });
+  const fallbackPage = await fallbackContext.newPage();
+  fallbackPage.on("pageerror", (error) =>
+    browserErrors.push("fallback pageerror: " + error.message),
+  );
+  fallbackPage.on("console", (message) => {
+    if (message.type() === "error") {
+      browserErrors.push("fallback console: " + message.text());
+    }
+  });
+  await fallbackPage.goto(baseUrl, { waitUntil: "networkidle" });
+  equal(
+    await fallbackPage.locator("#new-target-button").isEnabled(),
+    true,
+    "new target remains available without crypto.getRandomValues",
+  );
+  const fallbackPreviousTarget = await fallbackPage
+    .locator("#target-grid")
+    .getAttribute("data-rows");
+  await activate(fallbackPage, fallbackPage.locator("#new-target-button"));
+  await fallbackPage.waitForFunction(
+    () => document.querySelector("#app").dataset.seedSource === "fallback",
+  );
+  const fallbackSeed = new URL(fallbackPage.url()).searchParams.get("seed");
+  check(
+    fallbackSeed.startsWith("fallback-"),
+    "fallback seed is explicit in the URL",
+  );
+  const fallbackTarget = await fallbackPage
+    .locator("#target-grid")
+    .getAttribute("data-rows");
+  check(
+    fallbackTarget !== fallbackPreviousTarget,
+    "fallback seed generates a different target",
+  );
+  const fallbackPuzzleKey = await fallbackPage
+    .locator("#app")
+    .getAttribute("data-puzzle-key");
+  const fallbackInitialRows = await fallbackPage
+    .locator("#target-grid")
+    .getAttribute("data-initial-rows");
+  await fallbackPage.reload({ waitUntil: "networkidle" });
+  equal(
+    await fallbackPage.locator("#app").getAttribute("data-seed-source"),
+    "fallback",
+    "fallback source survives reload",
+  );
+  equal(
+    await fallbackPage.locator("#target-grid").getAttribute("data-rows"),
+    fallbackTarget,
+    "fallback target reproduces from URL seed",
+  );
+  equal(
+    await fallbackPage.locator("#target-grid").getAttribute("data-initial-rows"),
+    fallbackInitialRows,
+    "fallback initial board reproduces from URL seed",
+  );
+  equal(
+    await fallbackPage.locator("#app").getAttribute("data-puzzle-key"),
+    fallbackPuzzleKey,
+    "fallback puzzle key reproduces from URL seed",
+  );
+  await fallbackContext.close();
+
   equal(browserErrors.length, 0, "browser errors: " + browserErrors.join(" | "));
 
   await browser.close();
   console.log(
     "browserAssertions=" +
       assertionCount +
-      " viewport=360x640 easyMoves=2 normalMoves=3 hardMoves=4 backupMoves=3" +
+      " viewport=320/360/960 easyMoves=2 normal4Moves=3 normal5Moves=3" +
+      " hard4Moves=2 hard5Moves=3 hard6Moves=3 backupMoves=3" +
+      " timer=visibility-safe newTarget=crypto+fallback sweepGuidance=column" +
       " consoleErrors=0 screenshot=" +
       screenshotPath,
   );
-})().catch((error) => {
+})().catch(async (error) => {
+  if (browser) await browser.close();
   console.error(error.stack || error);
   process.exitCode = 1;
 });
