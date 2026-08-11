@@ -6,7 +6,7 @@
 
 - **현재 phase**: M00 — Rule Proof & Scope Lock
 - **상태**: 진행 중 — M00 구현·E2 완료 / formal Easy E1·관련 DoD 판정은 출시 직전 playable beta로 연기
-- **마지막 갱신**: 2026-08-11 / formal Easy n≥5 베타 연기와 구현 체크포인트·M00 완료의 경계 기록
+- **마지막 갱신**: 2026-08-11 / 구현 체크포인트 `5d57e09` GitHub Pages 배포·원격 Edge 573 단언 통과
 - **목표 릴리스**: OpenAI Game Builders Seoul Track 1 제출 빌드
 - **제출 접수 종료**: 2026-08-26
 
@@ -39,7 +39,7 @@
 ## 다음 할 일
 
 1. 현재 M00 구현·E2 증거를 상태 인계하되 formal Easy E1 표본이나 관련 DoD 통과를 주장하지 않는다.
-2. 오너의 별도 지시가 있으면 현재 구현을 체크포인트로 commit·push하고 공개 URL을 재스모크한다. 이 체크포인트는 M00 phase 완료나 DoD 통과 태그가 아니다.
+2. [x] 현재 구현을 체크포인트 `5d57e09`로 commit·push하고 공개 URL Edge 573 단언 재스모크를 완료했다. 이 체크포인트는 M00 phase 완료나 DoD 통과 태그가 아니다.
 3. 출시 직전 playable beta의 build SHA·공개 URL이 고정되면 신규 사용자 n≥5, 표본 구성, 비공개 원시 기록 위치·삭제 예정일을 확정한다.
 4. 동일 베타 빌드의 Easy 조건에서 n≥5와 4/5 임계치를 그대로 적용해 DOD-02~05를 판정하고, 결과를 반영해 DOD-06~07과 M00 formal gate를 판정한다.
 
@@ -95,6 +95,7 @@
 | 2026-08-09 | M00 | 반복 UX 최종 Edge E2 | `node prototypes/rule-proof/browser-smoke.cjs` | assertions=573; 320/360/960px; timer=visibility-safe; newTarget=crypto+fallback; sweepGuidance=column; consoleErrors=0 | `evidence/M00/browser-smoke-stages-360x640.png` |
 | 2026-08-09 | M00 | 비게이트 난도 비교 관찰 | 사람 대상 5×5·6×6 비교 플레이 후기 | 둘 다 4×4보다 생각할 거리가 있고 지나치게 쉽지 않음; 난도별 크기 풀 채택; 참가자 수·시간·기기·개입 미보고로 DOD 미집계 | `docs/PLAYTEST_PROTOCOL.md` §13 |
 | 2026-08-10 | M00 | formal Easy E1 일정 결정 | 프로젝트 오너 결정 | 출시 직전 playable beta까지 자료 수집·DOD-02~07 판정 연기; PASS·면제 아님 | `phases/M00_rule_proof.md` §3.1, `docs/PLAYTEST_PROTOCOL.md` §13 |
+| 2026-08-11 | M00 | 구현 체크포인트 Pages 배포 | application=`5d57e09d250859b4eccdf64bca784f8ae527f6ce`, Pages `built` → 공개 URL Edge smoke | assertions=573; viewport=320/360/960; consoleErrors=0 | `https://jtech-co.github.io/axis-shift/`, `phases/M00_rule_proof.md` §10 |
 
 ### M00 최신 검증 출력
 
@@ -140,7 +141,7 @@ public browserAssertions=140 viewport=360x640 easyMoves=2 normalMoves=3 hardMove
 
 51개·140개 단언 출력은 단일-stage와 P0 발견 전 4×4 다단계의 역사 기준선으로 보존한다. 동일 캡처 경로는 현재 573개 단언 E2 이미지로 교체됐다. `hardGate`는 anti-sweep 구조 적격성만 뜻하며 Easy도 통과하므로 체감 Hard 승인이 아니다. 5×5·6×6의 `bfs=not-run`은 이동 거리 전수 BFS를 큰 보드에 적용하지 않았다는 범위 표기다. 자동 검증과 내부 파일럿은 DOD-02~04의 E1 본 표본을 대체하지 않는다.
 
-현재 200,967·573 E2는 로컬 작업트리의 구현 완료 증거이며 아직 commit·push하지 않았다. 공개 GitHub Pages는 위 `68f7614`·140개 단언 스냅샷을 유지한다. 오너 지시에 따른 구현 체크포인트 push가 이뤄져도 formal Easy E1과 DOD-02~07은 출시 직전 beta에서 별도 판정하며, 그 push 자체를 M00 완료로 해석하지 않는다.
+현재 구현은 체크포인트 `5d57e09d250859b4eccdf64bca784f8ae527f6ce`로 `main`에 push됐고 GitHub Pages `built` 뒤 공개 URL Edge 573 단언·320/360/960px·콘솔 오류 0으로 통과했다. formal Easy E1과 DOD-02~07은 출시 직전 beta에서 별도 판정하며, 이 구현 체크포인트 push를 M00 phase 완료로 해석하지 않는다.
 
 ## 활성 위험
 

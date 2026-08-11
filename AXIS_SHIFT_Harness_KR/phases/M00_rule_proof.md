@@ -293,7 +293,7 @@ screenshot=<PROJECT_ROOT>\AXIS_SHIFT_Harness_KR\evidence\M00\browser-smoke-stage
 
 여섯 profile·Full Rank 대조군·예비 fixture의 canonical 완주, seed URL 재현·직전 target 제외, Hard 4×4 initial 노이즈, visibility-safe 타이머, sweep 안내, 320/360/960px 무가로스크롤, 44px 축 타깃, 키보드·Reset·Undo·Preview와 콘솔 오류 0을 확인했다. 이 E2는 구현·구조 계약 증거이며 정식 Easy E1 표본이나 체감 Hard 승인을 대체하지 않는다.
 
-### E2 — 공개 GitHub Pages 플레이 스모크
+### E2 — 공개 GitHub Pages 플레이 스모크 (`68f7614` 역사 로그)
 
 ```text
 publish command: git push -u origin main
@@ -308,6 +308,22 @@ browserAssertions=140 viewport=360x640 easyMoves=2 normalMoves=3 hardMoves=4 bac
 ```
 
 공개 URL에서도 로컬과 동일한 세 단계 canonical 풀이, 단계 전환, 예비 fixture 회귀와 콘솔 오류 0을 확인했다. 이 배포는 신규 사용자 모집을 위한 M00 프로토타입 공개이며 M01 프로덕션 스캐폴딩 시작이나 DOD-02~07 통과를 뜻하지 않는다.
+
+### E2 — 현재 구현 체크포인트 공개 GitHub Pages 스모크
+
+```text
+application commit: 5d57e09d250859b4eccdf64bca784f8ae527f6ce
+pages source: main /
+pages status: built
+pages duration: 16043ms
+root URL: https://jtech-co.github.io/axis-shift/ (HTTP 200)
+game URL: https://jtech-co.github.io/axis-shift/prototypes/rule-proof/ (HTTP 200)
+game.mjs: HTTP 200, text/javascript; charset=utf-8
+remote browser smoke exit: 0
+browserAssertions=573 viewport=320/360/960 easyMoves=2 normal4Moves=3 normal5Moves=3 hard4Moves=2 hard5Moves=3 hard6Moves=3 backupMoves=3 timer=visibility-safe newTarget=crypto+fallback sweepGuidance=column consoleErrors=0
+```
+
+공개 체크포인트에서도 여섯 profile·반복 목표·visibility-safe 타이머·sweep 안내와 320/360/960px 회귀가 로컬 E2와 일치했다. 이 push는 플레이 가능한 구현 체크포인트이며 formal Easy E1, DOD-02~07 또는 M00 phase 완료를 뜻하지 않는다.
 
 ### E1 준비 관찰 — 내부 파일럿
 
