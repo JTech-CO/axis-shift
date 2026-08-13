@@ -4,9 +4,9 @@
 
 ## 현재 상태
 
-- **현재 phase**: M01 — Production Scaffolding & Boundaries (ADR-0008 선행 체크포인트)
-- **상태**: 진행 중 — M01 DOD-01 clean checkout과 로컬 Pages 3엔진 E2 완료, 원격 Actions/Pages 증거 대기 / M00 formal Easy E1·DOD-02~07은 출시 직전 playable beta까지 미완료 유지
-- **마지막 갱신**: 2026-08-14 / commit `bf3d1fe` clean checkout·Pages 24/24 완료
+- **현재 phase**: M01 — Production Scaffolding & Boundaries 완료 (ADR-0008 선행 체크포인트, M02 미착수)
+- **상태**: M01 DOD-01~09·CI·Pages artifact 배포 완료 / M00 formal Easy E1·DOD-02~07은 출시 직전 playable beta까지 미완료 유지
+- **마지막 갱신**: 2026-08-14 / deployed `93a4359`, CI·Pages success, 공개 M00 573단언·M01 smoke 8/8
 - **목표 릴리스**: OpenAI Game Builders Seoul Track 1 제출 빌드
 - **제출 접수 종료**: 2026-08-26
 
@@ -41,13 +41,13 @@
 - [x] M01 로컬 E2 — verify 10단계, unit 5/5, 정적 접근성 target 6개, Chromium·Firefox·WebKit route/44px E2E 12/12
 - [x] PR CI — Node 24 `npm ci`부터 동일 품질 명령·non-root build·Chromium core E2E까지 연결
 - [x] Pages artifact 호환 배포 구현 — M00 루트·stage/seed·anchor·직접 경로와 M01 hash route를 한 artifact에 조립, 3엔진 24/24
+- [x] Pages artifact 공개 전환 — legacy SHA `576e6db` 백업, `build_type=workflow`, commit `93a4359` 배포, CI·Pages Actions와 공개 M00/M01 smoke 통과
 
 ## 다음 할 일
 
-1. 기존 `origin/main`을 legacy 백업 branch로 보존하고 Pages를 `build_type=workflow`로 전환한 뒤 main을 push한다.
-2. 최초 CI·Pages Actions와 공개 루트 M00, stage/seed, M01 `/#/` route smoke 결론을 기록한다.
-3. M01 체크포인트에서도 M00 formal E1이나 DOD-02~07 통과를 주장하지 않으며, M02는 별도 착수 판단 전 시작하지 않는다.
-4. 출시 직전 playable beta의 SHA·공개 URL이 고정되면 신규 사용자 n≥5, 표본 구성, 비공개 원시 기록 위치·삭제 예정일을 확정한다.
+1. M02는 별도 착수 지시 전 시작하지 않는다.
+2. M01 완료를 M00 formal E1이나 DOD-02~07 통과로 해석하지 않는다.
+3. 출시 직전 playable beta의 SHA·공개 URL이 고정되면 신규 사용자 n≥5, 표본 구성, 비공개 원시 기록 위치·삭제 예정일을 확정한다.
 
 ### Formal Easy 게이트 연기 경계
 
@@ -72,7 +72,7 @@
 | Phase | 이름 | 상태 | 핵심 출구 게이트 |
 |---|---|---|---|
 | M00 | Rule Proof & Scope Lock | 진행 중 — 구현·E2 완료 / formal E1은 출시 직전 베타로 연기 | 베타 n≥5에서 4/5 기준 판정; 현재 미완료 |
-| M01 | Production Scaffolding | 진행 중 — DOD-01·로컬 source/Pages E2 완료 / 원격 증거 대기 | 원격 CI·Pages smoke |
+| M01 | Production Scaffolding | 완료 — ADR-0008 제한 체크포인트, DOD-01~09·CI·Pages smoke 통과 | 완료 |
 | M02 | Board & GF(2) Core | 미시작 | 3×3 전수에서 brute-force = rank |
 | M03 | Generator & Content Pipeline | 미시작 | 10년 Daily 감사, 54개 정적 레벨 검증 |
 | M04 | Session, Persistence & Scoring | 미시작 | reducer·저장·시간·등급 정합 |
@@ -102,11 +102,12 @@
 | 2026-08-09 | M00 | 비게이트 난도 비교 관찰 | 사람 대상 5×5·6×6 비교 플레이 후기 | 둘 다 4×4보다 생각할 거리가 있고 지나치게 쉽지 않음; 난도별 크기 풀 채택; 참가자 수·시간·기기·개입 미보고로 DOD 미집계 | `docs/PLAYTEST_PROTOCOL.md` §13 |
 | 2026-08-10 | M00 | formal Easy E1 일정 결정 | 프로젝트 오너 결정 | 출시 직전 playable beta까지 자료 수집·DOD-02~07 판정 연기; PASS·면제 아님 | `phases/M00_rule_proof.md` §3.1, `docs/PLAYTEST_PROTOCOL.md` §13 |
 | 2026-08-11 | M00 | 구현 체크포인트 Pages 배포 | application=`5d57e09d250859b4eccdf64bca784f8ae527f6ce`, Pages `built` → 공개 URL Edge smoke | assertions=573; viewport=320/360/960; consoleErrors=0 | `https://jtech-co.github.io/axis-shift/`, `phases/M00_rule_proof.md` §10 |
-| 2026-08-14 | M01 | DOD-02~05·07·09 로컬 품질·경계 | Node 24 `npm run verify` + `npm run test:a11y` | scripts=12/12; unit=5/5; boundaries files=37, violations=0, cycles=0, lintAssertions=7; secret findings=0; a11y targets=6 | `phases/M01_scaffolding.md` §10 |
+| 2026-08-14 | M01 | DOD-02~05·07·09 로컬 품질·경계 | Node 24 `npm run verify` + `npm run test:a11y` | scripts=14/14; unit=5/5; boundaries files=37, violations=0, cycles=0, lintAssertions=7; secret findings=0; a11y targets=6 | `phases/M01_scaffolding.md` §10 |
 | 2026-08-14 | M01 | DOD-03 zero-target validator 안전성 | `validate:levels` + `audit:daily` | level files=0/selfChecks=2; Daily implementations=0/detectorSelfChecks=2; 무조건 통과 stub 아님 | `phases/M01_scaffolding.md` §10 |
 | 2026-08-14 | M01 | DOD-06 non-root route·AppShell target | Node 24 `npm run test:e2e` | Chromium·Firefox·WebKit 12/12; 3 routes HTTP 200; computed target ≥44px | `tests/e2e/routes.spec.ts`, `phases/M01_scaffolding.md` §10 |
 | 2026-08-14 | M01 | ADR-0009 Pages artifact 호환 E2 | final clean checkout `npm run build:pages` + `npm run test:pages` | files=14, bytes=327103, M00 runtime=10; Chromium·Firefox·WebKit 24/24; asset HTTP 200; 오류 0 | `tests/pages/pages-artifact.spec.ts`, `phases/M01_scaffolding.md` §10 |
 | 2026-08-14 | M01 | DOD-01 재현 설치 | commit `bf3d1fe` detached clean checkout, Node 24 `npm ci` → `npm run verify` | 261 packages, vulnerabilities=0, lock hash 동일, tracked changes=0, verify 10단계 통과 | `phases/M01_scaffolding.md` §10 |
+| 2026-08-14 | M01 | CI·Pages artifact 공개 배포 | legacy backup → Pages workflow 전환 → `main` push → Actions → 공개 smoke | deployed=`93a4359`; CI run 31733232235 success; Pages run 31733232206 success; public M01 8/8; M00 573단언·오류 0 | `https://jtech-co.github.io/axis-shift/`, `phases/M01_scaffolding.md` §10 |
 
 ### M01 최신 검증 출력
 
@@ -125,7 +126,9 @@ Pages artifact: files=14 bytes=327103 prototypeFiles=10
 Pages Playwright: chromium+firefox+webkit tests=24 passed
 package-lock SHA256 before=after=3D8ECB7F611A72BC815DE3A2F1A0189546A1B607E558E508C1A3E47DAD50915B
 clean checkout: commit=bf3d1fe npmCiExit=0 lockBefore=lockAfter trackedChanges=0
-remaining: first remote Actions + public Pages smoke conclusion
+remote: commit=93a4359 CI=success Pages=success buildType=workflow
+public: M01 Chromium=8/8 M00 assertions=573 consoleErrors=0
+remaining M01: none
 ```
 
 ### M00 최신 검증 출력
@@ -186,8 +189,8 @@ public browserAssertions=140 viewport=360x640 easyMoves=2 normalMoves=3 hardMove
 | R-06 | 공유 서명이 정답/이동을 간접 노출 | 낮음 | 높음 | 금지 필드 invariant, payload snapshot, 수동 검토 | M09 |
 | R-07 | 기능 범위가 일정 안에 과도함 | 중 | 매우 높음 | phase gate, 8/21 scope freeze, P0/P1 우선 | 전역 |
 | R-08 | rank/Par만으로 난도를 정하면 단일 축 순회가 최적 또는 준최적이 됨 | 높음 | 매우 높음 | `sweepBound`·`compressionGap` 검증, full-rank를 난도 stage가 아닌 대조군으로 분리, 사람 비교 | M00·M03·M06 |
-| R-09 | legacy Pages가 `main:/` 소스를 직접 제공해 Vite source entry push 시 기존 공개 링크가 깨짐 | 높음 | 매우 높음 | push 전 artifact Pages 전환 또는 M00 링크 보존, 이후 실제 URL smoke | M01·M10 |
 
+해소된 위험: R-09는 ADR-0009 artifact workflow 전환, legacy backup branch, 공개 M00 573단언·M01 8/8 smoke로 2026-08-14 닫았다.
 ## 막힘 기록
 
 현재 없음.

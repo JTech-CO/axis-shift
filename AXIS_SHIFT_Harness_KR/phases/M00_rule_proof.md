@@ -327,6 +327,21 @@ browserAssertions=573 viewport=320/360/960 easyMoves=2 normal4Moves=3 normal5Mov
 
 공개 체크포인트에서도 여섯 profile·반복 목표·visibility-safe 타이머·sweep 안내와 320/360/960px 회귀가 로컬 E2와 일치했다. 이 push는 플레이 가능한 구현 체크포인트이며 formal Easy E1, DOD-02~07 또는 M00 phase 완료를 뜻하지 않는다.
 
+### E2 — M01 artifact 전환 후 M00 공개 호환 스모크
+
+```text
+deployed commit: 93a4359b5cbe1b45f8ed1fe0ee4a984003e8191c
+pages build_type: workflow
+pages status: built
+legacy backup: backup/pages-legacy-20260814
+legacy backup SHA: 576e6dbac1938652ba892539c91a1fa07f4d2cf7
+root URL: https://jtech-co.github.io/axis-shift/
+remote browser smoke exit: 0
+browserAssertions=573 viewport=320/360/960 easyMoves=2 normal4Moves=3 normal5Moves=3 hard4Moves=2 hard5Moves=3 hard6Moves=3 backupMoves=3 timer=visibility-safe newTarget=crypto+fallback sweepGuidance=column consoleErrors=0
+```
+
+Pages source를 artifact workflow로 전환한 뒤에도 공개 루트·stage/seed·anchor는 M00 프로토타입으로 연결되고 기존 전체 회귀가 그대로 통과했다. M01 AppShell은 `/#/`로 분리됐다. 이 호환 배포는 M00의 플레이 가능성을 보존하지만 formal Easy E1이나 DOD-02~07을 대신하지 않는다.
+
 ### E1 준비 관찰 — 내부 파일럿
 
 - run: 2회, 본 표본 미포함

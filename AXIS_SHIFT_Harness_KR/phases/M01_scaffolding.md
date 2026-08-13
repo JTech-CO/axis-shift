@@ -1,6 +1,6 @@
 # M01 — Production Scaffolding & Boundaries
 
-- **상태**: 진행 중 — 로컬 DoD·commit 기준 clean checkout 완료, 원격 Actions·Pages 배포 증거 대기
+- **상태**: 완료 — ADR-0008 제한 체크포인트, DOD-01~09·CI·Pages artifact 공개 smoke 통과
 - **담당 범위**: 저장소 기반, 도구 체인, 라우팅, CI, 모듈 경계
 - **최종 갱신**: 2026-08-14
 
@@ -170,7 +170,16 @@ CI:
   pull_request + main push, setup-node .nvmrc, npm ci, 동일 품질 명령,
   non-root build, Chromium core E2E까지 연결
   Pages는 artifact build + a11y + Chromium core/artifact smoke + hidden-file 포함 upload/deploy로 분리
-  YAML은 Prettier parser 통과; 최초 원격 Actions run은 commit/push 후 추가 기록
+  CI run=31733232235 conclusion=success duration=51s
+  Pages run=31733232206 conclusion=success build=60s deploy=11s
+
+remote Pages:
+  deployed commit=93a4359b5cbe1b45f8ed1fe0ee4a984003e8191c
+  build_type=workflow status=built
+  legacy backup=backup/pages-legacy-20260814
+  legacy backup SHA=576e6dbac1938652ba892539c91a1fa07f4d2cf7
+  public Chromium Pages smoke=8/8
+  public M00 browserAssertions=573 viewport=320/360/960 consoleErrors=0
 ```
 
 실패 후 수정 기록:
@@ -188,8 +197,8 @@ CI:
 ## 12. 리스크·미지수
 
 - 최신 ESLint·Vite 플러그인과 Node 24 호환성.
-- GitHub Pages base `/axis-shift/`와 M00 호환 artifact는 로컬 3엔진 검증을 통과했다. 실제 Pages 설정 전환·Actions 배포·원격 route smoke는 아직 남는다.
-- 2026-08-14 현재 Pages는 `build_type=legacy`, `source=main:/`이다. 전환 직전 legacy SHA를 백업 branch로 보존하고 ADR-0009 순서로 workflow 방식으로 바꾼다.
+- GitHub Pages base `/axis-shift/`와 M00 호환 artifact는 로컬 3엔진과 실제 공개 URL smoke를 통과했다.
+- Pages는 `build_type=workflow`로 전환됐고 이전 legacy SHA는 `backup/pages-legacy-20260814`에 보존됐다. 이후 배포에서도 공개 루트 M00·M01 hash route smoke를 유지한다.
 - 불필요한 의존성을 초기에 추가하면 PWA 번들과 유지 비용이 증가한다.
 
 ## 13. STOP 트리거

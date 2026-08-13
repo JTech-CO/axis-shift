@@ -240,7 +240,14 @@ M01 workflow는 `node-version-file: .nvmrc`, npm cache와 `package-lock.json`, `
 
 ## 9. GitHub Pages 배포
 
-2026-08-14 전환 전 원격은 legacy Pages(`main` 브랜치의 `/`)로 M00 정적 프로토타입을 직접 제공한다. M01에는 `deploy-pages.yml`과 로컬 3엔진 artifact smoke가 준비됐으며, legacy SHA 백업 → `build_type=workflow` 전환 → main push → 실제 URL smoke 순서로 적용한다.
+2026-08-14 원격 Pages를 legacy branch source에서 공식 artifact workflow로 전환했다. 배포 SHA는 `93a4359b5cbe1b45f8ed1fe0ee4a984003e8191c`이며 `build_type=workflow`·`status=built`다. 전환 전 SHA `576e6dbac1938652ba892539c91a1fa07f4d2cf7`는 `backup/pages-legacy-20260814`에 보존했다.
+
+최초 원격 결론:
+
+- CI run [31733232235](https://github.com/JTech-CO/axis-shift/actions/runs/31733232235): success, quality job 51초
+- Pages run [31733232206](https://github.com/JTech-CO/axis-shift/actions/runs/31733232206): success, artifact build 60초·deploy 11초
+- 공개 Chromium artifact smoke: 8/8
+- 공개 M00 전체 회귀: 573단언, 320/360/960px, console 오류 0
 
 M01 전환 artifact 계약:
 
