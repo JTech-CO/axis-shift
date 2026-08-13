@@ -5,8 +5,8 @@
 ## 현재 상태
 
 - **현재 phase**: M01 — Production Scaffolding & Boundaries (ADR-0008 선행 체크포인트)
-- **상태**: 진행 중 — M01 로컬 Pages artifact E2 완료, DOD-01 clean checkout·원격 Actions/Pages 증거 대기 / M00 formal Easy E1·DOD-02~07은 출시 직전 playable beta까지 미완료 유지
-- **마지막 갱신**: 2026-08-14 / ADR-0009 Pages artifact 전환 구현·3엔진 호환 smoke 완료
+- **상태**: 진행 중 — M01 DOD-01 clean checkout과 로컬 Pages 3엔진 E2 완료, 원격 Actions/Pages 증거 대기 / M00 formal Easy E1·DOD-02~07은 출시 직전 playable beta까지 미완료 유지
+- **마지막 갱신**: 2026-08-14 / commit `bf3d1fe` clean checkout·Pages 24/24 완료
 - **목표 릴리스**: OpenAI Game Builders Seoul Track 1 제출 빌드
 - **제출 접수 종료**: 2026-08-26
 
@@ -44,11 +44,10 @@
 
 ## 다음 할 일
 
-1. M01 범위를 commit한 뒤 clean checkout의 Node 24 `npm ci`·lockfile 불변을 확인해 DOD-01을 판정한다.
-2. 기존 `origin/main`을 legacy 백업 branch로 보존하고 Pages를 `build_type=workflow`로 전환한 뒤 main을 push한다.
-3. 최초 CI·Pages Actions와 공개 루트 M00, stage/seed, M01 `/#/` route smoke 결론을 기록한다.
-4. M01 체크포인트에서도 M00 formal E1이나 DOD-02~07 통과를 주장하지 않으며, M02는 별도 착수 판단 전 시작하지 않는다.
-5. 출시 직전 playable beta의 SHA·공개 URL이 고정되면 신규 사용자 n≥5, 표본 구성, 비공개 원시 기록 위치·삭제 예정일을 확정한다.
+1. 기존 `origin/main`을 legacy 백업 branch로 보존하고 Pages를 `build_type=workflow`로 전환한 뒤 main을 push한다.
+2. 최초 CI·Pages Actions와 공개 루트 M00, stage/seed, M01 `/#/` route smoke 결론을 기록한다.
+3. M01 체크포인트에서도 M00 formal E1이나 DOD-02~07 통과를 주장하지 않으며, M02는 별도 착수 판단 전 시작하지 않는다.
+4. 출시 직전 playable beta의 SHA·공개 URL이 고정되면 신규 사용자 n≥5, 표본 구성, 비공개 원시 기록 위치·삭제 예정일을 확정한다.
 
 ### Formal Easy 게이트 연기 경계
 
@@ -73,7 +72,7 @@
 | Phase | 이름 | 상태 | 핵심 출구 게이트 |
 |---|---|---|---|
 | M00 | Rule Proof & Scope Lock | 진행 중 — 구현·E2 완료 / formal E1은 출시 직전 베타로 연기 | 베타 n≥5에서 4/5 기준 판정; 현재 미완료 |
-| M01 | Production Scaffolding | 진행 중 — 로컬 source·Pages artifact E2 완료 / clean checkout·원격 증거 대기 | clean checkout `npm ci` + 원격 CI·Pages smoke |
+| M01 | Production Scaffolding | 진행 중 — DOD-01·로컬 source/Pages E2 완료 / 원격 증거 대기 | 원격 CI·Pages smoke |
 | M02 | Board & GF(2) Core | 미시작 | 3×3 전수에서 brute-force = rank |
 | M03 | Generator & Content Pipeline | 미시작 | 10년 Daily 감사, 54개 정적 레벨 검증 |
 | M04 | Session, Persistence & Scoring | 미시작 | reducer·저장·시간·등급 정합 |
@@ -106,8 +105,8 @@
 | 2026-08-14 | M01 | DOD-02~05·07·09 로컬 품질·경계 | Node 24 `npm run verify` + `npm run test:a11y` | scripts=12/12; unit=5/5; boundaries files=37, violations=0, cycles=0, lintAssertions=7; secret findings=0; a11y targets=6 | `phases/M01_scaffolding.md` §10 |
 | 2026-08-14 | M01 | DOD-03 zero-target validator 안전성 | `validate:levels` + `audit:daily` | level files=0/selfChecks=2; Daily implementations=0/detectorSelfChecks=2; 무조건 통과 stub 아님 | `phases/M01_scaffolding.md` §10 |
 | 2026-08-14 | M01 | DOD-06 non-root route·AppShell target | Node 24 `npm run test:e2e` | Chromium·Firefox·WebKit 12/12; 3 routes HTTP 200; computed target ≥44px | `tests/e2e/routes.spec.ts`, `phases/M01_scaffolding.md` §10 |
-| 2026-08-14 | M01 | ADR-0009 Pages artifact 호환 E2 | Node 24 `npm run build:pages` + `npm run test:pages` | files=14, bytes=328852, M00 runtime=10; Chromium·Firefox·WebKit 24/24; asset HTTP 200; 오류 0 | `tests/pages/pages-artifact.spec.ts`, `phases/M01_scaffolding.md` §10 |
-| 2026-08-14 | M01 | DOD-01 부분 증거 | Node 24 `npm ci`, lockfile SHA-256 전후 비교 | exit 0, 261 packages, vulnerabilities=0, hash 동일; commit 전 source tree라 clean checkout 판정 보류 | `phases/M01_scaffolding.md` §10 |
+| 2026-08-14 | M01 | ADR-0009 Pages artifact 호환 E2 | final clean checkout `npm run build:pages` + `npm run test:pages` | files=14, bytes=327103, M00 runtime=10; Chromium·Firefox·WebKit 24/24; asset HTTP 200; 오류 0 | `tests/pages/pages-artifact.spec.ts`, `phases/M01_scaffolding.md` §10 |
+| 2026-08-14 | M01 | DOD-01 재현 설치 | commit `bf3d1fe` detached clean checkout, Node 24 `npm ci` → `npm run verify` | 261 packages, vulnerabilities=0, lock hash 동일, tracked changes=0, verify 10단계 통과 | `phases/M01_scaffolding.md` §10 |
 
 ### M01 최신 검증 출력
 
@@ -122,10 +121,11 @@ secretScan files=143 findings=0
 a11yTargetAudit files=12 interactiveTargets=6 staticNames=true computedSizeChecks=0 failures=0
 build modules=41 JS=233.88kB gzip=74.94kB CSS=2.73kB gzip=1.15kB
 Playwright: chromium+firefox+webkit tests=12 passed
-Pages artifact: files=14 bytes=328852 prototypeFiles=10
+Pages artifact: files=14 bytes=327103 prototypeFiles=10
 Pages Playwright: chromium+firefox+webkit tests=24 passed
 package-lock SHA256 before=after=3D8ECB7F611A72BC815DE3A2F1A0189546A1B607E558E508C1A3E47DAD50915B
-remaining: committed clean checkout npm ci + first remote Actions conclusion
+clean checkout: commit=bf3d1fe npmCiExit=0 lockBefore=lockAfter trackedChanges=0
+remaining: first remote Actions + public Pages smoke conclusion
 ```
 
 ### M00 최신 검증 출력

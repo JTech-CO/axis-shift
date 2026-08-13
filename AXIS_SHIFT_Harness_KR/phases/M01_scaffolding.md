@@ -1,6 +1,6 @@
 # M01 — Production Scaffolding & Boundaries
 
-- **상태**: 진행 중 — 로컬 구현·Pages artifact E2 완료, commit 기준 clean checkout·원격 배포 증거 대기
+- **상태**: 진행 중 — 로컬 DoD·commit 기준 clean checkout 완료, 원격 Actions·Pages 배포 증거 대기
 - **담당 범위**: 저장소 기반, 도구 체인, 라우팅, CI, 모듈 경계
 - **최종 갱신**: 2026-08-14
 
@@ -78,7 +78,7 @@ M00 DoD는 미완료 상태다. 프로젝트 오너가 2026-08-14 ADR-0008 범�
 
 ## 7. DoD — 완료 게이트
 
-- [ ] **DOD-01 — 재현 설치**: 깨끗한 checkout과 Node 24.x에서 `npm ci`가 lockfile 변경 없이 exit 0이다. E2.
+- [x] **DOD-01 — 재현 설치**: 깨끗한 checkout과 Node 24.x에서 `npm ci`가 lockfile 변경 없이 exit 0이다. E2.
 - [x] **DOD-02 — 기본 품질 명령**: `npm run lint`, `format:check`, `typecheck`, `test`, `build`가 모두 exit 0이다. E2.
 - [x] **DOD-03 — Script 계약**: `AGENTS.md`에 선언된 모든 script 이름이 `package.json`에 존재한다. 아직 후속 phase 구현 전인 script는 명시적 placeholder가 아니라 안전한 “해당 검사 대상 0건” 검증기를 가져야 하며, 무조건 exit 0 스텁은 금지한다. (INV-018)
 - [x] **DOD-04 — 경계 차단**: `features`가 다른 feature 내부 파일을 import하거나 `domain`이 React·DOM·services를 import하는 의도적 샘플에서 lint가 실패한다. 샘플 제거 후 lint는 통과한다. E3. (INV-003)
@@ -116,18 +116,25 @@ npm run test:pages
 |---|---|---|---|
 | production preview | `/axis-shift/` base로 빌드 후 3개 hash route를 3개 엔진에서 접속 | 404 없이 AppShell·복구 화면, 셸 타깃 44px 이상 | Playwright 12/12 통과 |
 | Pages artifact | 공개 루트·stage/seed query·M00 anchor·직접 경로와 M01 hash route를 3개 엔진에서 접속 | M00 플레이 보존, M01 route·JS·CSS HTTP 200, console/page 오류 0 | Playwright 24/24 통과 |
-| Windows 개발환경 | Node 24 → `npm ci` → `npm run verify` | 경로/쉘 의존 오류 없음 | 로컬 source tree 통과; commit 기준 clean checkout은 DOD-01에 남음 |
+| Windows 개발환경 | final commit detached clean checkout → Node 24 `npm ci` → `npm run verify` | lockfile·tracked 변경과 경로/쉘 의존 오류 없음 | commit `bf3d1fe`, install·verify 통과 |
 
 ## 10. 증거
 
 환경: Windows, Node v24.19.0, npm 11.6.2
 
 ```text
-partial DOD-01:
+DOD-01 final clean checkout:
+  commit=bf3d1fe1fe37f101718d21df9ca8c020e97fd5b1
+  detached worktree=C:/tmp/axis-shift-m01-clean-bf3d1fe
+  node=v24.19.0 npm=11.6.2
   npm ci exit=0, added=261, vulnerabilities=0
   package-lock SHA256 before/after:
   3D8ECB7F611A72BC815DE3A2F1A0189546A1B607E558E508C1A3E47DAD50915B (동일)
-  미완료 이유: 스캐폴딩이 아직 commit되지 않아 clean checkout 증거가 아님
+  git status after install/verify/tests: tracked changes=0
+  npm run verify exit=0
+  npm run test:a11y exit=0
+  npm run test:e2e -- --project=chromium: 4/4
+  npm run test:pages -- --project=chromium: 8/8
 
 npm run verify exit=0
   scriptContract required=14 missing=0
@@ -141,7 +148,7 @@ npm run verify exit=0
   detectorSelfChecks=2 failures=0
   secretScan files=143 findings=0
   build modules=41 JS=233.88kB(gzip 74.94kB) CSS=2.73kB(gzip 1.15kB)
-  pagesArtifact files=14 bytes=328852 prototypeFiles=10
+  pagesArtifact files=14 bytes=327103 prototypeFiles=10
 
 npm run test:a11y exit=0
   files=12 interactiveTargets=6 staticNames=true computedSizeChecks=0 failures=0
@@ -170,7 +177,7 @@ CI:
 
 - 최초 3엔진 실행은 Firefox·WebKit 바이너리 미설치로 Chromium 3건만 통과했다. 두 엔진을 설치한 뒤 당시 route 9건은 통과했다.
 - 44px E2E 추가 후 Firefox가 `43.99993896484375px` 반올림과 8-worker teardown timeout을 드러냈다. CSS 최소값을 45px로 올리고 로컬 worker를 3으로 제한한 뒤 12/12 통과했다.
-- 최초 commit 기준 Windows clean checkout은 `npm ci`와 lockfile 불변을 통과했지만 CRLF checkout으로 `format:check`가 65개 파일에서 실패했다. 루트 `.gitattributes`에 `text=auto eol=lf`를 추가하고 final commit clean checkout에서 재검증한다.
+- 최초 commit 기준 Windows clean checkout은 `npm ci`와 lockfile 불변을 통과했지만 CRLF checkout으로 `format:check`가 65개 파일에서 실패했다. 루트 `.gitattributes`에 `text=auto eol=lf`를 추가한 final commit의 새 clean checkout에서 전체 verify와 Pages 3엔진 24/24가 통과했다.
 
 ## 11. 롤백 계획
 
