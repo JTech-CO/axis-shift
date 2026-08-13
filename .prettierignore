@@ -1,0 +1,13 @@
+AGENTS.md
+AXIS_SHIFT_Harness_KR/
+prototypes/
+docs/
+node_modules/
+dist/
+pages-dist/
+coverage/
+playwright-report/
+test-results/
+blob-report/
+outputs/
+package-lock.json

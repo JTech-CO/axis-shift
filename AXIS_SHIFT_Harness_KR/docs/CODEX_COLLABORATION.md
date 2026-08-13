@@ -2,7 +2,7 @@
 
 **버전**: 1.0.0  
 **상태**: 기록 중  
-**최종 갱신**: 2026-08-09
+**최종 갱신**: 2026-08-14
 
 ## 1. 목적
 
@@ -97,8 +97,41 @@ Codex가 제안·생성·수정한 항목
 | CX-M00-002 | 2026-08-09 | M00 | 실제 저장소·구현 루트 정정 | root/harness 계약·Git origin | root/branch/origin 확인, push 없음 | 부모 루트·하네스 분리 | 완료 |
 | CX-M00-003 | 2026-08-09 | M00 | 규칙 증명 프로토타입·E2 검증 | `prototypes/rule-proof/`·M00 증거 | core 196,674 + browser 51 단언, 오류 0 | 프로토타입 이후 모집·임계치 유지 | E2 완료 / E1 대기 |
 | CX-M00-004 | 2026-08-09 | M00 | 파일럿 관찰·다단계 난도 범위 정리 | 폐기형 stage·하네스 문서 | verifier 196,708 + browser 140 단언, 오류 0 | Easy 정식 조건·Daily 비독점·공유 레이아웃 한정 | E2 완료 / E1 대기 |
+| CX-M01-001 | 2026-08-14 | M01 | 제한 스캐폴딩·Pages artifact 전환 | ADR-0008·0009·생산 기반 | verify 통과, 경계 0·위반 단언 7, route 12/12, Pages 24/24 | 오너가 예외 범위와 artifact 전환 승인, M00 미완료 유지 | 로컬 E2 완료 / clean checkout·원격 대기 |
 
 ## 8. 상세 로그 템플릿
+
+### CX-M01-001 — M00 formal gate 전 제한 스캐폴딩 착수
+
+- 날짜: 2026-08-14
+- Phase / DoD: M01 / DoR 예외와 DOD-01~09
+- 관련 INV / ADR: INV-001~003, INV-014, INV-017~019 / ADR-0001, ADR-0004, ADR-0007, ADR-0008, ADR-0009
+- 시작 상태·실패: M00 자동 E2와 공개 프로토타입은 완료됐지만 formal Easy n≥5 E1과 DOD-02~07은 출시 직전 beta까지 연기돼 M01의 원래 DoR와 순환 대기가 생겼다.
+- 사람 결정: 프로젝트 오너가 M00을 통과·면제 처리하지 않은 채 M01의 도구 체인·경계·라우팅·CI 체크포인트만 선행 착수하도록 직접 승인했다. 최종 라이선스 결정 전에는 `UNLICENSED`를 유지한다.
+- Codex 요청 요약: React·TypeScript·Vite 생산 기반과 자동 경계를 M01 DoD 순서로 구현하고, 퍼즐 수학·콘텐츠·대규모 UI는 포함하지 않는다.
+- Codex 제안·변경:
+  - React 19·TypeScript 6·Vite 8 기반과 Node 24/npm 11 lock, strict typecheck, ESLint·Prettier·Vitest·Playwright를 루트에 구성했다.
+  - Hash Router의 `/`, `/daily`, wildcard 복구 route, 최소 AppShell·Error Boundary·i18n·CSS를 구현했다. 퍼즐 수학·콘텐츠·대규모 게임 UI는 만들지 않았다.
+  - source 37개의 계층·public entrypoint·순환을 검사하고 React·DOM·services·feature 교차·직접 browser service 접근 위반 7종과 순환 1종 fixture가 실제 실패한 뒤 자동 정리되게 했다.
+  - 레벨 0건과 Daily 구현 0건을 숨기지 않되, 향후 canonical solution 합성·필수 version·Daily 구현 탐지·퍼즐 스키마를 검사하는 self-check validator로 연결했다.
+  - CI에 Node 24 `npm ci`, 동일 품질 명령, `/axis-shift/` build, Chromium core E2E를 연결했다.
+  - 공개 루트·stage/seed는 M00으로, `/#/` 경로는 M01로 제공하는 artifact 전용 bridge와 whitelist 복사 빌더를 만들고 공식 Pages upload/deploy workflow에 연결했다.
+- 사람이 수정·거절한 것과 이유: 자동 E2를 사람 gate로 환산하거나 M00 DOD를 체크하는 방안은 채택하지 않았다.
+- 발견한 실패와 수정:
+  - 최초 full E2E에서 Firefox·WebKit 실행 파일이 없어 6건이 실행 전 실패했다. 브라우저를 설치한 뒤 route 9건이 통과했다.
+  - 44px 검사를 추가하자 Firefox가 44px를 `43.99993896484375px`로 계산했고 8-worker teardown이 timeout됐다. CSS 최소값을 45px로 올리고 worker를 3으로 제한한 뒤 12/12 통과했다.
+  - Pages Playwright spec가 최초 `npm run verify`에서 Vitest에 함께 수집돼 1 suite가 실패했다. `tests/pages/**`와 생성 artifact를 Vitest 수집에서 명시적으로 제외한 뒤 unit 5/5와 전체 verify가 다시 통과했다.
+  - 최종 읽기 전용 감사에서 Pages workflow가 별도 품질 CI와 독립 실행되고 upload 기본값이 `.nojekyll`을 제외하는 문제를 찾았다. 배포 workflow 자체에 a11y·core Chromium E2E를 추가하고 `include-hidden-files: true`로 artifact 동일성을 고정했다.
+  - 최초 commit의 Windows clean checkout에서 `npm ci`는 성공했지만 Git 자동 CRLF checkout으로 Prettier가 65개 파일을 실패시켰다. `.gitattributes`로 text LF를 고정한 final commit을 새 clean worktree에서 다시 검증하도록 수정했다.
+- 변경 파일: 루트 package·tool config·CI·Pages workflow, `scripts/`, 최소 `src/`, `tests/e2e/`, `tests/pages/`, ADR-0008·0009, M00/M01·PROGRESS·FILE_TREE·ENVIRONMENT·협업 기록
+- Commit / PR: 없음
+- 검증:
+  - Node v24.19.0, npm 11.6.2; `npm ci` exit 0, package-lock SHA-256 전후 동일
+  - `npm run verify` exit 0; script 14/14, unit 5/5, boundary violations=0, cycles=0, lintAssertions=7
+  - level files=0/selfChecks=2, Daily implementations=0/detectorSelfChecks=2, secret findings=0
+  - static a11y targets=6/failures=0, Chromium·Firefox·WebKit E2E 12/12
+  - Pages artifact files=14/bytes=328852/M00 runtime=10, Chromium·Firefox·WebKit 24/24, asset HTTP 200, console/page 오류 0
+- 남은 위험: commit된 clean checkout의 `npm ci`와 첫 원격 Actions·Pages 결론이 없어 M01 DOD-01과 실제 배포 증거는 미완료다. ADR-0009 순서로 legacy 백업·workflow 전환·공개 smoke가 남는다. M00 formal E1과 M02 착수 판단은 별도로 남는다.
 
 ### CX-M00-001 — DoR 감사와 4×4 fixture 고정
 

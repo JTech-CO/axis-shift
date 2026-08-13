@@ -1,8 +1,8 @@
 # AXIS//SHIFT 파일 트리·모듈 경계 계약
 
 **버전**: 1.0.0  
-**상태**: M01 구현 기준  
-**최종 갱신**: 2026-08-09  
+**상태**: M01 제한 체크포인트 구현 + 후속 phase 목표 계약
+**최종 갱신**: 2026-08-14
 **관련 불변식**: INV-002, INV-003, INV-017, INV-019
 
 ## 1. 목표
@@ -14,7 +14,7 @@
 
 ## 2. 목표 저장소 트리
 
-> **물리 배치 주의 (2026-08-09)**: 아래 트리의 구현 항목(`prototypes/`, `src/`, `public/`, `tests/`, `scripts/`, 설정 파일)은 부모 `PROJECT_ROOT` 기준이다. phase·ADR·불변식·증거 문서는 개발 중 `PROJECT_ROOT/AXIS_SHIFT_Harness_KR/`에 유지한다. M01 진입 시 이 구분을 실제 스캐폴딩과 경계 검사에 반영한다.
+> **물리 배치 주의 (2026-08-14)**: 아래 트리는 M11까지의 목표 구조이며 모든 항목이 M01에 존재한다는 뜻이 아니다. 구현 항목(`prototypes/`, `src/`, `public/`, `tests/`, `scripts/`, 설정 파일)은 부모 `PROJECT_ROOT` 기준이고, phase·ADR·불변식·증거 문서는 개발 중 `PROJECT_ROOT/AXIS_SHIFT_Harness_KR/`에 유지한다. 바로 아래 §2.1에 M01 실제 범위를 별도로 적는다.
 
 ```text
 axis-shift/
@@ -38,10 +38,12 @@ axis-shift/
 │   ├── audit-assets.ts
 │   ├── audit-daily-generator.ts
 │   ├── audit-network.ts
+│   ├── build-pages.ts
 │   ├── check-boundaries.ts
 │   ├── check-traceability.ts
 │   ├── export-share-fixtures.ts
 │   ├── generate-level-candidates.ts
+│   ├── start-pages-server.ts
 │   └── validate-levels.ts
 ├── src/
 │   ├── app/
@@ -50,12 +52,7 @@ axis-shift/
 │   │   ├── providers.tsx
 │   │   └── router.tsx
 │   ├── assets/
-│   │   ├── icons/
-│   │   └── styles/
-│   │       ├── global.css
-│   │       ├── reset.css
-│   │       ├── tokens.css
-│   │       └── utilities.css
+│   │   └── icons/
 │   ├── components/
 │   │   ├── common/                  # 도메인을 모르는 원자 UI
 │   │   ├── game/                    # presentational game UI
@@ -98,6 +95,11 @@ axis-shift/
 │   │   ├── pwa/
 │   │   ├── sharing/
 │   │   └── storage/
+│   ├── styles/
+│   │   ├── global.css
+│   │   ├── reset.css
+│   │   ├── tokens.css
+│   │   └── utilities.css
 │   ├── test/
 │   │   ├── fixtures/
 │   │   ├── setup.ts
@@ -106,6 +108,7 @@ axis-shift/
 │   └── vite-env.d.ts
 ├── tests/
 │   ├── e2e/
+│   ├── pages/
 │   └── visual/
 ├── AGENTS.md
 ├── CLAUDE.md
@@ -117,6 +120,7 @@ axis-shift/
 ├── RUNBOOK.md
 ├── .editorconfig
 ├── .env.example
+├── .gitattributes
 ├── .gitignore
 ├── .nvmrc
 ├── eslint.config.js
@@ -124,10 +128,24 @@ axis-shift/
 ├── package-lock.json
 ├── package.json
 ├── playwright.config.ts
+├── playwright.pages.config.ts
 ├── tsconfig.json
 ├── vite.config.ts
 └── vitest.config.ts
 ```
+
+### 2.1 M01 제한 체크포인트의 실제 구현 범위
+
+2026-08-14 현재 실제 생성된 생산 트리는 다음 범위다.
+
+- `.github/workflows/ci.yml`, `.github/workflows/deploy-pages.yml`, Node/npm lock, TypeScript·Vite·Vitest·Playwright·ESLint·Prettier 설정
+- `scripts/`의 경계·레벨·Daily·시크릿·정적 접근성 검사, E2E preview runner, Pages artifact 빌더·정적 서버
+- `src/app`, 최소 `components/layout`, `features/home`, `features/daily`, 한·영 i18n, `src/styles`
+- 후속 모듈 위치를 고정하는 `domain`·`content`·`services`의 빈 public entrypoint
+- AppShell·Error Boundary unit/component test, non-root Hash Router E2E, M00 호환 진입을 포함한 Pages artifact 3엔진 E2E
+- 생성되지만 commit하지 않는 `pages-dist/`: Vite M01 bundle, `.nojekyll`, whitelist된 M00 브라우저 runtime
+
+아직 생성하지 않은 목표 항목은 `public/` PWA 자산, 실제 level JSON, 퍼즐 수학·generator 구현, M02 이후 feature와 visual fixture다. 빈 public entrypoint는 구현 완료 주장이 아니라 경계 위치 고정용이다.
 
 ## 3. 계층별 책임
 
@@ -249,14 +267,15 @@ npm run lint
 npm run check:boundaries
 ```
 
-검사 항목:
+M01에서 실제 집행하는 검사 항목:
 
-1. `domain` 금지 import·global 사용
-2. feature 간 deep import
+1. `domain`의 외부·비도메인 import, 브라우저 global, `Math.random()` 사용
+2. feature 간 import와 feature·component의 직접 `fetch`·storage·navigator 사용
 3. public entrypoint 우회
 4. 순환 의존성
-5. sharing이 raw session/puzzle 타입을 받는지
-6. components가 storage·network를 호출하는지
-7. scripts가 규칙을 중복 구현하는지
+5. component의 services import
+6. 위반 7종과 순환 1종의 생성 → 실패 확인 → 자동 정리
 
 의도적 위반 fixture가 실패하는지를 CI에서 확인하고 제거한다. 경계 규칙 완화는 ADR과 INV-003 검토가 필요하다.
+
+`sharing`의 raw session/puzzle 타입 차단은 DTO가 생기는 M09에서, `scripts`의 규칙 중복 의미 검사는 도메인 코어와 생성기가 생기는 M02~M03에서 활성화한다. M01은 존재하지 않는 API를 검사한 것처럼 보고하지 않는다.

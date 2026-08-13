@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "composite": true,
+    "erasableSyntaxOnly": true,
+    "forceConsistentCasingInFileNames": true,
+    "lib": ["ES2023"],
+    "module": "ESNext",
+    "moduleDetection": "force",
+    "moduleResolution": "Bundler",
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ES2023",
+    "tsBuildInfoFile": "./node_modules/.cache/tsconfig.node.tsbuildinfo",
+    "types": ["node"]
+  },
+  "include": [
+    "eslint.config.js",
+    "playwright.config.ts",
+    "playwright.pages.config.ts",
+    "scripts/**/*.ts",
+    "tests/**/*.ts",
+    "vite.config.ts",
+    "vitest.config.ts"
+  ]
+}

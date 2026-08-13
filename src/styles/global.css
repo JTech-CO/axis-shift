@@ -1,0 +1,121 @@
+body {
+  min-width: 20rem;
+  min-height: 100vh;
+  background: var(--color-background);
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+a {
+  color: var(--color-accent);
+  text-underline-offset: 0.2em;
+}
+
+a:focus-visible,
+button:focus-visible,
+[tabindex='-1']:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+button {
+  min-width: 2.8125rem;
+  min-height: 2.8125rem;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.app-shell a {
+  display: inline-flex;
+  min-width: 2.8125rem;
+  min-height: 2.8125rem;
+  align-items: center;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+}
+
+.shell-header,
+.shell-main,
+.route-status {
+  width: min(100% - 2rem, var(--content-width));
+  margin-inline: auto;
+}
+
+.shell-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-block: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.brand {
+  color: var(--color-text);
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+}
+
+.shell-nav a[aria-current='page'] {
+  color: var(--color-text);
+  text-decoration-thickness: 0.15em;
+}
+
+.shell-main {
+  padding-block: var(--space-5);
+}
+
+.page {
+  max-width: 44rem;
+}
+
+.page h1 {
+  line-height: 1.2;
+}
+
+.route-status {
+  padding-block: var(--space-3);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-muted);
+  font-size: 0.875rem;
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 10;
+  top: var(--space-2);
+  left: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  transform: translateY(-200%);
+  background: var(--color-text);
+  color: var(--color-background);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+@media (max-width: 32rem) {
+  .shell-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+}

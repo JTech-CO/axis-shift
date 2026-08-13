@@ -4,9 +4,9 @@
 
 ## 현재 상태
 
-- **현재 phase**: M00 — Rule Proof & Scope Lock
-- **상태**: 진행 중 — M00 구현·E2 완료 / formal Easy E1·관련 DoD 판정은 출시 직전 playable beta로 연기
-- **마지막 갱신**: 2026-08-11 / 구현 체크포인트 `5d57e09` GitHub Pages 배포·원격 Edge 573 단언 통과
+- **현재 phase**: M01 — Production Scaffolding & Boundaries (ADR-0008 선행 체크포인트)
+- **상태**: 진행 중 — M01 로컬 Pages artifact E2 완료, DOD-01 clean checkout·원격 Actions/Pages 증거 대기 / M00 formal Easy E1·DOD-02~07은 출시 직전 playable beta까지 미완료 유지
+- **마지막 갱신**: 2026-08-14 / ADR-0009 Pages artifact 전환 구현·3엔진 호환 smoke 완료
 - **목표 릴리스**: OpenAI Game Builders Seoul Track 1 제출 빌드
 - **제출 접수 종료**: 2026-08-26
 
@@ -35,13 +35,20 @@
 - [x] 사람 대상 폐기형 난도 비교 관찰 — 5×5·6×6 모두 4×4보다 생각할 거리가 있고 지나치게 쉽지 않다는 후기 확보; 표본 메타데이터 미보고로 Easy 본 표본·DOD 수치에는 미합산
 - [x] 난도별 보드 크기 풀 결정 — Easy=4×4, Normal=4×4·5×5, Hard=4×4·5×5·6×6
 - [x] formal Easy E1 실행 시점 결정 — 참가자·개별 기록을 확인할 수 없는 현재는 수집하지 않고 출시 직전 playable beta에서 n≥5로 실행
+- [x] M01 React·TypeScript·Vite 최소 AppShell — Hash Router의 `/`, `/daily`, wildcard 복구 route와 Error Boundary, 한·영 키 골격
+- [x] Node 24/npm 11 생산 도구 체인 — strict TypeScript, ESLint, Prettier, Vitest, Playwright, lockfile, non-root base 설정
+- [x] 자동 경계·zero-target validator — 실제 source 37개 순환/경계 0건, 위반 7종·순환 1종 fixture, 레벨 해법 합성·Daily 구현 탐지 self-check
+- [x] M01 로컬 E2 — verify 10단계, unit 5/5, 정적 접근성 target 6개, Chromium·Firefox·WebKit route/44px E2E 12/12
+- [x] PR CI — Node 24 `npm ci`부터 동일 품질 명령·non-root build·Chromium core E2E까지 연결
+- [x] Pages artifact 호환 배포 구현 — M00 루트·stage/seed·anchor·직접 경로와 M01 hash route를 한 artifact에 조립, 3엔진 24/24
 
 ## 다음 할 일
 
-1. 현재 M00 구현·E2 증거를 상태 인계하되 formal Easy E1 표본이나 관련 DoD 통과를 주장하지 않는다.
-2. [x] 현재 구현을 체크포인트 `5d57e09`로 commit·push하고 공개 URL Edge 573 단언 재스모크를 완료했다. 이 체크포인트는 M00 phase 완료나 DoD 통과 태그가 아니다.
-3. 출시 직전 playable beta의 build SHA·공개 URL이 고정되면 신규 사용자 n≥5, 표본 구성, 비공개 원시 기록 위치·삭제 예정일을 확정한다.
-4. 동일 베타 빌드의 Easy 조건에서 n≥5와 4/5 임계치를 그대로 적용해 DOD-02~05를 판정하고, 결과를 반영해 DOD-06~07과 M00 formal gate를 판정한다.
+1. M01 범위를 commit한 뒤 clean checkout의 Node 24 `npm ci`·lockfile 불변을 확인해 DOD-01을 판정한다.
+2. 기존 `origin/main`을 legacy 백업 branch로 보존하고 Pages를 `build_type=workflow`로 전환한 뒤 main을 push한다.
+3. 최초 CI·Pages Actions와 공개 루트 M00, stage/seed, M01 `/#/` route smoke 결론을 기록한다.
+4. M01 체크포인트에서도 M00 formal E1이나 DOD-02~07 통과를 주장하지 않으며, M02는 별도 착수 판단 전 시작하지 않는다.
+5. 출시 직전 playable beta의 SHA·공개 URL이 고정되면 신규 사용자 n≥5, 표본 구성, 비공개 원시 기록 위치·삭제 예정일을 확정한다.
 
 ### Formal Easy 게이트 연기 경계
 
@@ -52,7 +59,7 @@
 
 ## 현재 미결 질문 / 사용자 결정 대기
 
-- 공개 저장소 라이선스: MIT를 권장하나 최종 결정 필요.
+- 공개 저장소의 최종 라이선스: 결정 전 package는 `private: true`·`UNLICENSED`로 유지한다.
 - 최종 프로덕션 URL: GitHub Pages 경로와 별도 도메인 사용 여부.
 - 앱 표시 기본 언어: 브라우저 언어 자동 감지 후 한국어/영어 폴백 순서 확인.
 - 기술 백서의 “10초 내 행·열 선택과 교차점 반전 관계 이해”를 M00 통과 게이트로 볼지 별도 관찰 지표로 볼지.
@@ -66,7 +73,7 @@
 | Phase | 이름 | 상태 | 핵심 출구 게이트 |
 |---|---|---|---|
 | M00 | Rule Proof & Scope Lock | 진행 중 — 구현·E2 완료 / formal E1은 출시 직전 베타로 연기 | 베타 n≥5에서 4/5 기준 판정; 현재 미완료 |
-| M01 | Production Scaffolding | 미시작 | build/lint/type/test + 실제 경계 위반 차단 |
+| M01 | Production Scaffolding | 진행 중 — 로컬 source·Pages artifact E2 완료 / clean checkout·원격 증거 대기 | clean checkout `npm ci` + 원격 CI·Pages smoke |
 | M02 | Board & GF(2) Core | 미시작 | 3×3 전수에서 brute-force = rank |
 | M03 | Generator & Content Pipeline | 미시작 | 10년 Daily 감사, 54개 정적 레벨 검증 |
 | M04 | Session, Persistence & Scoring | 미시작 | reducer·저장·시간·등급 정합 |
@@ -96,6 +103,30 @@
 | 2026-08-09 | M00 | 비게이트 난도 비교 관찰 | 사람 대상 5×5·6×6 비교 플레이 후기 | 둘 다 4×4보다 생각할 거리가 있고 지나치게 쉽지 않음; 난도별 크기 풀 채택; 참가자 수·시간·기기·개입 미보고로 DOD 미집계 | `docs/PLAYTEST_PROTOCOL.md` §13 |
 | 2026-08-10 | M00 | formal Easy E1 일정 결정 | 프로젝트 오너 결정 | 출시 직전 playable beta까지 자료 수집·DOD-02~07 판정 연기; PASS·면제 아님 | `phases/M00_rule_proof.md` §3.1, `docs/PLAYTEST_PROTOCOL.md` §13 |
 | 2026-08-11 | M00 | 구현 체크포인트 Pages 배포 | application=`5d57e09d250859b4eccdf64bca784f8ae527f6ce`, Pages `built` → 공개 URL Edge smoke | assertions=573; viewport=320/360/960; consoleErrors=0 | `https://jtech-co.github.io/axis-shift/`, `phases/M00_rule_proof.md` §10 |
+| 2026-08-14 | M01 | DOD-02~05·07·09 로컬 품질·경계 | Node 24 `npm run verify` + `npm run test:a11y` | scripts=12/12; unit=5/5; boundaries files=37, violations=0, cycles=0, lintAssertions=7; secret findings=0; a11y targets=6 | `phases/M01_scaffolding.md` §10 |
+| 2026-08-14 | M01 | DOD-03 zero-target validator 안전성 | `validate:levels` + `audit:daily` | level files=0/selfChecks=2; Daily implementations=0/detectorSelfChecks=2; 무조건 통과 stub 아님 | `phases/M01_scaffolding.md` §10 |
+| 2026-08-14 | M01 | DOD-06 non-root route·AppShell target | Node 24 `npm run test:e2e` | Chromium·Firefox·WebKit 12/12; 3 routes HTTP 200; computed target ≥44px | `tests/e2e/routes.spec.ts`, `phases/M01_scaffolding.md` §10 |
+| 2026-08-14 | M01 | ADR-0009 Pages artifact 호환 E2 | Node 24 `npm run build:pages` + `npm run test:pages` | files=14, bytes=328852, M00 runtime=10; Chromium·Firefox·WebKit 24/24; asset HTTP 200; 오류 0 | `tests/pages/pages-artifact.spec.ts`, `phases/M01_scaffolding.md` §10 |
+| 2026-08-14 | M01 | DOD-01 부분 증거 | Node 24 `npm ci`, lockfile SHA-256 전후 비교 | exit 0, 261 packages, vulnerabilities=0, hash 동일; commit 전 source tree라 clean checkout 판정 보류 | `phases/M01_scaffolding.md` §10 |
+
+### M01 최신 검증 출력
+
+```text
+environment: Windows, node=v24.19.0, npm=11.6.2
+scriptContract required=14 missing=0
+Vitest: files=2 tests=5 failures=0
+boundaries files=37 edges=23 violations=0 cycles=0 lintFixtures=4 lintAssertions=7 cycleFixtures=1
+levelValidation files=0 levels=0 rankChecks=0 solutionChecks=0 validatorSelfChecks=2 failures=0
+dailyAudit sourceFiles=1 implementations=0 dates=0 puzzleChecks=0 detectorSelfChecks=2 failures=0
+secretScan files=143 findings=0
+a11yTargetAudit files=12 interactiveTargets=6 staticNames=true computedSizeChecks=0 failures=0
+build modules=41 JS=233.88kB gzip=74.94kB CSS=2.73kB gzip=1.15kB
+Playwright: chromium+firefox+webkit tests=12 passed
+Pages artifact: files=14 bytes=328852 prototypeFiles=10
+Pages Playwright: chromium+firefox+webkit tests=24 passed
+package-lock SHA256 before=after=3D8ECB7F611A72BC815DE3A2F1A0189546A1B607E558E508C1A3E47DAD50915B
+remaining: committed clean checkout npm ci + first remote Actions conclusion
+```
 
 ### M00 최신 검증 출력
 
@@ -155,6 +186,7 @@ public browserAssertions=140 viewport=360x640 easyMoves=2 normalMoves=3 hardMove
 | R-06 | 공유 서명이 정답/이동을 간접 노출 | 낮음 | 높음 | 금지 필드 invariant, payload snapshot, 수동 검토 | M09 |
 | R-07 | 기능 범위가 일정 안에 과도함 | 중 | 매우 높음 | phase gate, 8/21 scope freeze, P0/P1 우선 | 전역 |
 | R-08 | rank/Par만으로 난도를 정하면 단일 축 순회가 최적 또는 준최적이 됨 | 높음 | 매우 높음 | `sweepBound`·`compressionGap` 검증, full-rank를 난도 stage가 아닌 대조군으로 분리, 사람 비교 | M00·M03·M06 |
+| R-09 | legacy Pages가 `main:/` 소스를 직접 제공해 Vite source entry push 시 기존 공개 링크가 깨짐 | 높음 | 매우 높음 | push 전 artifact Pages 전환 또는 M00 링크 보존, 이후 실제 URL smoke | M01·M10 |
 
 ## 막힘 기록
 
@@ -184,6 +216,7 @@ STOP 발동 시 아래 형식으로 추가한다.
 - ADR-0005: DOM/CSS Grid 보드, Canvas 공유 카드만 사용한다.
 - ADR-0006: Signal Signature 기반 스포일러 없는 공유를 채택한다.
 - ADR-0007: 로컬 전용 데이터와 런타임 AI API 없음 원칙을 채택한다.
+- ADR-0008: M00 formal E1을 통과 처리하지 않은 채 M01의 도구·경계·라우팅·CI 체크포인트만 선행 착수한다.
 - Workspace-2026-08-09: 부모 `AXIS SHIFT (Tensor)`를 Git·구현 루트로, `AXIS_SHIFT_Harness_KR`를 가이드·증거 폴더로 유지한다.
 - 2026-08-09: 내부 파일럿 run 2회에서 Easy stage의 관측 최저는 3 PULSE였고, 초기 계산이 어긋난 흐름은 4~5 PULSE까지 이어질 수 있었다. 이는 수학적 Par 2를 바꾸지 않으며 참가자 수·시간·개입은 미보고로 둔다.
 - 2026-08-09: M00 정식 조건은 `M00-MAIN-v1` Easy 하나로 유지하고 Normal·당시 Hard는 폐기형 난도 탐색 stage로 추가했다. 이후 당시 Hard는 `P0-DIFF-001`에 따라 Full Rank 대조군으로 재분류했다. 날짜당 한 문제 제한은 Daily 모드에만 적용하며, Wordle 유사성은 간결한 SNS 공유 결과 레이아웃에만 한정한다.
@@ -194,3 +227,4 @@ STOP 발동 시 아래 형식으로 추가한다.
 - 2026-08-09: `m00-seeded-v1` 여섯 profile과 URL seed 재현, 직전 target 최대 32회 제외, 실패 시 현재 보드 보존을 구현했다. 단일 행/열 sweep 완료는 성공으로 인정하되 다른 풀이를 권하고, visibility-safe 스톱워치와 완료 PULSE·0.1초를 제공한다. verifier 200,967개·Edge 573개 단언으로 회귀했으며 코어 PULSE와 Par 계약은 바꾸지 않는다.
 - 2026-08-09: 위 난도 비교의 참가자 수·시간·기기·개입·DOD-02~04 지표는 보고되지 않았다. 이를 추정하거나 Easy 본 표본에 합산하지 않으며 M00 완료와 DOD-06 Scope Lock은 계속 보류한다.
 - 2026-08-10: 참가자 수·개별 기록을 검증할 지표가 없는 현시점에는 formal Easy n≥5 자료를 수집하지 않는다. 출시 직전 동일 playable beta 빌드에서 §3.1 표본·보관 게이트를 먼저 충족한 뒤 DOD-02~05와 그 결론에 의존하는 DOD-06~07을 판정한다. 이는 PASS·면제·임계치 완화가 아니며, 별도 구현 체크포인트 push도 M00 phase 완료를 뜻하지 않는다.
+- 2026-08-14: 프로젝트 오너가 M00 사람 대상 gate 전 M01 체크포인트 착수를 승인했다. ADR-0008에 따라 스캐폴딩·라우팅·경계·CI에만 한정하며 M00 DOD-02~07, M02 착수, 릴리스 승인을 대신하지 않는다.

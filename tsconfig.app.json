@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "composite": true,
+    "erasableSyntaxOnly": true,
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "react-jsx",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleDetection": "force",
+    "moduleResolution": "Bundler",
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ES2023",
+    "tsBuildInfoFile": "./node_modules/.cache/tsconfig.app.tsbuildinfo",
+    "types": ["vite/client", "vitest/globals"]
+  },
+  "include": ["src"]
+}

@@ -1,0 +1,59 @@
+{
+  "name": "axis-shift",
+  "version": "0.1.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "type": "module",
+  "engines": {
+    "node": ">=24 <25",
+    "npm": ">=11 <12"
+  },
+  "scripts": {
+    "dev": "vite",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc -b",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "validate:levels": "tsx scripts/validate-levels.ts",
+    "audit:daily": "tsx scripts/audit-daily-generator.ts",
+    "audit:secrets": "tsx scripts/check-secrets.ts",
+    "check:boundaries": "tsx scripts/check-boundaries.ts",
+    "build": "tsc -b && vite build",
+    "build:pages": "tsx scripts/build-pages.ts",
+    "preview": "vite preview",
+    "test:e2e": "playwright test",
+    "test:pages": "playwright test --config=playwright.pages.config.ts",
+    "test:a11y": "tsx scripts/check-a11y-targets.ts",
+    "verify": "tsx scripts/run-verify.ts"
+  },
+  "dependencies": {
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-router-dom": "7.18.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.62.1",
+    "@testing-library/jest-dom": "7.0.1",
+    "@testing-library/react": "16.3.2",
+    "@testing-library/user-event": "14.6.4",
+    "@types/node": "24.13.3",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "@vitejs/plugin-react": "6.0.5",
+    "@vitest/coverage-v8": "4.1.10",
+    "eslint": "10.8.1",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "eslint-plugin-react-refresh": "0.5.4",
+    "globals": "17.11.0",
+    "jsdom": "30.0.1",
+    "prettier": "3.9.6",
+    "tsx": "4.23.12",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.67.0",
+    "vite": "8.2.1",
+    "vitest": "4.1.10"
+  }
+}

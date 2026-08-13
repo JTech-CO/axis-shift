@@ -1,8 +1,8 @@
 # AXIS//SHIFT 개발·검증·배포 환경 계약
 
 **버전**: 1.0.0  
-**상태**: M01 구현 기준  
-**최종 갱신**: 2026-08-09
+**상태**: M01 제한 체크포인트·Pages artifact 전환 기준
+**최종 갱신**: 2026-08-14
 
 ## 1. 기준 환경
 
@@ -22,13 +22,27 @@
 
 Node 24 메이저 안의 정확한 patch는 CI와 개발환경에서 같은 lock 전략을 사용한다. Node major 변경은 도구 호환성·CI·artifact hash에 영향을 주므로 ADR 또는 environment 변경 기록이 필요하다.
 
+### M01 검증 기준선
+
+| 항목 | 실제 기준 |
+|---|---|
+| Node.js | v24.19.0 |
+| npm | 11.6.2 |
+| React / React DOM | 19.2.8 |
+| Vite | 8.2.1 |
+| TypeScript | 6.0.3 |
+| Vitest / Playwright | 4.1.10 / 1.62.1 |
+| Pages base | `/axis-shift/` |
+
+2026-08-14 Windows 호스트의 시스템 기본 Node는 v25.2.0이어서 공식 M01 증거 명령은 Node 24 실행기로 분리해 수행했다. 제품 계약은 시스템 Node 25가 아니라 `.nvmrc`와 `package.json#engines`의 Node 24다.
+
 ## 2. 지원 개발 OS
 
 - Windows 10/11 + PowerShell 7 또는 Git Bash
 - macOS 현재 지원 버전
 - Ubuntu LTS 또는 GitHub Actions `ubuntu-latest`
 
-shell-specific 문법을 npm script에 직접 넣지 않는다. 복잡한 검사는 TypeScript/Node script로 구현한다.
+shell-specific 문법을 npm script에 직접 넣지 않는다. 복잡한 검사는 TypeScript/Node script로 구현한다. `.gitattributes`의 `text=auto eol=lf`로 Windows clean checkout도 CI와 같은 LF를 사용한다.
 
 ## 3. 최초 설치
 
@@ -67,17 +81,20 @@ npm run test
 npm run test:coverage
 npm run validate:levels
 npm run audit:daily
+npm run audit:secrets
+npm run check:boundaries
 npm run build
+npm run build:pages
 npm run preview
 npm run test:e2e
+npm run test:pages
 npm run test:a11y
 npm run verify
 ```
 
-추가 권장 script:
+후속 phase에서 추가할 권장 script:
 
 ```bash
-npm run check:boundaries
 npm run test:math:exhaustive
 npm run test:storage:migrations
 npm run test:visual
@@ -120,26 +137,33 @@ VITE_PUBLIC_URL=http://localhost:4173
 
 ## 6. Base path·라우팅 검증
 
-GitHub Pages repository site는 root가 아닐 수 있다. M01부터 non-root preview를 검사한다.
+GitHub Pages repository site base는 `/axis-shift/`다. M01부터 non-root production preview를 검사한다. Vite config는 shell 환경변수를 우선하고, 없으면 mode별 `.env*`의 `VITE_BASE_PATH`를 읽는다.
 
 ```bash
 VITE_BASE_PATH=/axis-shift/ npm run build
 npm run preview -- --host 127.0.0.1 --port 4173
 ```
 
-필수 확인:
+PowerShell에서는 첫 줄 대신 다음을 사용한다.
+
+```powershell
+$env:VITE_BASE_PATH = '/axis-shift/'
+npm run build
+```
+
+M01 필수 확인:
 
 ```text
 /axis-shift/#/
-/axis-shift/#/tutorial
 /axis-shift/#/daily
-/axis-shift/#/daily/2026-08-09
 /axis-shift/#/unknown
 ```
 
 - 모두 서버 404 없이 app shell을 받는다.
 - unknown route는 앱 내부 복구 화면을 보인다.
-- manifest `start_url/scope`와 worker scope가 `/axis-shift/` 안이다.
+- `npm run test:e2e`는 위 세 route와 44px AppShell 상호작용 타깃을 Chromium·Firefox·WebKit에서 검사한다.
+
+`/#/tutorial`은 M06, `/#/daily/YYYY-MM-DD`는 M07, manifest `start_url/scope`와 worker scope는 M09에서 이 목록에 추가한다. M01은 PWA나 아직 없는 route를 통과했다고 주장하지 않는다.
 
 ## 7. 테스트 환경 고정
 
@@ -182,33 +206,53 @@ PR pipeline:
 ```text
 checkout
 → setup-node 24 + npm cache
+→ Node·npm 버전 출력
 → npm ci
 → lint
 → format:check
 → typecheck
 → unit/component
+→ 정적 접근성 이름 검사
+→ 모듈 경계·순환 검사
 → level validation
-→ Daily audit representative/full policy
+→ Daily 구현 탐지·대표 날짜 audit
+→ secret scan
 → build
-→ core E2E
+→ Chromium 설치
+→ non-root route core E2E
 ```
 
-main/release pipeline:
+main Pages pipeline:
 
 ```text
-PR pipeline 전체
-→ full 3,650-day audit
-→ full browser E2E
-→ accessibility
-→ visual regression
-→ asset/network/security audit
+checkout
+→ setup-node .nvmrc + npm cache
+→ npm ci
+→ npm run verify
+→ npm run test:a11y
+→ Chromium 설치
+→ npm run test:e2e -- --project=chromium
+→ npm run test:pages -- --project=chromium
 → Pages artifact upload/deploy
-→ production smoke
 ```
 
-CI는 `package-lock.json`, `.nvmrc`, Node setup major가 일치하는지 검사한다.
+M01 workflow는 `node-version-file: .nvmrc`, npm cache와 `package-lock.json`, `npm ci`를 사용한다. `.nvmrc=24`와 `package.json#engines`도 Node 24로 일치한다. PR/main 품질 CI는 Chromium core E2E까지, Pages workflow는 호환 artifact Chromium smoke와 공식 upload/deploy까지 실행한다.
 
 ## 9. GitHub Pages 배포
+
+2026-08-14 전환 전 원격은 legacy Pages(`main` 브랜치의 `/`)로 M00 정적 프로토타입을 직접 제공한다. M01에는 `deploy-pages.yml`과 로컬 3엔진 artifact smoke가 준비됐으며, legacy SHA 백업 → `build_type=workflow` 전환 → main push → 실제 URL smoke 순서로 적용한다.
+
+M01 전환 artifact 계약:
+
+- `npm run build:pages` 출력은 `pages-dist/`이며 commit하지 않는다.
+- 공개 루트와 기존 stage/seed query는 M00 `prototypes/rule-proof/`로 연결한다.
+- `/#/`, `/#/daily`, 알 수 없는 hash route는 M01 Hash Router로 제공한다.
+- 정적 접근성·Chromium core E2E와 Chromium artifact smoke를 배포 job 안에서 모두 통과한 artifact만 업로드한다.
+- upload는 숨김 파일 포함을 명시해 `.nojekyll`을 로컬 검증 artifact와 동일하게 보존한다.
+- Chromium·Firefox·WebKit 로컬 artifact E2E 24/24와 asset HTTP 200을 별도 회귀 기준으로 유지한다.
+- 실패 시 전환 직전 SHA의 legacy 백업 branch를 Pages source로 지정해 복구한다.
+
+M10 목표 계약:
 
 - source branch의 `dist/`를 commit하지 않는다.
 - CI artifact를 Pages 공식 action으로 배포한다.
@@ -255,14 +299,14 @@ sample count and median/p95
 
 ```bash
 sha256sum <file>
-find dist -type f -print0 | sort -z | xargs -0 sha256sum
+find pages-dist -type f -print0 | sort -z | xargs -0 sha256sum
 ```
 
 ### PowerShell
 
 ```powershell
 Get-FileHash -Algorithm SHA256 <file>
-Get-ChildItem dist -Recurse -File |
+Get-ChildItem pages-dist -Recurse -File |
   Sort-Object FullName |
   Get-FileHash -Algorithm SHA256
 ```
