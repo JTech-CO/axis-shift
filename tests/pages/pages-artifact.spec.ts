@@ -79,6 +79,7 @@ for (const route of [
 
     await expect(page).toHaveURL(new RegExp(`/axis-shift/${route.hash.replace('/', '\\/')}$`, 'u'));
     await expect(page.getByRole('heading', { level: 1 })).toHaveAttribute('id', route.headingId);
+    await expect(page.locator('link[rel="icon"]')).toHaveAttribute('href', 'data:,');
     expect(errors).toEqual([]);
   });
 }
