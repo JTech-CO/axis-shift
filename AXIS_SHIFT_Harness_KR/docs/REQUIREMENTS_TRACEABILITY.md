@@ -1,7 +1,7 @@
 # AXIS//SHIFT 요구사항 추적표
 
 **버전**: 1.0.0  
-**상태**: M00·M01 verified / H00 v0.1 submission slice in progress / v1 roadmap baseline
+**상태**: M00·M01 verified / H00 v0.1 submission slice verified / v1 roadmap baseline
 **최종 갱신**: 2026-08-21
 
 > 기능 요구사항 ID는 기술 백서 §2.2.2를 따른다. `NFR-*`는 백서의 성능·접근성·배포·개인정보 기준을 하네스에서 추적 가능하게 부여한 ID다. 이 표가 새로운 제품 요구를 만드는 것은 아니며, 원문 기준의 검증 경로를 연결한다.
@@ -67,8 +67,10 @@
 | HS-CONTENT-001 | 기존 6 profile × 고정 signal 3개 이상, 총 18개 이상·중복 0 | H00 | `prototypes/rule-proof/fixtures.mjs` | verifier + 전체 진행 browser smoke | 004~007,018 | Verified |
 | HS-AXIS-001 | 선택 축 진행선·PULSE 교차점 충격·완료 Signal Lock | H00 | `game.mjs`, `styles.css` | state/computed-style browser smoke | 005,010,015 | Verified |
 | HS-A11Y-001 | 키보드·44px·reduced motion·비색상 preview 유지 | H00 | M00 prototype UI | 320/360/390/960 E2E + E1 | 015,018 | Verified |
-| HS-DEPLOY-001 | 고정 v0.1 SHA Pages root·signal·seed·M01 bridge 공개 smoke | H00 | Pages artifact | local artifact + public E4 | 014,017,020 | In Progress |
-| HS-SUBMIT-001 | Prototype/v0.1로 정직한 URL·README·영상·썸네일·백업 | H00 | 제출 문서·자산 | 2회 필드 대조 | 018~020 | In Progress |
+| HS-DEPLOY-001 | 고정 v0.1 SHA Pages root·signal·seed·M01 bridge 공개 smoke | H00 | Pages artifact | CI `32453169036` + Pages `32453169029` + public E4 | 014,017,020 | Verified |
+| HS-SUBMIT-001 | Prototype/v0.1로 정직한 URL·README·영상·썸네일·백업 | H00 | 제출 문서·자산 | 필드 대조 2회 + manifest 14/0 + 2중 백업 hashDelta 0 | 018~020 | Verified |
+
+> **H00 완료 증거 (2026-08-21)**: tag/release SHA와 app capture SHA는 모두 `6690f5778f706e1875b452d552bd75ba1c06ee9a`이며 Pages digest는 `sha256:07a222cc7af5ad221e3d4be3524f53992cdf01823e6af56b7723c00282671998`다. H00 경계는 submission-ready 패키지까지이며 공식 Google 양식의 최종 Submit은 오너 작업으로 남아 있고 실행했다고 주장하지 않는다. v1 FR/NFR 행은 계속 `Planned`다.
 
 ## 5. 모드별 E2E 추적
 

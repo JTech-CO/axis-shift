@@ -99,9 +99,9 @@ Codex가 제안·생성·수정한 항목
 | CX-M00-004 | 2026-08-09 | M00 | 파일럿 관찰·다단계 난도 범위 정리 | 폐기형 stage·하네스 문서 | verifier 196,708 + browser 140 단언, 오류 0 | Easy 정식 조건·Daily 비독점·공유 레이아웃 한정 | E2 완료 / E1 대기 |
 | CX-M01-001 | 2026-08-14 | M01 | 제한 스캐폴딩·Pages artifact 전환 | ADR-0008·0009·생산 기반 | clean verify, 경계 0, route 12/12, Pages 24/24, 공개 M00 573 | 오너가 예외 범위와 artifact 전환 승인, M00 미완료 유지 | 완료 |
 | CX-M00-005 | 2026-08-21 | M00 | Formal Easy E1 판정과 phase 종료 | M00·protocol·progress | n=5, I0·first PULSE·solve·recall 모두 5/5, 반복 P0 0 | 오너가 aggregate-only 제한을 인지하고 종료 승인 | 완료 |
-| CX-H00-001 | 2026-08-21 | H00 | 5일 제출 슬라이스 범위 고정 | ADR-0010·H00 phase·traceability | DoR 6/6, 구현 검증 대기 | 콘텐츠→AXIS 연출 우선, 3D·새 모드 제외 | 진행 중 |
-| CX-H00-002 | 2026-08-21 | H00 | 18신호·AXIS 연출 local vertical slice | prototype·Pages test·H00 증거 | campaign 217, browser 891, Pages 27/27, 오류 0 | 3D 대신 콘텐츠·축 인과·모바일 완성도 채택 | local 완료 / E4 대기 |
-| CX-H00-003 | 2026-08-21 | H00 | 공개 배포 회귀와 제출 패키지 준비 | PR #1·#2, Pages, private submission package | public Pages 27/27, browser 891, 외부 요청·콘솔 오류 0 | 오너가 라이선스·개인정보·동의·최종 Submit 책임 유지 | release record 진행 |
+| CX-H00-001 | 2026-08-21 | H00 | 5일 제출 슬라이스 범위 고정 | ADR-0010·H00 phase·traceability | DoR 6/6, 최종 DOD 12/12 | 콘텐츠→AXIS 연출 우선, 3D·새 모드 제외 | 완료 |
+| CX-H00-002 | 2026-08-21 | H00 | 18신호·AXIS 연출 vertical slice | prototype·Pages test·H00 증거 | campaign 217, browser 891, Pages 27/27, 오류 0 | 3D 대신 콘텐츠·축 인과·모바일 완성도 채택 | 완료 |
+| CX-H00-003 | 2026-08-21 | H00 | 공개 배포 회귀와 submission-ready 패키지 | PR #1·#2·#3, tag·Pages·private package | clean E3, public E4, 14-entry manifest, backup delta 0 | 오너가 라이선스·개인정보·동의·최종 Submit 책임 유지 | 완료 |
 
 ## 8. 상세 로그 템플릿
 
@@ -122,7 +122,7 @@ Codex가 제안·생성·수정한 항목
 - 관련 INV / ADR: INV-001~002, 004~006, 014~015, 017~020 / ADR-0010
 - 사람 결정: 8월 26일 마감과 베타 피드백을 근거로 M00을 닫고 콘텐츠량, AXIS 연출, 2D 표현 순으로 작업하도록 승인했다.
 - Codex 역할: 정규 M02~M11 완료를 주장하지 않는 `v0.1.0-hackathon` lane, allowlist, 18+ signal·연출·접근성·Pages E4·제출 DoD를 정의했다.
-- 상태: 구현과 E2/E4 증거 대기. 완료 수치는 실제 실행 후 갱신한다.
+- 상태: 구현·E2/E3·공개 E4·제출 패키지까지 완료. 최종 수치는 CX-H00-002·003과 H00 phase에 고정했다.
 
 ### CX-H00-002 — 18신호 캠페인과 AXIS 인과 연출
 
@@ -133,19 +133,19 @@ Codex가 제안·생성·수정한 항목
 - Codex 역할: 기존 6 profile과 `m00-seeded-v1`을 재사용해 18개 고정 signal을 만들고, 순차/랜덤 CTA와 URL 재현을 추가했다. 선택 mask에서 axis rail·intersection 상태를 파생하고 PULSE 360ms·Signal Lock CSS를 논리 상태와 분리했다.
 - 발견한 실패와 수정: invalid `signal`이 앱을 중단하던 경로, control fixture의 실패하는 replay/불일치 CTA, forced-colors 셀 상태 가림, 전역 seed 결합을 정적 리뷰에서 발견해 수정했다. Pages title 기대값 실패 3건은 H00 제목·signal route 계약으로 테스트를 갱신해 27/27로 복구했다.
 - 검증: M00 verifier 200,967/0; H00 campaign 217/0; browser 891/0, 320/360/390/960, 외부 요청·콘솔 오류 0; Node 24 verify 10단계; Pages 3엔진 27/27; a11y failures=0; 360·390 완료 캡처 육안 PASS.
-- 사람이 확인할 남은 일: commit/push와 공개 E4, LICENSE, tag, 실제 제출 양식·썸네일·영상·2중 백업. H00은 M02~M11을 완료시키지 않는다.
+- 완료 경계: PR #1 구현과 PR #2 favicon 회귀를 병합하고 공개 E4를 통과했다. H00은 `UNLICENSED`/All Rights Reserved를 유지하며 M02~M11을 완료시키지 않는다.
 
 ### CX-H00-003 — 공개 배포 회귀 검증과 제출 패키지 준비
 
 - 날짜: 2026-08-21
-- Phase / DoD: H00 / DOD-08·09·11·12 진행
+- Phase / DoD: H00 / DOD-08·09·11·12 완료
 - 관련 INV / ADR: INV-001~002, 014~015, 017~020 / ADR-0010
 - 사람 결정: 게임 방향과 beta 증거를 제공하고 공개 라이선스 결정권, Google 계정·개인정보·법적 동의·최종 Submit 책임을 유지했다. 별도 공개 라이선스 승인이 없어 H00은 기존 `UNLICENSED`/All Rights Reserved를 보존한다.
-- Codex 역할: feature branch·draft PR·CI·Pages 배포를 운영하고 공개 URL E4를 실행했다. Chromium이 origin root `/favicon.ico`를 요청해 콘솔 오류가 발생하는 것을 재현하고 data URL favicon과 회귀 단언으로 수정했다. 동일 공개 SHA에서 썸네일·13.76초 무음 영상·권리·필드 대조 자료를 만들었다.
-- 변경: PR #1 H00 slice 병합, PR #2 favicon 회귀 수정. application SHA `5e2fe2390ccacd4c5425a476fc13770c524a9517`, Pages run `32451745534`, artifact digest `sha256:43d01cb2b76806eb218bca3c01b32c9aa5af9c5f4155e008f730b643b4df6f74`.
-- 검증: 공개 Pages Chromium·Firefox·WebKit `27/27`; browser smoke `891`; `externalRequests=0`; `consoleErrors=0`; 썸네일 1920×1080; 영상 1920×1080·13.76초; 제출 필드 독립 검사 2회 PASS.
+- Codex 역할: feature branch·draft PR·CI·Pages 배포를 운영하고 공개 URL E4를 실행했다. Chromium이 origin root `/favicon.ico`를 요청해 콘솔 오류가 발생하는 것을 재현하고 data URL favicon과 회귀 단언으로 수정했다. 최종 release SHA 공개 화면에서 썸네일·14.84초 무음 영상·권리·필드 대조 자료를 만들었다.
+- 변경: PR #1 H00 slice, PR #2 favicon 회귀, PR #3 release record를 병합했다. annotated remote tag와 GitHub prerelease `v0.1.0-hackathon`은 release SHA `6690f5778f706e1875b452d552bd75ba1c06ee9a`를 가리키며 application capture SHA도 동일하다.
+- 검증: release SHA clean checkout에서 `npm ci` lock 동일·취약점 0, M00 200,967/0, H00 217/0, verify 10단계, E2E 12/12, a11y 0, Pages 27/27, artifact 14 files/336,182 bytes. final CI `32453169036`, Pages `32453169029`, digest `sha256:07a222cc7af5ad221e3d4be3524f53992cdf01823e6af56b7723c00282671998`; 공개 browser 891·외부 요청/콘솔 오류 0을 통과했다. source/Pages archive와 14-entry manifest를 두 위치에 각 15 files로 백업해 hash delta 0을 확인했고 post-tag 독립 검사 2회도 PASS했다.
 - 역할 경계: Codex는 제출 가능한 패키지를 준비·검증했지만 공식 양식의 개인 식별 정보, 약관·개인정보·국외 이전 동의와 최종 Submit은 수행하거나 완료로 주장하지 않는다.
-- 남은 일: final release-record SHA clean checkout·public E4, tag와 두 위치 backup, phase·progress 완료 기록.
+- 남은 일: H00 내부 작업 없음. 공식 Google 양식 최종 Submit은 프로젝트 오너 작업이며, 정규 M02는 원래 DoR에서 별도로 시작한다.
 
 ### CX-M01-001 — M00 formal gate 전 제한 스캐폴딩 착수
 

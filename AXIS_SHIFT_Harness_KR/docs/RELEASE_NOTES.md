@@ -1,6 +1,6 @@
 # AXIS//SHIFT Release Notes
 
-**상태**: `v0.1.0-hackathon` release record / v1.0.0 계획
+**상태**: `v0.1.0-hackathon` released / v1.0.0 계획
 **최종 갱신**: 2026-08-21
 
 > H00 항목만 현재 해커톤 프로토타입을 나타낸다. 아래 v1.0.0 절은 계속 `Planned`이며 H00 제출 문구로 인용하지 않는다.
@@ -12,14 +12,16 @@
 | 항목 | 값 |
 |---|---|
 | Release date | 2026-08-21 |
-| Tag | `v0.1.0-hackathon` — 이 release record merge 뒤 고정 |
-| Application SHA | `5e2fe2390ccacd4c5425a476fc13770c524a9517` |
+| Tag / prerelease | [`v0.1.0-hackathon`](https://github.com/JTech-CO/axis-shift/releases/tag/v0.1.0-hackathon) — annotated remote tag 고정 |
+| Release / tag target SHA | `6690f5778f706e1875b452d552bd75ba1c06ee9a` |
+| Application capture SHA | `6690f5778f706e1875b452d552bd75ba1c06ee9a` — release/tag SHA와 동일 |
 | Gameplay URL | `https://jtech-co.github.io/axis-shift/` |
-| Pages run | `32451745534` — success |
-| Pages artifact digest | `sha256:43d01cb2b76806eb218bca3c01b32c9aa5af9c5f4155e008f730b643b4df6f74` |
+| Final CI run | `32453169036` — success |
+| Final Pages run | `32453169029` — success, deployed SHA=`6690f577…` |
+| Final Pages artifact digest | `sha256:07a222cc7af5ad221e3d4be3524f53992cdf01823e6af56b7723c00282671998` |
 | Generator version | `m00-seeded-v1` |
 | Storage | 없음 — 새로고침 이후 기록 보존 안 함 |
-| QA decision | H00 public E4 PASS; tag·package backup record 고정 후 종료 |
+| QA decision | H00 DOD-01~12 PASS; submission-ready. 공식 Google 양식 Submit은 오너 작업이며 완료로 주장하지 않음 |
 
 ### Shipped prototype slice
 
@@ -38,10 +40,21 @@
 - formal Easy 신규 사용자: `n=5`, first PULSE·first solve·rule recall `5/5`, I0 `5/5`
 - M00 verifier: `assertions=200967`, `bfsVisited=65536`, `failures=0`
 - H00 campaign: `signals=18`, `uniqueBoardPairs=18`, `assertions=217`, `failures=0`
-- clean checkout: Node 24, `npm ci`, verify 10단계, 취약점·추적 변경 `0`
+- release SHA clean checkout: Node 24/npm 11, `npm ci` lock 동일·취약점 `0`, verify 10단계, artifact `14 files / 336182 bytes`
+- browser E2E `12/12`, a11y failures `0`, Pages Chromium·Firefox·WebKit `27/27`
 - public Pages: Chromium·Firefox·WebKit `27/27`
 - public interaction: `browserAssertions=891`, 외부 요청·콘솔 오류 `0`
-- main CI `32451745524`와 Pages `32451745534`: success
+- final main CI `32453169036`와 Pages `32453169029`: success
+
+### Release package
+
+- source archive: `axis-shift-source-v0.1.0-hackathon.zip`, 1,059,850 bytes, SHA-256 `69d623eac50d186f52cb88e2dd451ebb4859fd475151dc76ad1a4e4c243b919a`
+- Pages archive: `axis-shift-pages-v0.1.0-hackathon.zip`, 103,088 bytes, SHA-256 `34a0601312712a5d7fa20c544960975cdfe3e1b5a2795e65036bc38dae663f01`
+- `MANIFEST.sha256`: SHA-256 `ae37db3ed60b0c7a751865b3cc1e078a812fbc069335b02c6954cbd3043cd3b0`, 14 entries, failures `0`
+- final release review: `release-package-review.png`, SHA-256 `7cfc102b2dbe84b6afb11058a3d0908b720d4636f0686ee35940bec0f62a7679`
+- backup A `.private/submission/H00`, backup B 사용자 Documents의 `v0.1.0-hackathon`: 각 15 files, hash delta `0`
+- final release-SHA 독립 필드 검사: 2026-08-21 15:41:32 KST, 15:42:06 KST — PASS
+- PR 기록: #1 H00 구현, #2 public favicon 회귀, #3 release record
 
 ### Explicitly not shipped
 
@@ -149,7 +162,7 @@ AXIS//SHIFT는 행과 열을 선택해 교차점의 셀을 반전하고 목표 �
 
 | Version | Status | Summary |
 |---|---|---|
-| 0.1.0-hackathon | Release record | 18 signal·AXIS/PULSE 공개 프로토타입 |
+| 0.1.0-hackathon | Released prerelease | 18 signal·AXIS/PULSE 공개 프로토타입 |
 | 1.0.0 | Planned | 최초 공개 release·hackathon submission 목표 |
 | 1.0.0-rc.1 | Future | M10 QA용 release candidate |
 | 1.0.0-preview.1 | Future | 내부·플레이테스트 preview |

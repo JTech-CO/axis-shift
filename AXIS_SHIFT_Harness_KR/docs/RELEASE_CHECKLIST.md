@@ -1,7 +1,7 @@
 # AXIS//SHIFT Release Checklist
 
 **문서 버전**: 1.0.0  
-**상태**: H00 v0.1 체크 진행 / M10·M11 v1 체크 미실행
+**상태**: H00 v0.1 완료 / M10·M11 v1 체크 미실행
 **최종 갱신**: 2026-08-21
 
 > 체크박스가 비어 있으면 미검증이다. “해당 없음”은 이유와 승인자를 기록해야 하며, 불변식·P0/P1 항목에는 사용할 수 없다.
@@ -13,17 +13,17 @@
 - [x] M00 종료 기록과 H00 구현을 별도 commit으로 고정했다.
 - [x] PR #1에서 18 signal campaign과 AXIS/PULSE vertical slice를 검토·병합했다.
 - [x] 공개 Chromium origin의 `/favicon.ico` 404를 PR #2에서 수정하고 회귀 단언을 추가했다.
-- [x] application SHA `5e2fe2390ccacd4c5425a476fc13770c524a9517`의 CI run `32451745524`와 Pages run `32451745534`가 성공했다.
-- [x] Pages artifact digest `sha256:43d01cb2b76806eb218bca3c01b32c9aa5af9c5f4155e008f730b643b4df6f74`를 기록했다.
+- [x] release/tag SHA `6690f5778f706e1875b452d552bd75ba1c06ee9a`의 CI run `32453169036`와 Pages run `32453169029`가 성공했다.
+- [x] release/tag SHA의 Pages artifact digest `sha256:07a222cc7af5ad221e3d4be3524f53992cdf01823e6af56b7723c00282671998`를 기록했다.
 - [x] 공개 URL에서 Chromium·Firefox·WebKit Pages `27/27`과 browser smoke `891`, 외부 요청·콘솔 오류 `0`을 확인했다.
-- [x] 동일 공개 application SHA에서 1920×1080 썸네일과 13.76초 무음 데모 영상을 생성했다.
+- [x] 동일 공개 release/tag SHA에서 1920×1080 썸네일과 14.84초 무음 데모 영상을 생성했다.
 - [x] H00 전용 제목·95자 소개·URL·자산·권리 문구를 두 구현으로 독립 대조했다.
 - [x] Google 인증·개인정보·법적 동의·최종 Submit은 프로젝트 오너 작업이며 현재 제출 완료로 주장하지 않는다.
-- [ ] 최종 release-record SHA clean checkout에서 DOD-08 명령을 다시 실행한다.
-- [ ] 최종 release-record SHA의 CI·Pages·공개 E4를 확인한다.
-- [ ] `v0.1.0-hackathon` annotated tag와 원격 tag를 대조한다.
-- [ ] source·Pages archive와 제출 패키지 manifest를 두 위치에 백업한다.
-- [ ] H00 phase·PROGRESS·traceability를 완료 상태로 고정한다.
+- [x] release/tag SHA `6690f5778f706e1875b452d552bd75ba1c06ee9a` clean checkout에서 `npm ci` lock 동일·취약점 0, M00 200,967/0, H00 217/0, verify 10단계, E2E 12/12, a11y 0, Pages 27/27, artifact 14 files/336,182 bytes로 DOD-08을 통과했다.
+- [x] final CI `32453169036`, Pages `32453169029`, artifact digest `sha256:07a222cc7af5ad221e3d4be3524f53992cdf01823e6af56b7723c00282671998`와 공개 browser 891·외부 요청/콘솔 오류 0으로 DOD-09를 통과했다.
+- [x] `v0.1.0-hackathon` annotated remote tag와 GitHub prerelease가 SHA `6690f577…`를 가리키는지 대조했다.
+- [x] source·Pages archive, 14-entry `MANIFEST.sha256`와 제출 자산을 primary `.private/submission/H00` 및 사용자 Documents `v0.1.0-hackathon`에 각 15 files로 백업하고 hash delta 0을 확인했다.
+- [x] H00 phase·PROGRESS·traceability를 완료 상태로 고정했다. 공식 Google 양식의 최종 Submit은 계속 프로젝트 오너 작업이며 제출 완료로 주장하지 않는다.
 
 현재 공개 자산과 공식 양식 값은 `SUBMISSION_PACKAGE.md`, 자산 권리는 `ASSET_LICENSES.md`, 실제 기능은 `RELEASE_NOTES.md`를 단일 대조 기준으로 사용한다.
 
