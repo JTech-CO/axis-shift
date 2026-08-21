@@ -1,7 +1,11 @@
 import {
+  CAMPAIGN_SIGNAL_COUNT,
+  CAMPAIGN_SIGNALS_PER_STAGE,
   STAGES,
   generateStageFixture,
+  getCampaignSignal,
   getFixture,
+  getNextCampaignSignal,
   getNextStage,
   getStage,
 } from "./fixtures.mjs";
@@ -37,7 +41,17 @@ function requiredElement(id) {
 
 function stageFixtureFromParams(stage, params) {
   const seed = params.get("seed");
-  return seed === null ? stage : generateStageFixture(stage.stageId, seed);
+  if (seed !== null) return generateStageFixture(stage.stageId, seed);
+  if (stage.stageNumber === null) return stage;
+
+  const requestedSignal = Number(params.get("signal") ?? 1);
+  const signal =
+    Number.isInteger(requestedSignal) &&
+    requestedSignal >= 1 &&
+    requestedSignal <= CAMPAIGN_SIGNALS_PER_STAGE
+      ? requestedSignal
+      : 1;
+  return getCampaignSignal(stage.stageId, signal);
 }
 
 function requestedFixture() {
@@ -108,6 +122,7 @@ const resultMoves = requiredElement("result-moves");
 const resultTime = requiredElement("result-time");
 const resultGuidance = requiredElement("result-guidance");
 const nextStageButton = requiredElement("next-stage-button");
+const replayStageButton = requiredElement("replay-stage-button");
 const newTargetButton = requiredElement("new-target-button");
 const resetDialog = requiredElement("reset-dialog");
 const confirmReset = requiredElement("confirm-reset");
@@ -218,21 +233,29 @@ function activeStage() {
   return STAGES.find((stage) => stage.stageId === fixture.stageId) ?? null;
 }
 
+function campaignSignal() {
+  return Number.isInteger(fixture.campaignSignal) ? fixture.campaignSignal : null;
+}
+
 function generatedSeed() {
+  if (campaignSignal() !== null) return null;
   return fixture.baseFixtureId === undefined ? null : fixture.seed;
 }
 
 function seedSource() {
+  if (campaignSignal() !== null) return "campaign";
   const seed = generatedSeed();
   if (seed === null) return "catalog";
   return seed.startsWith("fallback-") ? "fallback" : "crypto";
 }
 
-function nextStage() {
+function nextPlayableFixture() {
+  const signal = campaignSignal();
+  if (signal !== null) return getNextCampaignSignal(fixture.stageId, signal);
   try {
-    return getNextStage(fixture.stageId);
+    return getCampaignSignal(getNextStage(fixture.stageId).stageId, 1);
   } catch {
-    return getStage("easy");
+    return getCampaignSignal("easy", 1);
   }
 }
 
@@ -387,6 +410,10 @@ function rebuildBoard() {
     Array.from({ length: fixture.size }, (_, col) => {
       const cell = document.createElement("div");
       cell.className = "current-cell";
+      cell.dataset.row = String(row);
+      cell.dataset.col = String(col);
+      cell.style.setProperty("--cell-row", String(row));
+      cell.style.setProperty("--cell-col", String(col));
       cell.setAttribute("aria-hidden", "true");
 
       const signal = document.createElement("span");
@@ -439,43 +466,64 @@ function renderAxisButtons(buttons, mask) {
 
 function renderStageMetadata() {
   const current = activeStage();
-  const next = nextStage();
+  const next = nextPlayableFixture();
+  const signal = campaignSignal();
+  const isCampaign = signal !== null;
 
   fixtureLabel.textContent = current
-    ? `STAGE ${String(current.stageNumber).padStart(2, "0")} · ${current.label}`
+    ? isCampaign
+      ? `SIGNAL ${String(fixture.campaignPosition).padStart(2, "0")} · ${current.label}`
+      : `RANDOM · ${current.label}`
     : `TEST · ${fixture.label}`;
   app.dataset.fixture = fixture.id;
   app.dataset.stage = fixture.stageId;
   app.dataset.seed = generatedSeed() ?? "";
-  app.dataset.puzzleKey = generatedSeed() === null ? "" : fixture.puzzleKey;
+  app.dataset.puzzleKey = fixture.puzzleKey ?? "";
   app.dataset.generated = String(generatedSeed() !== null);
   app.dataset.seedSource = seedSource();
+  app.dataset.campaignSignal = signal === null ? "" : String(signal);
+  app.dataset.campaignPosition = isCampaign ? String(fixture.campaignPosition) : "";
+  app.dataset.campaignCount = String(CAMPAIGN_SIGNAL_COUNT);
+  app.dataset.runKind = isCampaign ? "campaign" : current ? "random" : "control";
   goalChip.textContent = `PAR ${fixture.par}`;
 
   if (current) {
-    stageCurrent.textContent = `${current.stageNumber}단계 · ${current.label} — ${current.title}`;
-    stagePosition.textContent = `${current.stageNumber} / ${STAGES.length}`;
+    stageCurrent.textContent = isCampaign
+      ? `${current.stageNumber}단계 · ${current.label} — ${current.title} · 신호 ${signal}/${CAMPAIGN_SIGNALS_PER_STAGE}`
+      : `${current.stageNumber}단계 · ${current.label} — 랜덤 신호`;
+    stagePosition.textContent = isCampaign
+      ? `${fixture.campaignPosition} / ${CAMPAIGN_SIGNAL_COUNT}`
+      : "∞ RANDOM";
     stagePosition.setAttribute(
       "aria-label",
-      `전체 ${STAGES.length}단계 중 ${current.stageNumber}단계`,
+      isCampaign
+        ? `전체 ${CAMPAIGN_SIGNAL_COUNT}개 신호 중 ${fixture.campaignPosition}번째`
+        : `${current.label} 랜덤 신호`,
     );
     resultTitle.textContent = `${current.label} 패턴 일치`;
     nextStageButton.textContent =
-      next.stageNumber === 1 ? "쉬움부터 다시 플레이" : `다음 단계 · ${next.label}`;
+      next.stageId === fixture.stageId
+        ? `다음 신호 · ${next.campaignSignal} / ${CAMPAIGN_SIGNALS_PER_STAGE}`
+        : next.stageNumber === 1
+          ? "처음 신호부터 다시 플레이"
+          : `다음 단계 · ${next.label}`;
+    replayStageButton.textContent = `${current.label} · 랜덤 신호`;
+    replayStageButton.hidden = false;
   } else {
     stageCurrent.textContent = `검증 fixture · ${fixture.label} — ${fixture.title}`;
     stagePosition.textContent = "TEST";
     stagePosition.setAttribute("aria-label", "회귀 검증 fixture");
     resultTitle.textContent = "패턴 일치";
-    nextStageButton.textContent = "쉬움부터 플레이";
+    nextStageButton.textContent = `${next.label}부터 플레이`;
+    replayStageButton.textContent = "";
+    replayStageButton.hidden = true;
   }
 
   nextStageButton.dataset.stage = next.stageId;
+  nextStageButton.dataset.signal = String(next.campaignSignal ?? 1);
   newTargetButton.setAttribute(
     "aria-label",
-    current
-      ? `${current.label} 새 목표 신호 생성`
-      : "플레이 단계에서 새 목표 신호 생성",
+    current ? `${current.label} 랜덤 목표 신호 생성` : "플레이 단계에서 랜덤 목표 신호 생성",
   );
 }
 
@@ -503,8 +551,13 @@ function renderBoard(previewRowMask, previewColMask) {
         ((previewColMask >> col) & 1) === 1;
       const previewOn = intersection && !on;
       const previewOff = intersection && on;
+      const rowSelected = ((previewRowMask >> row) & 1) === 1;
+      const colSelected = ((previewColMask >> col) & 1) === 1;
 
       cell.dataset.on = String(on);
+      cell.dataset.axisRow = String(rowSelected);
+      cell.dataset.axisCol = String(colSelected);
+      cell.dataset.intersection = String(intersection);
       cell.classList.toggle("preview-on", previewOn);
       cell.classList.toggle("preview-off", previewOff);
       cell.classList.toggle("is-solved", session.phase === "solved");
@@ -530,6 +583,8 @@ function render() {
   app.dataset.phase = session.phase;
   boardStage.dataset.phase = session.phase;
   currentGrid.dataset.rows = session.currentRows.join(",");
+  currentGrid.dataset.axisLinked = String(rowCount > 0 && colCount > 0);
+  currentGrid.dataset.signalLock = String(session.phase === "solved");
   currentGrid.setAttribute(
     "aria-label",
     `현재 신호 ${fixture.size}행 ${fixture.size}열. ${targetDescription(session.currentRows)}`,
@@ -590,14 +645,16 @@ function hasUnfinishedProgress() {
   );
 }
 
-function replaceRouteInUrl(stageId, seed = null) {
+function replaceRouteInUrl(nextFixture) {
   const url = new URL(window.location.href);
   url.searchParams.delete("fixture");
-  url.searchParams.set("stage", stageId);
-  if (seed === null) {
-    url.searchParams.delete("seed");
-  } else {
-    url.searchParams.set("seed", seed);
+  url.searchParams.delete("seed");
+  url.searchParams.delete("signal");
+  url.searchParams.set("stage", nextFixture.stageId);
+  if (Number.isInteger(nextFixture.campaignSignal)) {
+    url.searchParams.set("signal", String(nextFixture.campaignSignal));
+  } else if (nextFixture.baseFixtureId !== undefined) {
+    url.searchParams.set("seed", nextFixture.seed);
   }
   window.history.replaceState({}, "", url);
 }
@@ -617,7 +674,7 @@ function activateFixture(
   resetGameStopwatch();
   rebuildBoard();
   render();
-  replaceRouteInUrl(fixture.stageId, generatedSeed());
+  replaceRouteInUrl(fixture);
 
   const announcement =
     startMessage ?? `${fixture.stageNumber}단계 ${fixture.label} 시작`;
@@ -640,7 +697,7 @@ function activateFixture(
 }
 
 function activateStage(stageId, options = {}) {
-  activateFixture(getStage(stageId), options);
+  activateFixture(getCampaignSignal(stageId, 1), options);
 }
 
 function sameRows(leftRows, rightRows) {
@@ -681,11 +738,11 @@ function generateDifferentTargetFixture() {
   throw new Error("Could not generate a different target");
 }
 
-function activateNewTarget() {
+function activateNewTarget(focus = "target") {
   try {
     const nextFixture = generateDifferentTargetFixture();
     activateFixture(nextFixture, {
-      focus: "target",
+      focus,
       startMessage: `${nextFixture.label} 새 목표 신호 시작`,
     });
   } catch {
@@ -733,7 +790,7 @@ pulseButton.addEventListener("click", () => {
   session = next;
   render();
 
-  const duration = prefersReducedMotion.matches ? 0 : 240;
+  const duration = prefersReducedMotion.matches ? 0 : 360;
   pulseTimer = window.setTimeout(() => {
     session = commitPulse(session);
     pulseTimer = null;
@@ -791,7 +848,12 @@ confirmStageChange.addEventListener("click", (event) => {
 
 nextStageButton.addEventListener("click", () => {
   if (session.phase !== "solved") return;
-  activateStage(nextStage().stageId, { focus: "heading" });
+  activateFixture(nextPlayableFixture(), { focus: "heading" });
+});
+
+replayStageButton.addEventListener("click", () => {
+  if (session.phase !== "solved") return;
+  activateNewTarget("heading");
 });
 
 newTargetButton.addEventListener("click", requestNewTarget);
@@ -829,4 +891,14 @@ document.addEventListener("visibilitychange", () => {
 
 rebuildBoard();
 render();
+
+const initialSignalParam = new URLSearchParams(window.location.search).get("signal");
+if (
+  initialSignalParam !== null &&
+  Number.isInteger(fixture.campaignSignal) &&
+  initialSignalParam !== String(fixture.campaignSignal)
+) {
+  replaceRouteInUrl(fixture);
+}
+
 announceBoard("게임 시작");

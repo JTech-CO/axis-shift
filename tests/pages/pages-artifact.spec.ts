@@ -19,9 +19,24 @@ test('keeps the public root on the playable M00 prototype', async ({ page }) => 
   await expectSuccessfulNavigation(page, './');
 
   await expect(page).toHaveURL(/\/axis-shift\/prototypes\/rule-proof\/$/u);
-  await expect(page).toHaveTitle('AXIS//SHIFT — Rule Proof');
+  await expect(page).toHaveTitle('AXIS//SHIFT — Tensor Puzzle');
   await expect(page.getByRole('heading', { level: 1, name: 'AXIS SHIFT' })).toBeVisible();
   await expect(page.locator('#stage-buttons button')).toHaveCount(6);
+  await expect(page.locator('.stage-catalog-note')).toContainText('18 SIGNALS');
+  await expect(page.locator('#app')).toHaveAttribute('data-campaign-count', '18');
+  await expect(page.locator('#app')).toHaveAttribute('data-campaign-position', '1');
+  expect(errors).toEqual([]);
+});
+
+test('preserves stage and signal links while bridging to H00', async ({ page }) => {
+  const errors = monitorPageErrors(page);
+  await expectSuccessfulNavigation(page, './?stage=hard-6&signal=2');
+
+  await expect(page).toHaveURL(/\/prototypes\/rule-proof\/\?stage=hard-6&signal=2$/u);
+  await expect(page.locator('#board-stage')).toHaveAttribute('data-size', '6');
+  await expect(page.locator('#app')).toHaveAttribute('data-campaign-signal', '2');
+  await expect(page.locator('#app')).toHaveAttribute('data-campaign-position', '17');
+  await expect(page.locator('#stage-current')).toContainText('신호 2/3');
   expect(errors).toEqual([]);
 });
 

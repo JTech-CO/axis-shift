@@ -1,8 +1,8 @@
 # AXIS//SHIFT 요구사항 추적표
 
 **버전**: 1.0.0  
-**상태**: Pre-Production baseline  
-**최종 갱신**: 2026-08-09
+**상태**: M00·M01 verified / H00 v0.1 submission slice in progress / v1 roadmap baseline
+**최종 갱신**: 2026-08-21
 
 > 기능 요구사항 ID는 기술 백서 §2.2.2를 따른다. `NFR-*`는 백서의 성능·접근성·배포·개인정보 기준을 하네스에서 추적 가능하게 부여한 ID다. 이 표가 새로운 제품 요구를 만드는 것은 아니며, 원문 기준의 검증 경로를 연결한다.
 
@@ -58,7 +58,19 @@
 | NFR-RELEASE-001 | P0/P1·INV 위반 0 | M10·M11 | QA_REPORT + issue audit | 020 | Planned |
 | NFR-CODEX-001 | Codex 기여·사람 판단·검증 증거 구분 | 전 phase·M11 | collaboration log + commit links | 018 | Planned |
 
-## 4. 모드별 E2E 추적
+## 4. H00 해커톤 제출 슬라이스 추적
+
+> 아래 `HS-*`는 2026-08-26 제출용 v0.1 프로토타입 승인 조건이다. 기존 v1 FR/NFR 행을 `Verified`로 승격하지 않는다.
+
+| ID | 승인 조건 | Phase | 기준 구현 | 검증 | INV | 상태 |
+|---|---|---|---|---|---|---|
+| HS-CONTENT-001 | 기존 6 profile × 고정 signal 3개 이상, 총 18개 이상·중복 0 | H00 | `prototypes/rule-proof/fixtures.mjs` | verifier + 전체 진행 browser smoke | 004~007,018 | Verified |
+| HS-AXIS-001 | 선택 축 진행선·PULSE 교차점 충격·완료 Signal Lock | H00 | `game.mjs`, `styles.css` | state/computed-style browser smoke | 005,010,015 | Verified |
+| HS-A11Y-001 | 키보드·44px·reduced motion·비색상 preview 유지 | H00 | M00 prototype UI | 320/360/390/960 E2E + E1 | 015,018 | Verified |
+| HS-DEPLOY-001 | 고정 v0.1 SHA Pages root·signal·seed·M01 bridge 공개 smoke | H00 | Pages artifact | local artifact + public E4 | 014,017,020 | In Progress |
+| HS-SUBMIT-001 | Prototype/v0.1로 정직한 URL·README·영상·썸네일·백업 | H00 | 제출 문서·자산 | 2회 필드 대조 | 018~020 | In Progress |
+
+## 5. 모드별 E2E 추적
 
 | 사용자 흐름 | 주요 요구 | Test file 목표 | Phase |
 |---|---|---|---|
@@ -73,7 +85,7 @@
 | ko↔en·테마·모션 설정 | I18N-001, A11Y | `settings.spec.ts` | M09 |
 | GitHub Pages non-root 전체 route | DEPLOY | `base-path.spec.ts`, production smoke | M01·M10 |
 
-## 5. 추적성 완료 조건
+## 6. 추적성 완료 조건
 
 M10 진입 전:
 
@@ -87,7 +99,7 @@ M11 진입 전:
 - test file·명령·CI artifact·QA_REPORT 증거를 실제 값으로 연결한다.
 - 코드 검색으로 요구사항 ID의 중복·누락을 검사한다.
 
-## 6. 변경 규칙
+## 7. 변경 규칙
 
 - 새 요구사항은 ID를 재사용하지 않는다.
 - 삭제 대신 `Deferred` 또는 대체 ID를 기록한다.

@@ -75,7 +75,7 @@ button:disabled {
 }
 
 .skip-link {
-  position: fixed;
+  position: absolute;
   z-index: 100;
   top: 10px;
   left: 10px;
@@ -282,6 +282,19 @@ button:disabled {
   visibility: visible;
 }
 
+.stage-catalog-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.stage-catalog-note strong {
+  color: var(--signal);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  letter-spacing: 0.08em;
+}
+
 .play-layout {
   display: grid;
   grid-template-columns: minmax(218px, 0.7fr) minmax(0, 1.3fr);
@@ -462,8 +475,33 @@ button:disabled {
 }
 
 .current-grid {
+  position: relative;
   grid-template-columns: repeat(var(--board-size), minmax(0, 1fr));
   aspect-ratio: 1;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.current-grid::after {
+  position: absolute;
+  z-index: 5;
+  inset: -15% -45%;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent 30%,
+    rgba(255, 212, 121, 0.12) 42%,
+    rgba(255, 212, 121, 0.92) 50%,
+    rgba(113, 246, 205, 0.28) 58%,
+    transparent 70%
+  );
+  content: "";
+  opacity: 0;
+  transform: translateX(-75%) skewX(-12deg);
+}
+
+.current-grid[data-signal-lock="true"]::after {
+  animation: signal-lock 520ms ease-out both;
 }
 
 .shell[data-board-size="5"] {
@@ -501,6 +539,8 @@ button:disabled {
   border-color: var(--signal);
   color: #06100d;
   background: var(--signal);
+  box-shadow: 0 0 0 2px rgba(113, 246, 205, 0.2), 0 0 18px rgba(113, 246, 205, 0.32);
+  transform: translateY(-1px);
 }
 
 .axis-button:disabled {
@@ -545,6 +585,23 @@ button:disabled {
 .current-cell::after {
   width: 100%;
   height: 1px;
+}
+
+.current-cell[data-axis-row="true"]::after {
+  height: 2px;
+  background: linear-gradient(90deg, rgba(113, 246, 205, 0.24), var(--signal));
+  box-shadow: 0 0 8px rgba(113, 246, 205, 0.48);
+}
+
+.current-cell[data-axis-col="true"]::before {
+  width: 2px;
+  background: linear-gradient(rgba(113, 246, 205, 0.24), var(--signal));
+  box-shadow: 0 0 8px rgba(113, 246, 205, 0.48);
+}
+
+.current-cell[data-intersection="true"] {
+  border-color: var(--focus);
+  box-shadow: inset 0 0 0 1px rgba(248, 251, 145, 0.72);
 }
 
 .current-signal {
@@ -607,16 +664,41 @@ button:disabled {
   border-color: var(--target);
 }
 
-.board-stage[data-phase="pulsing"] .current-cell.preview-on,
-.board-stage[data-phase="pulsing"] .current-cell.preview-off {
-  animation: transmit 240ms ease-out;
+.board-stage[data-phase="pulsing"] .current-cell[data-axis-row="true"]::after {
+  animation: axis-charge-row 360ms ease-out;
 }
 
-@keyframes transmit {
-  50% {
-    filter: brightness(1.65);
-    transform: scale(0.94);
-  }
+.board-stage[data-phase="pulsing"] .current-cell[data-axis-col="true"]::before {
+  animation: axis-charge-col 360ms ease-out;
+}
+
+.board-stage[data-phase="pulsing"] .current-cell[data-intersection="true"] {
+  animation: intersection-impact 360ms ease-out;
+}
+
+@keyframes axis-charge-row {
+  0% { opacity: 0.25; transform: scaleX(0.08); transform-origin: left; }
+  55% { opacity: 1; transform: scaleX(1); transform-origin: left; }
+  100% { opacity: 0.48; }
+}
+
+@keyframes axis-charge-col {
+  0% { opacity: 0.25; transform: scaleY(0.08); transform-origin: top; }
+  55% { opacity: 1; transform: scaleY(1); transform-origin: top; }
+  100% { opacity: 0.48; }
+}
+
+@keyframes intersection-impact {
+  0% { filter: brightness(1); transform: scale(1); }
+  48% { filter: brightness(1.8); transform: scale(0.86); }
+  78% { filter: brightness(1.28); transform: scale(1.04); }
+  100% { filter: brightness(1); transform: scale(1); }
+}
+
+@keyframes signal-lock {
+  0% { opacity: 0; transform: translateX(-75%) skewX(-12deg); }
+  35% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(75%) skewX(-12deg); }
 }
 
 .selection-readout {
@@ -783,6 +865,21 @@ button:disabled {
   background: var(--target);
   font-weight: 800;
   cursor: pointer;
+}
+
+.result-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.result-actions .next-stage-button {
+  margin-top: 0;
+}
+
+.replay-stage-button {
+  border-color: var(--target);
 }
 
 .next-stage-button:hover:not(:disabled) {
@@ -1024,6 +1121,22 @@ button:disabled {
     forced-color-adjust: none;
     border-color: Highlight;
     color: HighlightText;
+    background: Highlight;
+  }
+
+  .current-cell[data-axis-row="true"],
+  .current-cell[data-axis-col="true"] {
+    outline: 1px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  .current-cell[data-intersection="true"] {
+    outline: 3px double Highlight;
+    outline-offset: -4px;
+  }
+
+  .current-cell[data-axis-row="true"]::after,
+  .current-cell[data-axis-col="true"]::before {
     background: Highlight;
   }
 

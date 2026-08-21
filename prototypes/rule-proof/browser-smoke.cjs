@@ -9,7 +9,13 @@ const screenshotPath =
   process.env.M00_SCREENSHOT ||
   path.resolve(
     __dirname,
-    "../../AXIS_SHIFT_Harness_KR/evidence/M00/browser-smoke-stages-360x640.png",
+    "../../AXIS_SHIFT_Harness_KR/evidence/H00/h00-campaign-360x640.png",
+  );
+const mobileScreenshotPath =
+  process.env.H00_MOBILE_SCREENSHOT ||
+  path.resolve(
+    __dirname,
+    "../../AXIS_SHIFT_Harness_KR/evidence/H00/h00-signal18-390x844.png",
   );
 
 const STAGE_IDS = Object.freeze([
@@ -21,6 +27,7 @@ const STAGE_IDS = Object.freeze([
   "hard-6",
 ]);
 let STAGES;
+let CAMPAIGN_SIGNALS;
 let BACKUP;
 let FULL_RANK;
 
@@ -207,8 +214,8 @@ async function expectCleanStage(page, stageId, context) {
   );
   equal(
     await page.locator("#app").getAttribute("data-seed-source"),
-    "catalog",
-    context + ": catalog seed source is explicit",
+    "campaign",
+    context + ": campaign seed source is explicit",
   );
   check(
     (await page.locator("#fixture-label").textContent()).includes(stage.label),
@@ -253,8 +260,8 @@ async function expectCleanStage(page, stageId, context) {
   );
 }
 
-async function expectSolvedStage(page, stageId) {
-  const stage = STAGES.get(stageId);
+async function expectSolvedStage(page, stageId, expected = STAGES.get(stageId)) {
+  const stage = expected;
   equal(
     await page.locator("#current-grid").getAttribute("data-rows"),
     stage.targetRows.join(","),
@@ -296,6 +303,11 @@ async function expectSolvedStage(page, stageId) {
     "completed",
     stage.label + ": solve freezes timer",
   );
+  equal(
+    await page.locator("#current-grid").getAttribute("data-signal-lock"),
+    "true",
+    stage.label + ": solved board exposes Signal Lock",
+  );
   check(
     /^\d+\.\d초$/.test(await page.locator("#result-time").textContent()),
     stage.label + ": result time uses tenths of a second",
@@ -324,27 +336,72 @@ function columnSweepPulses(stage) {
   return moves;
 }
 
-async function advanceWithNextCta(page, fromStageId, toStageId) {
+async function expectCampaignFixture(page, expected, context) {
+  equal(await page.locator("#app").getAttribute("data-stage"), expected.stageId, context + ": campaign stage");
+  equal(
+    await page.locator("#app").getAttribute("data-campaign-signal"),
+    String(expected.campaignSignal),
+    context + ": campaign signal",
+  );
+  equal(
+    await page.locator("#app").getAttribute("data-campaign-position"),
+    String(expected.campaignPosition),
+    context + ": campaign position",
+  );
+  equal(await page.locator("#app").getAttribute("data-campaign-count"), "18", context + ": campaign count");
+  equal(await page.locator("#app").getAttribute("data-run-kind"), "campaign", context + ": campaign run kind");
+  equal(
+    await page.locator("#current-grid").getAttribute("data-rows"),
+    expected.initialRows.join(","),
+    context + ": initial board",
+  );
+  equal(
+    await page.locator("#target-grid").getAttribute("data-rows"),
+    expected.targetRows.join(","),
+    context + ": target board",
+  );
+  equal(await page.locator("#move-count").textContent(), "0", context + ": move count reset");
+  equal(await page.locator("#elapsed-time").textContent(), "00:00.0", context + ": timer reset");
+  equal(await page.locator("#result-panel").isHidden(), true, context + ": result cleared");
+  equal(
+    await stageButton(page, expected.stageId).getAttribute("aria-pressed"),
+    "true",
+    context + ": stage button active",
+  );
+}
+
+async function advanceWithNextCta(page, fromFixture, toFixture) {
+  const context =
+    fromFixture.stageId + "/" + fromFixture.campaignSignal +
+    " -> " + toFixture.stageId + "/" + toFixture.campaignSignal;
   const button = page.locator("#next-stage-button");
-  equal(await button.isVisible(), true, fromStageId + ": next-stage CTA visible");
+  equal(await button.isVisible(), true, context + ": next-signal CTA visible");
   const buttonText = await button.textContent();
-  if (STAGES.get(toStageId).stageNumber === 1) {
-    check(buttonText.includes("다시 플레이"), fromStageId + ": CTA names catalog replay");
-  } else {
+  if (toFixture.campaignPosition === 1) {
+    check(buttonText.includes("처음 신호"), context + ": CTA names campaign wrap");
+  } else if (toFixture.stageId === fromFixture.stageId) {
     check(
-      buttonText.includes(STAGES.get(toStageId).label),
-      fromStageId + ": CTA names " + STAGES.get(toStageId).label,
+      buttonText.includes(`다음 신호 · ${toFixture.campaignSignal} / 3`),
+      context + ": CTA names next signal",
     );
+  } else {
+    check(buttonText.includes(toFixture.label), context + ": CTA names next stage");
   }
   await activate(page, button);
-  await waitForStage(page, toStageId);
-  await page.waitForFunction(() => document.activeElement?.id === "stage-current");
-  equal(
-    new URL(page.url()).searchParams.get("stage"),
-    toStageId,
-    fromStageId + ": URL advances to " + toStageId,
+  await page.waitForFunction(
+    ({ stageId, signal }) =>
+      document.querySelector("#app")?.dataset.stage === stageId &&
+      document.querySelector("#app")?.dataset.campaignSignal === String(signal),
+    { stageId: toFixture.stageId, signal: toFixture.campaignSignal },
   );
-  await expectCleanStage(page, toStageId, fromStageId + " -> " + toStageId);
+  await page.waitForFunction(() => document.activeElement?.id === "stage-current");
+  equal(new URL(page.url()).searchParams.get("stage"), toFixture.stageId, context + ": URL stage");
+  equal(
+    new URL(page.url()).searchParams.get("signal"),
+    String(toFixture.campaignSignal),
+    context + ": URL signal",
+  );
+  await expectCampaignFixture(page, toFixture, context);
 }
 
 async function currentInteractionSnapshot(page) {
@@ -440,6 +497,10 @@ async function expectGeneratedFixture(page, expected, context) {
   STAGES = new Map(
     fixtureModule.STAGES.map((stage) => [stage.stageId, stage]),
   );
+  CAMPAIGN_SIGNALS = fixtureModule.CAMPAIGN_SIGNALS;
+  equal(fixtureModule.CAMPAIGN_SIGNALS_PER_STAGE, 3, "three fixed signals per stage");
+  equal(fixtureModule.CAMPAIGN_SIGNAL_COUNT, 18, "eighteen fixed campaign signals");
+  equal(CAMPAIGN_SIGNALS.length, 18, "campaign catalog length");
   BACKUP = fixtureModule.getFixture("M00-BACKUP-v1");
   FULL_RANK = fixtureModule.getStage("hard");
   equal(fixtureModule.getStage("hard").stageId, "full-rank", "legacy hard alias");
@@ -464,6 +525,14 @@ async function expectGeneratedFixture(page, expected, context) {
   });
   const page = await context.newPage();
   const browserErrors = [];
+  const externalRequests = [];
+  const expectedOrigin = new URL(baseUrl).origin;
+  page.on("request", (request) => {
+    const requestUrl = new URL(request.url());
+    if (requestUrl.origin !== expectedOrigin && requestUrl.protocol !== "data:") {
+      externalRequests.push(request.url());
+    }
+  });
   page.on("pageerror", (error) => browserErrors.push("pageerror: " + error.message));
   page.on("console", (message) => {
     if (message.type() === "error") {
@@ -472,7 +541,7 @@ async function expectGeneratedFixture(page, expected, context) {
   });
 
   await page.goto(baseUrl, { waitUntil: "networkidle" });
-  equal(await page.title(), "AXIS//SHIFT — Rule Proof", "document title");
+  equal(await page.title(), "AXIS//SHIFT — Tensor Puzzle", "document title");
   equal(await page.locator(".stage-button").count(), 6, "six playable stages");
   check(
     await page.locator(".stage-button").evaluateAll((buttons) =>
@@ -493,14 +562,24 @@ async function expectGeneratedFixture(page, expected, context) {
   await expectCleanStage(page, "easy", "initial load");
   equal(
     await page.locator("#stage-position").textContent(),
-    "1 / 6",
-    "initial stage position exposes six-stage catalog",
+    "1 / 18",
+    "initial position exposes eighteen-signal campaign",
   );
   equal(
     await page.locator("#stage-position").getAttribute("aria-label"),
-    "전체 6단계 중 1단계",
-    "initial stage position accessible name exposes six stages",
+    "전체 18개 신호 중 1번째",
+    "initial position accessible name exposes eighteen signals",
   );
+  check(
+    (await page.locator(".stage-catalog-note").textContent()).includes("18 SIGNALS"),
+    "visible catalog note exposes eighteen signals",
+  );
+  for (const route of ["?stage=easy&signal=4", "?signal=abc", "?fixture=main&signal="]) {
+    await page.goto(new URL(route, baseUrl).href, { waitUntil: "networkidle" });
+    await expectCampaignFixture(page, CAMPAIGN_SIGNALS[0], "invalid signal fallback " + route);
+    equal(new URL(page.url()).searchParams.get("signal"), "1", "invalid signal normalizes: " + route);
+  }
+  await page.goto(baseUrl, { waitUntil: "networkidle" });
   equal(
     await page.locator(".briefing p").count(),
     1,
@@ -664,6 +743,10 @@ async function expectGeneratedFixture(page, expected, context) {
     6,
     "first preview shows six ON changes",
   );
+  equal(await page.locator('.current-cell[data-axis-row="true"]').count(), 8, "selected rows expose horizontal AXIS rails");
+  equal(await page.locator('.current-cell[data-axis-col="true"]').count(), 12, "selected columns expose vertical AXIS rails");
+  equal(await page.locator('.current-cell[data-intersection="true"]').count(), 6, "AXIS rails expose all intersections");
+  equal(await page.locator("#current-grid").getAttribute("data-axis-linked"), "true", "board exposes linked axes");
   equal(
     await page.locator(".current-cell.preview-off").count(),
     0,
@@ -932,7 +1015,9 @@ async function expectGeneratedFixture(page, expected, context) {
   await page.waitForFunction(() => document.activeElement?.id === "result-title");
   const solvedGeneratedSeed = confirmedFixture.seed;
   const solvedGeneratedTarget = confirmedFixture.targetRows.join(",");
-  await activate(page, page.locator("#new-target-button"));
+  equal(await page.locator("#replay-stage-button").isVisible(), true, "result replay CTA visible");
+  check((await page.locator("#replay-stage-button").textContent()).includes("랜덤 신호"), "result replay CTA names random signal");
+  await activate(page, page.locator("#replay-stage-button"));
   await page.waitForFunction(
     (previousSeed) =>
       document.querySelector("#app").dataset.seed !== previousSeed &&
@@ -981,42 +1066,20 @@ async function expectGeneratedFixture(page, expected, context) {
   );
 
   await page.goto(baseUrl, { waitUntil: "networkidle" });
-  await expectCleanStage(page, "easy", "canonical chain start");
-  await solve(page, STAGES.get("easy").canonicalPulses);
-  await expectSolvedStage(page, "easy");
-  await advanceWithNextCta(page, "easy", "normal");
-
-  await solve(page, STAGES.get("normal").canonicalPulses);
-  await expectSolvedStage(page, "normal");
-  await advanceWithNextCta(page, "normal", "normal-5");
-
-  await solve(page, STAGES.get("normal-5").canonicalPulses);
-  await expectSolvedStage(page, "normal-5");
-  await advanceWithNextCta(page, "normal-5", "hard-4");
-
-  await solve(page, STAGES.get("hard-4").canonicalPulses);
-  await expectSolvedStage(page, "hard-4");
-  await advanceWithNextCta(page, "hard-4", "hard-5");
-
-  await solve(page, STAGES.get("hard-5").canonicalPulses);
-  await expectSolvedStage(page, "hard-5");
-  await advanceWithNextCta(page, "hard-5", "hard-6");
-
-  await solve(page, STAGES.get("hard-6").canonicalPulses);
-  await expectSolvedStage(page, "hard-6");
-  fs.mkdirSync(path.dirname(screenshotPath), { recursive: true });
-  await page.locator("#stage-current").scrollIntoViewIfNeeded();
-  await page.screenshot({ path: screenshotPath, animations: "disabled" });
-  check(
-    fs.existsSync(screenshotPath) && fs.statSync(screenshotPath).size > 0,
-    "stage screenshot written",
-  );
-  await advanceWithNextCta(page, "hard-6", "easy");
-  equal(
-    await page.locator("#result-panel").isHidden(),
-    true,
-    "6x6-to-Easy wrap leaves solved result",
-  );
+  await expectCampaignFixture(page, CAMPAIGN_SIGNALS[0], "campaign chain start");
+  for (let index = 0; index < CAMPAIGN_SIGNALS.length; index += 1) {
+    const currentSignal = CAMPAIGN_SIGNALS[index];
+    const nextSignal = CAMPAIGN_SIGNALS[(index + 1) % CAMPAIGN_SIGNALS.length];
+    await solve(page, currentSignal.canonicalPulses);
+    await expectSolvedStage(page, currentSignal.stageId, currentSignal);
+    if (index === CAMPAIGN_SIGNALS.length - 1) {
+      fs.mkdirSync(path.dirname(screenshotPath), { recursive: true });
+      await page.locator("#app").screenshot({ path: screenshotPath, animations: "disabled" });
+      check(fs.existsSync(screenshotPath) && fs.statSync(screenshotPath).size > 0, "campaign completion screenshot written");
+    }
+    await advanceWithNextCta(page, currentSignal, nextSignal);
+  }
+  equal(await page.locator("#result-panel").isHidden(), true, "signal 18-to-1 wrap clears solved result");
 
   await page.goto(new URL("?stage=hard", baseUrl).href, { waitUntil: "networkidle" });
   equal(
@@ -1062,6 +1125,17 @@ async function expectGeneratedFixture(page, expected, context) {
   await page.setViewportSize({ width: 320, height: 640 });
   await page.goto(new URL("?stage=hard-6", baseUrl).href, { waitUntil: "networkidle" });
   await expectCleanStage(page, "hard-6", "320px 6x6 route");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(new URL("?stage=hard-6&signal=3", baseUrl).href, { waitUntil: "networkidle" });
+  await expectCampaignFixture(page, CAMPAIGN_SIGNALS[17], "390px 6x6 signal 18 route");
+  check(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), "390px has no horizontal scroll");
+  await solve(page, CAMPAIGN_SIGNALS[17].canonicalPulses);
+  await expectSolvedStage(page, "hard-6", CAMPAIGN_SIGNALS[17]);
+  fs.mkdirSync(path.dirname(mobileScreenshotPath), { recursive: true });
+  await page
+    .locator("#app")
+    .screenshot({ path: mobileScreenshotPath, animations: "disabled" });
+  check(fs.existsSync(mobileScreenshotPath), "390px completion screenshot written");
   await page.setViewportSize({ width: 360, height: 640 });
 
   await page.goto(new URL("?fixture=backup", baseUrl).href, {
@@ -1104,6 +1178,37 @@ async function expectGeneratedFixture(page, expected, context) {
     desktopMetrics.targetLeft < desktopMetrics.consoleLeft,
     "desktop uses two-column layout",
   );
+
+  const motionContext = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    reducedMotion: "no-preference",
+  });
+  const motionPage = await motionContext.newPage();
+  motionPage.on("pageerror", (error) => browserErrors.push("motion pageerror: " + error.message));
+  motionPage.on("console", (message) => {
+    if (message.type() === "error") browserErrors.push("motion console: " + message.text());
+  });
+  await motionPage.goto(baseUrl, { waitUntil: "networkidle" });
+  await selectMask(motionPage, "col", 1);
+  await selectMask(motionPage, "row", 1);
+  await motionPage.locator("#pulse-button").click();
+  await motionPage.waitForFunction(() => document.querySelector("#app").dataset.phase === "pulsing");
+  const motionStyle = await motionPage.locator('.current-cell[data-intersection="true"]').first().evaluate((cell) => ({
+    animationName: getComputedStyle(cell).animationName,
+    animationDuration: getComputedStyle(cell).animationDuration,
+  }));
+  equal(motionStyle.animationName, "intersection-impact", "PULSE animates the AXIS intersection");
+  equal(motionStyle.animationDuration, "0.36s", "PULSE choreography lasts 360ms");
+  await motionPage.waitForFunction(() => document.querySelector("#app").dataset.phase !== "pulsing");
+  await motionPage.goto(baseUrl, { waitUntil: "networkidle" });
+  await solve(motionPage, CAMPAIGN_SIGNALS[0].canonicalPulses);
+  equal(await motionPage.locator("#current-grid").getAttribute("data-signal-lock"), "true", "completion exposes Signal Lock state");
+  equal(
+    await motionPage.locator("#current-grid").evaluate((grid) => getComputedStyle(grid, "::after").animationName),
+    "signal-lock",
+    "completion runs the Signal Lock axis sweep",
+  );
+  await motionContext.close();
 
   const fallbackContext = await browser.newContext({
     viewport: { width: 360, height: 640 },
@@ -1178,17 +1283,26 @@ async function expectGeneratedFixture(page, expected, context) {
   );
   await fallbackContext.close();
 
+  equal(
+    externalRequests.length,
+    0,
+    "external runtime requests: " + externalRequests.join(" | "),
+  );
   equal(browserErrors.length, 0, "browser errors: " + browserErrors.join(" | "));
 
   await browser.close();
   console.log(
     "browserAssertions=" +
       assertionCount +
-      " viewport=320/360/960 easyMoves=2 normal4Moves=3 normal5Moves=3" +
+      " viewport=320/360/390/960 campaignSignals=18 signalsPerStage=3" +
+      " easyMoves=2 normal4Moves=3 normal5Moves=3" +
       " hard4Moves=2 hard5Moves=3 hard6Moves=3 backupMoves=3" +
-      " timer=visibility-safe newTarget=crypto+fallback sweepGuidance=column" +
-      " consoleErrors=0 screenshot=" +
-      screenshotPath,
+      " timer=visibility-safe newTarget=crypto+fallback replay=result-cta" +
+      " axisChoreography=360ms+signal-lock sweepGuidance=column" +
+      " externalRequests=0 consoleErrors=0 screenshot=" +
+      screenshotPath +
+      " mobileScreenshot=" +
+      mobileScreenshotPath,
   );
 })().catch(async (error) => {
   if (browser) await browser.close();
