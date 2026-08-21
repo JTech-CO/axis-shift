@@ -1,9 +1,62 @@
 # AXIS//SHIFT Release Notes
 
-**상태**: v1.0.0 초안 — 아직 배포된 기능을 나타내지 않음  
-**최종 갱신**: 2026-08-09
+**상태**: `v0.1.0-hackathon` release record / v1.0.0 계획
+**최종 갱신**: 2026-08-21
 
-> M10 전에는 아래 항목을 “출시됨”으로 인용하지 않는다. M11에서 실제 build·QA 결과와 대조해 `Planned`를 `Shipped` 또는 `Deferred`로 바꾼다.
+> H00 항목만 현재 해커톤 프로토타입을 나타낸다. 아래 v1.0.0 절은 계속 `Planned`이며 H00 제출 문구로 인용하지 않는다.
+
+## v0.1.0-hackathon — Release record
+
+### Release metadata
+
+| 항목 | 값 |
+|---|---|
+| Release date | 2026-08-21 |
+| Tag | `v0.1.0-hackathon` — 이 release record merge 뒤 고정 |
+| Application SHA | `5e2fe2390ccacd4c5425a476fc13770c524a9517` |
+| Gameplay URL | `https://jtech-co.github.io/axis-shift/` |
+| Pages run | `32451745534` — success |
+| Pages artifact digest | `sha256:43d01cb2b76806eb218bca3c01b32c9aa5af9c5f4155e008f730b643b4df6f74` |
+| Generator version | `m00-seeded-v1` |
+| Storage | 없음 — 새로고침 이후 기록 보존 안 함 |
+| QA decision | H00 public E4 PASS; tag·package backup record 고정 후 종료 |
+
+### Shipped prototype slice
+
+- Easy 4×4, Normal 4×4·5×5, Hard 4×4·5×5·6×6의 여섯 profile
+- profile별 고정 signal 3개, 총 18개 순차 campaign과 18→1 wrap
+- 각 profile의 재현 가능한 URL seed와 무제한 랜덤 목표 신호
+- 행·열 복수 선택, 교차 preview, PULSE, Undo, Reset
+- visibility-safe stopwatch와 PULSE·시간 결과
+- 단일 축 sweep 성공 시 대안 풀이 안내
+- 선택 axis rail, 360ms PULSE 양축 전파·교차 impact, 완료 Signal Lock
+- 키보드, 44px target, reduced motion, forced colors, 320~960px 회귀
+- GitHub Pages root 게임과 M01 `/#/` bridge
+
+### Verification
+
+- formal Easy 신규 사용자: `n=5`, first PULSE·first solve·rule recall `5/5`, I0 `5/5`
+- M00 verifier: `assertions=200967`, `bfsVisited=65536`, `failures=0`
+- H00 campaign: `signals=18`, `uniqueBoardPairs=18`, `assertions=217`, `failures=0`
+- clean checkout: Node 24, `npm ci`, verify 10단계, 취약점·추적 변경 `0`
+- public Pages: Chromium·Firefox·WebKit `27/27`
+- public interaction: `browserAssertions=891`, 외부 요청·콘솔 오류 `0`
+- main CI `32451745524`와 Pages `32451745534`: success
+
+### Explicitly not shipped
+
+- Tutorial 6·Lab 48, Daily Signal·Archive·streak, Sprint
+- score·grade·Hint, LocalStorage resume·best record
+- share text·PNG·Signal Signature, PWA·offline 설치
+- 완전한 ko/en i18n, sound, haptics
+- production `src/domain` core와 v1.0 QA
+
+### Known limitations
+
+- H00은 M00 기반 폐기 가능한 정적 프로토타입이며 M02~M11 완료를 뜻하지 않는다.
+- 18개 고정 signal은 Lab 48이 아니며 고정 signal 이후 랜덤 반복을 제공한다.
+- 저장·계정·동기화·분석이 없고 진행 정보는 서버로 전송되지 않는다.
+- `UNLICENSED`/All Rights Reserved 상태를 유지하며 공개 오픈소스 라이선스는 M11 전에 별도 오너 결정한다.
 
 ## v1.0.0 — Planned
 
@@ -96,6 +149,7 @@ AXIS//SHIFT는 행과 열을 선택해 교차점의 셀을 반전하고 목표 �
 
 | Version | Status | Summary |
 |---|---|---|
+| 0.1.0-hackathon | Release record | 18 signal·AXIS/PULSE 공개 프로토타입 |
 | 1.0.0 | Planned | 최초 공개 release·hackathon submission 목표 |
 | 1.0.0-rc.1 | Future | M10 QA용 release candidate |
 | 1.0.0-preview.1 | Future | 내부·플레이테스트 preview |
