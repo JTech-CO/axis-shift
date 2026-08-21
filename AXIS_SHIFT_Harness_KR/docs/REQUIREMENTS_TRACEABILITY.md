@@ -1,7 +1,7 @@
 # AXIS//SHIFT 요구사항 추적표
 
 **버전**: 1.0.0  
-**상태**: M00·M01 verified / H00 v0.1 submission slice verified / v1 roadmap baseline
+**상태**: M00·M01·M02 verified / H00 v0.1 submission slice verified / v1 roadmap baseline
 **최종 갱신**: 2026-08-21
 
 > 기능 요구사항 ID는 기술 백서 §2.2.2를 따른다. `NFR-*`는 백서의 성능·접근성·배포·개인정보 기준을 하네스에서 추적 가능하게 부여한 ID다. 이 표가 새로운 제품 요구를 만드는 것은 아니며, 원문 기준의 검증 경로를 연결한다.
@@ -11,7 +11,7 @@
 | 상태 | 의미 |
 |---|---|
 | Planned | phase·test 경로만 정의, 구현 전 |
-| In Progress | 현재 phase에서 구현 중 |
+| In Progress | 일부 phase의 구현·증거는 있으나 전체 승인 조건의 후속 phase가 남음 |
 | Verified | 명령·증거가 연결됨 |
 | Blocked | DoR·결정·결함으로 진행 불가 |
 | Deferred | v1 비목표로 명시 |
@@ -22,12 +22,12 @@
 |---|---|---|---|---|---|---|
 | FR-CORE-001 | 행·열 복수 선택과 독립 토글, 시각·ARIA 상태 | M05·M06 | `components/game/AxisToggle`, session reducer | component + keyboard E2E | 010,015 | Planned |
 | FR-CORE-002 | PULSE 전 실제 변경 없는 교차점 preview | M05·M06 | `TensorGrid`, selectors | fixture snapshot + component | 005,015 | Planned |
-| FR-CORE-003 | 선택 교차점만 XOR 반전, 이동 1건 | M02·M04·M06 | `domain/board`, session reducer | property + rapid-input E2E | 005,010 | Planned |
+| FR-CORE-003 | 선택 교차점만 XOR 반전, 이동 1건 | M02·M04·M06 | `domain/board`, session reducer | property + rapid-input E2E | 005,010 | In Progress |
 | FR-CORE-004 | 목표 일치 시 완료 event 1회 | M04·M06 | session reducer | idempotency + E2E | 010 | Planned |
 | FR-CORE-005 | Undo가 직전 PULSE를 역산·기록 복원 | M04·M06 | session reducer | reducer + E2E | 005,010 | Planned |
 | FR-CORE-006 | 확인 후 initial state Reset, 확정 기록 보존 | M04·M06 | reducer, Dialog | reducer + component/E2E | 010,011 | Planned |
 | FR-CORE-007 | 새로고침 후 유효 미완료 세션 복구 | M04·M06·M07 | storage repository | migration + reload E2E | 011 | Planned |
-| FR-HINT-001 | 남은 Par → 한 축 → 전체 PULSE 단계형 Hint | M02·M04·M06 | factorization, selectors | rank/factorization + UI | 006 | Planned |
+| FR-HINT-001 | 남은 Par → 한 축 → 전체 PULSE 단계형 Hint | M02·M04·M06 | factorization, selectors | rank/factorization + UI | 006 | In Progress |
 | FR-LAB-001 | Tutorial 이후 Lab 진입·48레벨 진행 | M03·M06 | content, lab feature | level validator + E2E | 007,011 | Planned |
 | FR-DAILY-001 | 동일 UTC date/version에서 동일 퍼즐 | M03·M07 | generator, UTC adapter | 3,650-day audit + timezone E2E | 008,009 | Planned |
 | FR-DAILY-002 | 날짜별 완료와 local streak | M04·M07 | record repository, streak | truth table + E2E | 011,012 | Planned |
@@ -41,9 +41,9 @@
 
 | ID | 백서 기준 | Phase | 자동·수동 검증 | INV | 상태 |
 |---|---|---|---|---|---|
-| NFR-MATH-001 | Par=`rank_GF2(current XOR target)` | M02 | 3×3 512 전수 BFS 패리티 | 006 | Planned |
+| NFR-MATH-001 | Par=`rank_GF2(current XOR target)` | M02 | 3×3 512 전수 BFS 패리티 | 006 | Verified |
 | NFR-CONTENT-001 | Tutorial 6 + Lab 48 전부 유효 | M03·M06 | validator + canonical solve | 007 | Planned |
-| NFR-DET-001 | seed·factorization·signature 결정성 | M02·M03·M09 | golden vectors·browser parity | 006,008 | Planned |
+| NFR-DET-001 | seed·factorization·signature 결정성 | M02·M03·M09 | golden vectors·browser parity | 006,008 | In Progress |
 | NFR-STORAGE-001 | schema guard·migration·손상 복구 | M04 | fixture matrix + reload E2E | 011 | Planned |
 | NFR-RESP-001 | 360px부터 가로 스크롤·가림 없음 | M05·M10 | viewport E2E + 실기기 | 015 | Planned |
 | NFR-A11Y-001 | 키보드 전체 흐름, 44px, 색 외 표식 | M05~M10 | axe·computed size·manual SR | 015 | Planned |
@@ -58,6 +58,8 @@
 | NFR-RELEASE-001 | P0/P1·INV 위반 0 | M10·M11 | QA_REPORT + issue audit | 020 | Planned |
 | NFR-CODEX-001 | Codex 기여·사람 판단·검증 증거 구분 | 전 phase·M11 | collaboration log + commit links | 018 | Planned |
 
+> **M02 완료 증거 (2026-08-21)**: `matrixCount=512 oracleUnvisited=0 rankMismatch=0 factorizationMismatch=0 pulseInvariantFailures=0`, 고정 시드 `randomMatrices=50000 determinismFailures=0`; `board`·`pulse`·`guards`·`gf2-rank`·`factorization` 5개 파일은 파일별 statements/branches/functions/lines 100%, `src/domain` test 27/27이다. 경계 검사는 `files=43 edges=40 violations=0 cycles=0 coreFiles=27 coreFixtureImplementations=5 coreFixtureAssertions=2`로 production 중복 구현과 의도적 self-check를 함께 검증했다. 이 증거는 M02 수학 계층만 닫으며 FR-CORE-003의 M04/M06 session·UI, FR-HINT-001의 M04/M06 selector·UI, NFR-DET-001의 M03 seed와 M09 signature는 아직 완료하지 않는다.
+
 ## 4. H00 해커톤 제출 슬라이스 추적
 
 > 아래 `HS-*`는 2026-08-26 제출용 v0.1 프로토타입 승인 조건이다. 기존 v1 FR/NFR 행을 `Verified`로 승격하지 않는다.
@@ -68,9 +70,9 @@
 | HS-AXIS-001 | 선택 축 진행선·PULSE 교차점 충격·완료 Signal Lock | H00 | `game.mjs`, `styles.css` | state/computed-style browser smoke | 005,010,015 | Verified |
 | HS-A11Y-001 | 키보드·44px·reduced motion·비색상 preview 유지 | H00 | M00 prototype UI | 320/360/390/960 E2E + E1 | 015,018 | Verified |
 | HS-DEPLOY-001 | 고정 v0.1 SHA Pages root·signal·seed·M01 bridge 공개 smoke | H00 | Pages artifact | CI `32453169036` + Pages `32453169029` + public E4 | 014,017,020 | Verified |
-| HS-SUBMIT-001 | Prototype/v0.1로 정직한 URL·README·영상·썸네일·백업 | H00 | 제출 문서·자산 | 필드 대조 2회 + manifest 14/0 + 2중 백업 hashDelta 0 | 018~020 | Verified |
+| HS-SUBMIT-001 | Prototype/v0.1로 정직한 URL·README·영상·썸네일·백업 | H00 | 제출 문서·자산 | 필드 대조 2회 + manifest entries=14 failures=0 + 2중 백업 hashDelta 0 | 018~020 | Verified |
 
-> **H00 완료 증거 (2026-08-21)**: tag/release SHA와 app capture SHA는 모두 `6690f5778f706e1875b452d552bd75ba1c06ee9a`이며 Pages digest는 `sha256:07a222cc7af5ad221e3d4be3524f53992cdf01823e6af56b7723c00282671998`다. H00 경계는 submission-ready 패키지까지이며 공식 Google 양식의 최종 Submit은 오너 작업으로 남아 있고 실행했다고 주장하지 않는다. v1 FR/NFR 행은 계속 `Planned`다.
+> **H00 완료 증거 (2026-08-21)**: tag/release SHA와 app capture SHA는 모두 `6690f5778f706e1875b452d552bd75ba1c06ee9a`이며 Pages digest는 `sha256:07a222cc7af5ad221e3d4be3524f53992cdf01823e6af56b7723c00282671998`다. H00 경계는 submission-ready 패키지까지이며 공식 Google 양식의 최종 Submit은 오너 작업으로 남아 있고 실행했다고 주장하지 않는다. H00 자체는 v1 FR/NFR 행을 승격하지 않았고, 이후 M02 증거가 연결된 행만 위 표에서 `In Progress` 또는 `Verified`로 갱신했다.
 
 ## 5. 모드별 E2E 추적
 

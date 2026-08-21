@@ -4,9 +4,9 @@
 
 ## 현재 상태
 
-- **현재 phase**: H00 — Hackathon Submission Slice 완료 (ADR-0010); 다음 M02는 미착수이며 원래 DoR와 프로젝트 오너 지시를 기다림
-- **상태**: M00 DOD-01~07·M01 완료 / H00 DOD-01~12 완료, `v0.1.0-hackathon` tag·pre-release·제출 준비 패키지 고정
-- **마지막 갱신**: 2026-08-21 / release=`6690f57`, CI·Pages success, clean/public E4·2회 field check·2중 backup PASS
+- **현재 phase**: M02 — Board & GF(2) Domain Core 완료; 다음 M03은 미착수
+- **상태**: M00 DOD-01~07·M01·M02 DOD-01~10 완료 / H00 DOD-01~12 완료, M02 domain core와 독립 수학 오라클 고정
+- **마지막 갱신**: 2026-08-21 / M02 3×3 전수 512·4~8 각 10,000 property·core coverage 100%·boundary 0·verify 10단계 통과
 - **목표 릴리스**: `v0.1.0-hackathon` — OpenAI Game Builders Seoul Track 1 제출 슬라이스 완료
 - **제출 접수 종료**: 2026-08-26
 
@@ -52,10 +52,13 @@
 - [x] H00 clean release 검증 — release SHA `6690f5778f706e1875b452d552bd75ba1c06ee9a`, Node 24 `npm ci`, lock 동일·취약점 0, verify 10·E2E 12/12·Pages 27/27·a11y 0
 - [x] H00 공개 E4 — CI run `32453169036`, Pages run `32453169029`, deployed SHA 일치, artifact digest `sha256:07a222cc7af5ad221e3d4be3524f53992cdf01823e6af56b7723c00282671998`, 공개 browser 891·오류 0
 - [x] H00 제출 준비 패키지 — final release SHA 실제 공개 빌드 썸네일·14.84초 영상, 독립 field check 2회, tag/pre-release `v0.1.0-hackathon`, manifest 14/14, 별도 경로의 15파일 backup 2곳·hash delta 0
+- [x] M02 보드·PULSE·`GF(2)` 도메인 코어 — 크기 3~8 guard, 빈 축 no-op, exact-cell 반전, 차이·완료 판정, 결정적 rank·canonical factorization 공개 API 고정
+- [x] M02 독립 수학 오라클 — 3×3 전체 512개 BFS 최소 수와 rank mismatch 0, 4×4~8×8 고정 시드 각 10,000개 포함 총 50,000개 round-trip·결정성 실패 0
+- [x] M02 품질 계약 — domain 6파일/27테스트, 지정 runtime 5파일 statements/branches/functions/lines 각각 100%, validator self-check 2/2, boundary 위반 0, verify 10단계
 
 ## 다음 할 일
 
-1. 정규 M02 착수는 프로젝트 오너의 별도 지시 뒤 `phases/M02_board_core.md`의 원래 DoR에서 시작한다. H00 완료는 M02~M11 완료나 DoR 면제가 아니다.
+1. 다음 구현은 `phases/M03_generator_content.md`의 원래 DoR를 확인하고 프로젝트 오너 지시에 따라 시작한다. M02 완료는 M03의 생성기·콘텐츠·Daily 감사 gate를 면제하지 않는다.
 2. 공식 행사 양식의 Google 로그인·개인정보·동의·최종 `Submit`은 프로젝트 오너가 수행한다. H00은 제출 준비 상태까지만 완료했으며 실제 접수를 주장하지 않는다.
 3. `.private/playtests/M00-R1-2026-08-16.md`와 H00 제출 패키지·두 backup은 실제 행사 제출 완료를 확인할 때까지 보존한다.
 4. H00의 권리 상태는 `UNLICENSED` / All Rights Reserved로 고정했다. 공개 OSS 라이선스 채택 여부는 M11 오너 결정으로 남긴다.
@@ -86,7 +89,7 @@
 | M00 | Rule Proof & Scope Lock | 완료 — DOD-01~07, M00-R1 행동 기준 5/5 | aggregate-only E1 제한 보존, M06/M10 재사용 금지 |
 | M01 | Production Scaffolding | 완료 — ADR-0008 제한 체크포인트, DOD-01~09·CI·Pages smoke 통과 | 완료 |
 | H00 | Hackathon Submission Slice | 완료 — DOD-01~12, tag/pre-release `v0.1.0-hackathon` | clean checkout·public E4·릴리스 정직성·제출 준비 패키지·2중 backup 완료; 실제 양식 Submit은 오너 action |
-| M02 | Board & GF(2) Core | 미시작 | 3×3 전수에서 brute-force = rank |
+| M02 | Board & GF(2) Core | 완료 — DOD-01~10 | 3×3 전수 512 mismatch 0, 4~8 총 50,000 round-trip·결정성 실패 0, core coverage 각 100% |
 | M03 | Generator & Content Pipeline | 미시작 | 10년 Daily 감사, 54개 정적 레벨 검증 |
 | M04 | Session, Persistence & Scoring | 미시작 | reducer·저장·시간·등급 정합 |
 | M05 | Design System & Shared UI | 미시작 | 360px·테마·키보드·상태 fixture |
@@ -128,6 +131,27 @@
 | 2026-08-14 | M01 | ADR-0009 Pages artifact 호환 E2 | final clean checkout `npm run build:pages` + `npm run test:pages` | files=14, bytes=327103, M00 runtime=10; Chromium·Firefox·WebKit 24/24; asset HTTP 200; 오류 0 | `tests/pages/pages-artifact.spec.ts`, `phases/M01_scaffolding.md` §10 |
 | 2026-08-14 | M01 | DOD-01 재현 설치 | commit `bf3d1fe` detached clean checkout, Node 24 `npm ci` → `npm run verify` | 261 packages, vulnerabilities=0, lock hash 동일, tracked changes=0, verify 10단계 통과 | `phases/M01_scaffolding.md` §10 |
 | 2026-08-14 | M01 | CI·Pages artifact 공개 배포 | legacy backup → Pages workflow 전환 → `main` push → Actions → 공개 smoke | deployed=`93a4359`; CI run 31733232235 success; Pages run 31733232206 success; public M01 8/8; M00 573단언·오류 0 | `https://jtech-co.github.io/axis-shift/`, `phases/M01_scaffolding.md` §10 |
+| 2026-08-21 | M02 | DOD-01~06 수학 코어 E3 | `npm run test -- src/domain` + `npm run test:math:exhaustive` | domain 6 files/27 tests; matrixCount=512, rankMismatch=0, factorizationMismatch=0, pulseInvariantFailures=0, randomMatrices=50000, determinismFailures=0 | `phases/M02_core_math.md` §10 |
+| 2026-08-21 | M02 | DOD-09 core coverage E3 | `npm run test:coverage`; `npm run test:coverage:domain` | 공통 report 8 files/32 tests, S=99.38/B=100/F=97.5/L=99.32; 추가 domain gate는 board·pulse·gf2-rank·factorization·guards 각각 S/B/F/L=100%, total 131/59/26/117 | `phases/M02_core_math.md` §10 |
+| 2026-08-21 | M02 | M00 fixture 호환 | `M00-MAIN-v1` 정규 분해 적용 | diff=`[11,6,13,6]`, rank=2, canonical 2 PULSE, solved=true | `phases/M02_core_math.md` §9~10 |
+| 2026-08-21 | M02 | DOD-07~08·통합 검증 | `npm run check:boundaries` + `npm run verify` | boundary files=43, violations=0, cycles=0, named-duplicate self-check=5/5; occurrence review 병행; scriptContract=16/16, unit=32/32, secret findings=0, verify steps=10 | `phases/M02_core_math.md` §10 |
+
+### M02 최신 검증 출력
+
+```text
+environment: Windows, node=v24.19.0, npm=11.6.2
+typecheck: exit=0
+Vitest domain: files=6 tests=27 failures=0
+core coverage target files=5 each statements=100 branches=100 functions=100 lines=100
+coverage totals: statements=131 branches=59 functions=26 lines=117
+exhaustive: matrixCount=512 oracleUnvisited=0 rankMismatch=0 factorizationMismatch=0 pulseInvariantFailures=0 randomMatrices=50000 determinismFailures=0
+M00-MAIN-v1: diff=[11,6,13,6] rank=2 canonical=[{colMask:13,rowMask:5},{colMask:6,rowMask:11}] solved=true
+levelValidation: files=0 validatorSelfChecks=2 failures=0
+boundaries: files=43 edges=40 violations=0 cycles=0 coreFiles=27 coreFixtureImplementations=5 coreFixtureAssertions=2
+verify: scriptContract=16/16 unit=32/32 secretFindings=0 build=pass pagesArtifactFiles=14 steps=10
+next phase: M03 not started
+owner action preserved: official event form authentication, personal data/consents, final Submit
+```
 
 ### H00 최신 local 검증 출력
 
@@ -288,3 +312,4 @@ STOP 발동 시 아래 형식으로 추가한다.
 - 2026-08-21: H00 후보는 기존 수학·generator version을 바꾸지 않고 6×3 campaign, 결과 랜덤 재플레이, 정적 축 rail·360ms 교차 연출·Signal Lock을 구현했다. final release/tag SHA `6690f5778f706e1875b452d552bd75ba1c06ee9a`의 실제 공개 빌드에서 제출 자산을 만들었다.
 - 2026-08-21: release/tag SHA `6690f5778f706e1875b452d552bd75ba1c06ee9a`의 clean checkout, CI `32453169036`, Pages `32453169029`, public E4, post-tag field check 2회, tag/pre-release `v0.1.0-hackathon`, 2중 backup을 통과해 H00 DOD-01~12를 완료했다. 공식 행사 양식의 로그인·개인정보·동의·최종 Submit은 오너 action이며 실제 접수를 주장하지 않는다.
 - 2026-08-21: H00 v0.1에는 새 공개 라이선스를 부여하지 않고 `UNLICENSED` / All Rights Reserved를 유지한다. 공개 OSS 라이선스 여부는 M11 결정으로 남긴다.
+- 2026-08-21: 프로젝트 오너 승인 아래 M02 원래 DoR를 충족하고 단일 TypeScript 보드/PULSE/rank/canonical factorization 코어를 고정했다. 독립 3×3 BFS 512개와 4~8 고정 시드 50,000개가 mismatch·round-trip·불변식·결정성 실패 0을 기록했고 지정 코어 5파일의 S/B/F/L은 각각 100%다. 다음 M03은 별도 DoR 전 미착수이며 H00 공식 양식 Submit은 계속 오너 action이다.

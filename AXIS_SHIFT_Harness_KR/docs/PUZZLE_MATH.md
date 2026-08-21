@@ -1,8 +1,8 @@
 # AXIS//SHIFT 퍼즐 수학·구현 오라클
 
 **버전**: 1.0.0  
-**상태**: M02 계약 초안  
-**최종 갱신**: 2026-08-09  
+**상태**: M02 구현·전수 검증 완료
+**최종 갱신**: 2026-08-21
 **관련 결정**: ADR-0001, ADR-0002  
 **관련 불변식**: INV-004, INV-005, INV-006, INV-007
 
@@ -86,7 +86,7 @@ rows.length = size
 0 <= colMask <= boardMask
 ```
 
-UI는 `rowMask=0` 또는 `colMask=0`일 때 PULSE를 비활성화한다. domain의 `applyPulse`는 방어적으로 이를 no-op으로 처리하거나 명시적 result를 반환하되, throw/no-op 정책을 public API에서 하나로 고정한다.
+UI는 `rowMask=0` 또는 `colMask=0`일 때 PULSE를 비활성화한다. domain의 `applyPulse`는 이 유효한 빈 축을 항상 새 배열을 반환하는 immutable no-op으로 처리한다. 반면 정수가 아니거나 음수이거나 `boardMask` 밖 비트가 있는 마스크는 `BoardValidationError`로 거부하며 조용히 자르지 않는다.
 
 ## 4. PULSE의 정의
 
@@ -121,15 +121,19 @@ function applyPulse(
   rowMask: number,
   colMask: number,
 ): BoardRows {
-  const limit = (1 << size) - 1;
-  const safeRows = rowMask & limit;
-  const safeCols = colMask & limit;
+  assertBoardRows(rows, size);
+  assertAxisMask(rowMask, size, 'row');
+  assertAxisMask(colMask, size, 'column');
+  const nextRows = [...rows];
 
-  if (safeRows === 0 || safeCols === 0) return rows.slice();
+  if (rowMask === 0 || colMask === 0) return nextRows;
 
-  return rows.map((row, i) =>
-    ((safeRows >> i) & 1) === 1 ? (row ^ safeCols) & limit : row,
-  );
+  for (let rowIndex = 0; rowIndex < size; rowIndex += 1) {
+    if ((rowMask & (1 << rowIndex)) !== 0) {
+      nextRows[rowIndex] ^= colMask;
+    }
+  }
+  return nextRows;
 }
 ```
 
@@ -369,7 +373,7 @@ P1: rows {0,2}, cols {1,2}
 
 ```text
 rankGF2(rows, size):
-  a = masked copy of rows
+  a = guard-validated copy of rows
   pivotRow = 0
 
   for col from 0 to size-1:
@@ -435,7 +439,7 @@ while queue not empty:
 distance[state] === rankGF2(decode(state))
 ```
 
-오라클은 `rankGF2`, factorization, generator를 import하지 않는다.
+BFS 거리 테이블을 만드는 `buildIndependentOracleDistances`는 `rankGF2`, PULSE, factorization, generator를 호출하지 않고 9비트 셀 루프만 사용한다. 같은 test module의 비교 harness가 완성된 거리 테이블과 production `rankGF2`·factorization 결과를 대조한다.
 
 ## 12. 필수 테스트 집합
 
@@ -562,8 +566,8 @@ validator는 `0 <= compressionGap <= N-rank`, `0 < density <= 1`, Par 일치와 
 | 사례 | 정책 |
 |---|---|
 | `B == T` | Par 0, 이미 solved. 일반 콘텐츠 validator는 비자명성 때문에 제외 |
-| 빈 row/col 선택 | UI PULSE disabled; domain은 고정된 안전 정책 사용 |
-| mask 범위 초과 | public guard에서 거부 또는 명시적으로 실패 result. 조용한 truncation 금지 |
+| 빈 row/col 선택 | UI PULSE disabled; domain은 새 배열을 반환하는 immutable no-op |
+| mask 범위 초과 | public guard가 `BoardValidationError('mask-out-of-range')`로 거부. 조용한 truncation 금지 |
 | 여러 최적해 | canonical factorization 한 개만 Hint 기준으로 선택 |
 | 사용자가 Par보다 적게 해결 | 수학/구현 버그. P0로 처리 |
 | 저장된 Par 불일치 | 콘텐츠/저장 거부, 런타임에 잘못된 등급 표시 금지 |
@@ -585,3 +589,46 @@ validator는 `0 <= compressionGap <= N-rank`, `0 < density <= 1`, Par 일치와 
 기존 v1 규칙과 결과는 유지하고 새 실험은 별도 mode/version으로 구현한다.
 
 `sweepBound`·`compressionGap`처럼 기존 PULSE와 `Par=rank`를 바꾸지 않는 파생 진단값의 추가는 ADR-0002 대체 사유가 아니다. 다만 이 지표로 공개 난도 라벨이나 콘텐츠 수용 기준을 변경하면 해당 phase 문서와 콘텐츠 검증 증거를 함께 갱신한다.
+
+## 18. M02 공개 구현 계약과 검증 결과
+
+2026-08-21 M02에서 다음 경로를 production 단일 기준 구현으로 고정했다.
+
+```text
+src/domain/types.ts
+src/domain/board/{board,guards,pulse}.ts
+src/domain/algebra/{gf2-rank,factorization}.ts
+src/domain/index.ts
+```
+
+공개 entrypoint의 핵심 계약은 다음과 같다.
+
+```ts
+applyPulse(rows, size, rowMask, colMask): number[]
+applyPulses(rows, size, pulses): number[]
+differenceRows(leftRows, rightRows, size): number[]
+isSolved(currentRows, targetRows, size): boolean
+rankGF2(rows, size): number
+factorizeGF2(rows, size): EncodedPulse[]
+```
+
+- `boardKey(rows, size)`는 `size:row0,row1,...` 형태의 결정적 직렬화 키를 반환한다.
+- 일반 보드·영행렬·`B == T`는 대수 입력으로 유효하다. 플레이 콘텐츠의 비자명성만 `assertPlayablePuzzlePair`가 별도로 검사한다.
+- 모든 구조 오류는 안정적인 `BoardValidationError.code`로 구분한다. 범위 밖 비트는 거부하고 유효한 빈 축만 no-op이다.
+- `rankGF2`는 열 bit 0부터 증가 방향, 현재 pivot row 이상의 최초 행을 택해 RREF까지 제거한다.
+- `factorizeGF2`는 화면 왼쪽 열 bit 0부터 최초 독립 열을 기저로 채택하고 기저 채택 순서로 PULSE를 반환한다.
+- 문서 3×3 golden `[3,5,6]`은 `[{rowMask:3,colMask:5},{rowMask:5,colMask:6}]`이다.
+- `gf2-rank.test.ts`는 수치 rank 외에 production source를 raw fixture로 읽어 `columnIndex=0` 증가 루프와 `pivotRow=rank`부터 한 행씩 진행하는 비관찰 구조 계약을 고정한다. 디버그 전용 공개 API는 추가하지 않는다.
+- H00/M00의 `prototypes/rule-proof/core.mjs`는 과거 공개 프로토타입 재현을 위해 동결한 legacy 구현이다. 정규 `features`·`components`·`services`·`scripts`는 production domain API를 소비하며 새 코어를 복제하지 않는다. named AST gate는 정확한 코어 함수명을 가진 선언을 찾는 보조 검사이므로, 이름을 바꾼 의미적 복제는 occurrence 검색과 code review로 보완한다.
+
+검증 결과:
+
+```text
+domain test files=6 tests=27 passed
+matrixCount=512 oracleUnvisited=0 rankMismatch=0
+factorizationMismatch=0 pulseInvariantFailures=0
+randomMatrices=50000 determinismFailures=0
+coverage files=5 statements=131/131 branches=59/59
+coverage functions=26/26 lines=117/117 (각 파일 100%)
+M00-MAIN-v1 rank=2 pulses=[{rowMask:5,colMask:13},{rowMask:11,colMask:6}] solved=true
+```

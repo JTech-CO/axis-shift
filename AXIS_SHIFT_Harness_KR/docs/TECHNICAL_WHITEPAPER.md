@@ -683,12 +683,22 @@ minimumPulses(B, T) = rank_GF(2)(B ⊕ T)
 ```ts
 export function applyPulse(
   rows: readonly number[],
+  size: number,
   rowMask: number,
   colMask: number,
 ): number[] {
-  return rows.map((rowBits, rowIndex) =>
-    rowMask & (1 << rowIndex) ? rowBits ^ colMask : rowBits,
-  );
+  assertBoardRows(rows, size);
+  assertAxisMask(rowMask, size, 'row');
+  assertAxisMask(colMask, size, 'column');
+  const nextRows = [...rows];
+  if (rowMask === 0 || colMask === 0) return nextRows;
+
+  for (let rowIndex = 0; rowIndex < size; rowIndex += 1) {
+    if ((rowMask & (1 << rowIndex)) !== 0) {
+      nextRows[rowIndex] ^= colMask;
+    }
+  }
+  return nextRows;
 }
 ```
 
@@ -699,20 +709,22 @@ export function applyPulse(
 
 #### 4.3.4. `GF(2)` 랭크 계산
 
-행 비트를 복사한 뒤 높은 열부터 피벗을 찾는 가우스 소거법을 사용한다.
+행 비트를 검증·복사한 뒤 화면 왼쪽 열인 bit 0부터 증가 방향으로 피벗을 찾는 가우스 소거법을 사용한다. 같은 입력의 디버그·정규 분해 순서를 고정하기 위해 현재 pivot row 이상의 첫 행을 선택한다.
 
 ```ts
-export function gf2Rank(inputRows: readonly number[], width: number): number {
+export function rankGF2(inputRows: readonly number[], size: number): number {
+  assertBoardRows(inputRows, size);
   const rows = [...inputRows];
   let rank = 0;
 
-  for (let col = width - 1; col >= 0 && rank < rows.length; col -= 1) {
-    const pivot = rows.findIndex((row, index) => index >= rank && (row & (1 << col)) !== 0);
-    if (pivot === -1) continue;
+  for (let col = 0; col < size && rank < size; col += 1) {
+    let pivot = rank;
+    while (pivot < size && (rows[pivot] & (1 << col)) === 0) pivot += 1;
+    if (pivot === size) continue;
 
     [rows[rank], rows[pivot]] = [rows[pivot], rows[rank]];
 
-    for (let row = 0; row < rows.length; row += 1) {
+    for (let row = 0; row < size; row += 1) {
       if (row !== rank && (rows[row] & (1 << col)) !== 0) {
         rows[row] ^= rows[rank];
       }
@@ -724,7 +736,7 @@ export function gf2Rank(inputRows: readonly number[], width: number): number {
 }
 ```
 
-실제 구현에서는 `findIndex` 범위와 정적 분석 규칙을 최적화하되 동작 원리를 유지한다.
+production 기준 구현은 `src/domain/algebra/gf2-rank.ts`의 `rankGF2` 하나이며 높은 열 우선 `gf2Rank` 별도 경로를 두지 않는다.
 
 #### 4.3.5. 최적 펄스 분해
 
@@ -735,7 +747,7 @@ export function gf2Rank(inputRows: readonly number[], width: number): number {
 5. 기저 열 `k`를 `rowMask_k`로 사용하고, 해당 기저의 계수가 1인 원본 열 인덱스를 모아 `colMask_k`로 사용한다.
 6. `q`개의 `(rowMask_k, colMask_k)`가 canonical 최적 펄스 분해다.
 
-보드가 최대 6×6이므로 각 원본 열의 기저 조합을 `2^q` 전수 탐색해도 충분히 빠르다. 왼쪽부터 채택하는 기저 순서와 최초 일치 계수 조합을 공개 결정성 계약으로 유지한다. `gestureCost`는 canonical 해답을 다시 선택하는 최적화 함수가 아니라 생성 후보의 난도 보조 지표로 계산한다.
+v1 콘텐츠는 최대 6×6이고 domain 엔진은 최대 8×8이므로 각 원본 열의 기저 조합을 `2^q` 전수 탐색해도 충분히 빠르다. 왼쪽부터 채택하는 기저 순서와 최초 일치 계수 조합을 공개 결정성 계약으로 유지한다. `gestureCost`는 canonical 해답을 다시 선택하는 최적화 함수가 아니라 생성 후보의 난도 보조 지표로 계산한다.
 
 ```text
 gestureCost = Σ(popcount(rowMask) + popcount(colMask))
@@ -750,11 +762,23 @@ gestureCost = Σ(popcount(rowMask) + popcount(colMask))
 #### 4.3.6. 일치·차이 계산
 
 ```ts
-export function diffRows(current: readonly number[], target: readonly number[]): number[] {
-  return current.map((row, index) => row ^ target[index]);
+export function differenceRows(
+  leftRows: readonly number[],
+  rightRows: readonly number[],
+  size: number,
+): number[] {
+  assertBoardRows(leftRows, size);
+  assertBoardRows(rightRows, size);
+  return leftRows.map((row, index) => row ^ rightRows[index]);
 }
 
-export function isSolved(current: readonly number[], target: readonly number[]): boolean {
+export function isSolved(
+  current: readonly number[],
+  target: readonly number[],
+  size: number,
+): boolean {
+  assertBoardRows(current, size);
+  assertBoardRows(target, size);
   return current.every((row, index) => row === target[index]);
 }
 ```
