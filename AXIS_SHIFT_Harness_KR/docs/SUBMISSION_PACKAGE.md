@@ -1,14 +1,62 @@
 # AXIS//SHIFT — OpenAI Game Builders Seoul 제출 패키지
 
 **문서 버전**: 1.0.0  
-**상태**: 초안 — M11에서 실제 링크·파일 입력  
-**공식 안내 확인일**: 2026-08-09  
+**상태**: H00 v0.1 제출 입력 패키지 준비 완료 — 공식 양식 제출은 프로젝트 오너 작업
+**공식 안내 확인일**: 2026-08-21
 **제출 접수 종료**: 2026-08-26  
 **공식 안내**: `https://openaigame2026.com/#main`
 
-> 공식 양식은 변경될 수 있으므로 2026-08-25와 제출 직전에 다시 확인한다. 이 문서가 공식 양식보다 우선하지 않는다.
+> H00 기록은 2026-08-21에 실제 공식 양식을 다시 확인한 결과다. Google 계정 인증, 팀·연락처 정보, 동의 확인과 최종 `Submit`은 프로젝트 오너가 수행하며, 이 문서는 공식 제출 완료를 주장하지 않는다. 아래 M11 v1.0 템플릿은 향후 릴리스를 위해 보존한다.
 
-## 1. 공식 제출 필드 스냅샷
+## H00 v0.1 제출 입력 패키지
+
+### 공식 양식 필드와 확정 입력값
+
+2026-08-21 라이브 양식 확인 기준 필수 필드는 팀 이름, 게임 제목, 200자 이내 게임 소개, 공개 플레이 링크, 썸네일이다. 데모 영상과 Codex 활용 설명은 선택 필드다.
+
+| 필드 | H00 v0.1 값 | 상태 |
+|---|---|---|
+| Team name | 프로젝트 오너가 공식 양식에 직접 입력 | 공개 문서·패키지에 개인정보를 저장하지 않음 |
+| Game title | AXIS//SHIFT — A Tensor Pulse Puzzle | 확정 |
+| Game description | 행과 열을 선택해 교차점 신호를 반전하고 목표 패턴을 맞추는 짧은 텐서 퍼즐입니다. 6개 난도·크기 구역의 18개 신호와 무한 랜덤 문제에서 최소 PULSE에 도전하세요. | 95자 / 200자 이하 |
+| Repository | `https://github.com/JTech-CO/axis-shift` | 공개 접근 확인 |
+| Gameplay URL | `https://jtech-co.github.io/axis-shift/` | 로그인 없이 HTTP 200 및 public E4 확인 |
+| Application SHA | `5e2fe2390ccacd4c5425a476fc13770c524a9517` | 공개 빌드 기준 |
+| Release tag | `v0.1.0-hackathon` | H00 릴리스 절차에서 생성 예정; 아직 제출 완료 근거가 아님 |
+| Pages workflow | run `32451745534` | 성공·배포 SHA 일치 |
+| Pages artifact | `sha256:43d01cb2b76806eb218bca3c01b32c9aa5af9c5f4155e008f730b643b4df6f74` | GitHub Pages artifact digest |
+| Thumbnail | `.private/submission/H00/axis-shift-submission-thumbnail-v0.1.0.png` | 1920×1080, 293,827 bytes |
+| Demo video (MP4) | `.private/submission/H00/axis-shift-demo-v0.1.0.mp4` | H.264, 1920×1080, 25fps, 13.76초, 무음, 1,478,118 bytes |
+| Demo capture (WebM) | `.private/submission/H00/axis-shift-demo-v0.1.0.webm` | 1920×1080, 13.76초, 1,316,500 bytes |
+| Codex process | `.private/submission/H00/codex-collaboration-summary.txt` | H00에서 실제 수행한 구현·검증만 기술 |
+
+### 제출용 소개문
+
+> 행과 열을 선택해 교차점 신호를 반전하고 목표 패턴을 맞추는 짧은 텐서 퍼즐입니다. 6개 난도·크기 구역의 18개 신호와 무한 랜덤 문제에서 최소 PULSE에 도전하세요.
+
+문자 수는 PowerShell과 Node의 독립 검사에서 각각 95자로 확인했다. H00에는 Daily, PWA, Tutorial, Lab, Sprint, 결과 공유 기능을 구현했다고 쓰지 않는다.
+
+### 제출 자산 무결성
+
+| 자산 | SHA-256 |
+|---|---|
+| `axis-shift-submission-thumbnail-v0.1.0.png` | `69d19cccc8a2435e66f23dd5c45d692c0d4d79fc49e8a799ad2caef1e54bb8f1` |
+| `axis-shift-demo-v0.1.0.mp4` | `a2450610eeaf637df7451eaf6e40f88fe034b10794bb7ca11ba044e4b5f07c93` |
+| `axis-shift-demo-v0.1.0.webm` | `6c9415266268834422026f0a37a3491e0a24581f4f3d5970a9d6474e720590ac` |
+| `submission-package-review.png` | `bf8981a208ed637e9c9b2f95c51d8e8b30d934b8eef8ac68c963395aac0eb480` |
+
+썸네일과 영상은 위 application SHA의 실제 공개 게임 화면을 캡처했다. 외부 이미지·폰트·음원·상표 자산은 추가하지 않았고 영상에는 오디오가 없다. 저장소는 기존 `private: true`, `UNLICENSED`, All Rights Reserved 상태를 유지하며 H00에서 새로운 LICENSE 또는 오픈소스 권리를 부여하지 않는다.
+
+### 독립 필드 검사
+
+| 검사 | 일시(KST) | 방법 | 핵심 결과 |
+|---|---|---|---|
+| 1차 | 2026-08-21T14:55:14+09:00 | PowerShell, HTTP, `ffprobe` | 제목·95/200자·URL 200·썸네일 1920×1080·영상 13.76초·권리 기록 통과 |
+| 2차 | 2026-08-21T14:55:32+09:00 | Node `fetch`·crypto·PNG header | 제목·설명·URL·3개 자산 hash·썸네일 크기·H00 범위 주장 통과 |
+
+`submission-package-review.png`로 제출 패키지 화면을 별도 육안 검토했다. 공식 양식의 최종 제출은 Google 계정, 개인·팀 정보, 약관 동의를 포함하므로 프로젝트 오너가 직접 수행한다. 제출 시각, submission ID, 확인 화면이 생기기 전에는 `Submitted`로 기록하지 않는다.
+
+## 1. M11 v1.0 공식 제출 필드 스냅샷 — H00 미사용 템플릿
 
 2026-08-09 확인 기준:
 

@@ -1,8 +1,8 @@
 # AXIS//SHIFT Asset & License Registry
 
 **문서 버전**: 1.0.0  
-**상태**: Pre-Production inventory  
-**최종 갱신**: 2026-08-09  
+**상태**: H00 제출 자산 등록 완료 / M11 production inventory·공개 라이선스 결정 대기
+**최종 갱신**: 2026-08-21
 **관련 불변식**: INV-001, INV-002, INV-017, INV-019
 
 ## 1. 정책
@@ -17,12 +17,13 @@
 
 ## 2. 저장소 LICENSE 결정
 
-- **현재 상태**: 미결정
-- **릴리스 차단**: M11 전에 최종 선택 필수
-- **권장 검토 후보**: MIT 등 permissive license
-- **주의**: 프로젝트 오너가 최종 승인하기 전 LICENSE 파일을 임의로 확정하지 않는다.
+- **H00 현재 상태**: `package.json`의 `private: true`, `UNLICENSED`와 All Rights Reserved를 유지한다.
+- **권리 부여**: H00에서 `LICENSE` 파일을 추가하지 않았고, 저장소 코드·자산에 새 오픈소스 사용권을 부여하지 않았다.
+- **제출 권리 확인**: H00 제출 썸네일·영상은 실제 공개 게임 빌드의 프로젝트 통제 화면만 캡처했다. 외부 이미지·폰트·음원·상표 자산은 추가하지 않았다.
+- **M11 결정**: 공개 오픈소스 라이선스 채택 여부와 정확한 조건은 프로젝트 오너가 최종 승인한다.
+- **주의**: 공개 저장소라는 사실만으로 복제·수정·재배포 라이선스가 발생하지 않는다.
 
-선택 시 다음을 기록한다.
+M11에서 오픈소스 라이선스를 선택할 경우 다음을 기록한다.
 
 ```text
 License:
@@ -34,7 +35,7 @@ Decision/ADR:
 
 ## 3. 현재 자산 inventory
 
-아직 production 자산이 생성·추가되지 않았다. 아래는 계획 항목이며 `Included=No`다.
+H00 제출 전용 자산 AST-007·AST-008은 등록·검증을 마쳤다. AST-001~AST-006은 향후 production 계획 또는 OS 제공 항목이므로 기존 `Included=No`·`No file` 상태를 유지한다.
 
 | ID | 자산 | Source/Author | License/권리 | 수정 | 사용 위치 | Included | 상태 |
 |---|---|---|---|---|---|---:|---|
@@ -44,10 +45,33 @@ Decision/ADR:
 | AST-004 | Share card background·signature glyph | CSS/Canvas로 직접 생성 예정 | 프로젝트 original | runtime 생성 | share PNG | No | 계획 |
 | AST-005 | Selection/PULSE/completion tones | Web Audio oscillator로 코드 생성 예정 | 프로젝트 code output | runtime 파라미터 | audio service | No | 계획 |
 | AST-006 | System UI font stack | 사용자 OS 제공 | 각 OS/브라우저 환경 | 재배포 없음 | UI·Canvas fallback | No file | 허용 |
-| AST-007 | Submission thumbnail | 실제 게임 캡처+original brand 예정 | 프로젝트 original | composition | submission | No | 계획 |
-| AST-008 | Demo video | 실제 게임 캡처·자체 narration 예정 | 프로젝트 original | edit/subtitle | submission | No | 계획 |
+| AST-007 | H00 submission thumbnail | application SHA `5e2fe239…` 실제 공개 게임 캡처 | All Rights Reserved; 외부 자산 없음 | 1920×1080 화면 구성·crop 없음 | private submission package | Yes | H00 검증 완료 |
+| AST-008 | H00 demo video | application SHA `5e2fe239…` 실제 공개 게임 캡처 | All Rights Reserved; 외부 자산·오디오 없음 | WebM 캡처, H.264 MP4 변환 | private submission package | Yes | H00 검증 완료 |
 
 실제 포함 시 `No`를 `Yes`로 바꾸고 정확한 file path·hash·source URL 또는 생성 기록을 입력한다.
+
+### AST-007 — H00 submission thumbnail
+
+- 경로: `.private/submission/H00/axis-shift-submission-thumbnail-v0.1.0.png`
+- 생성 기록: `https://jtech-co.github.io/axis-shift/`의 application SHA `5e2fe2390ccacd4c5425a476fc13770c524a9517` 실제 6×6 게임 화면 캡처
+- 권리: 프로젝트 통제 UI 캡처, All Rights Reserved; H00에서 별도 라이선스 부여 없음
+- 외부 입력 자산: 없음
+- 규격: PNG, 1920×1080, 293,827 bytes
+- SHA-256: `69d19cccc8a2435e66f23dd5c45d692c0d4d79fc49e8a799ad2caef1e54bb8f1`
+- 검토: 2026-08-21 자동 field check 2회 및 사람 육안 검토 통과
+
+### AST-008 — H00 demo video
+
+- 경로: `.private/submission/H00/axis-shift-demo-v0.1.0.mp4`
+- 원본 캡처: `.private/submission/H00/axis-shift-demo-v0.1.0.webm`
+- 생성 기록: 위 application SHA의 실제 공개 플레이를 Playwright로 캡처하고 FFmpeg로 H.264 MP4 변환
+- 권리: 프로젝트 통제 UI 캡처, All Rights Reserved; 외부 영상·이미지·폰트·음원 없음
+- 오디오: 없음
+- 규격: MP4 1920×1080, 25fps, 13.76초, 1,478,118 bytes; WebM 1920×1080, 13.76초, 1,316,500 bytes
+- MP4 SHA-256: `a2450610eeaf637df7451eaf6e40f88fe034b10794bb7ca11ba044e4b5f07c93`
+- WebM SHA-256: `6c9415266268834422026f0a37a3491e0a24581f4f3d5970a9d6474e720590ac`
+- 권리 근거: `.private/submission/H00/RIGHTS.md`
+- 검토: 2026-08-21 대표 프레임 3개 육안 확인과 독립 field check 2회 통과
 
 ## 4. 자산 등록 필수 필드
 
@@ -154,12 +178,24 @@ hotlinks=0
 
 ## 10. 릴리스 승인
 
-- [ ] 저장소 LICENSE 확정
+### H00 v0.1 체크포인트
+
+- [x] submission asset inventory와 AST-007·AST-008 일치
+- [x] 제출 자산의 unknown/custom third-party license 0
+- [x] 외부 attribution·third-party notice 의무 없음
+- [x] public browser smoke의 external font/audio/image request 0
+- [x] 실제 공개 빌드 캡처와 application SHA 기록
+- [x] 자산 hash·규격 독립 검사 2회 및 육안 검토 기록
+- [x] `UNLICENSED` / All Rights Reserved 유지와 신규 LICENSE 부재 명시
+
+### M11 v1.0 최종 릴리스 체크리스트
+
+- [ ] 저장소 LICENSE 또는 명시적 비공개 라이선스 정책 최종 승인
 - [ ] production asset inventory와 표 일치
 - [ ] submission asset inventory와 표 일치
 - [ ] unknown/custom license 0
-- [ ] required attribution 표시
-- [ ] third-party notices 생성
+- [ ] required attribution 표시 또는 해당 없음 증명
+- [ ] third-party notices 생성 또는 해당 없음 증명
 - [ ] hotlink·external font/audio/image request 0
 - [ ] 삭제 자산이 dist/service worker cache에 남지 않음
 - [ ] 최종 검토자·일시 기록

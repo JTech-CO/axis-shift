@@ -2,7 +2,7 @@
 
 **버전**: 1.0.0  
 **상태**: 기록 중  
-**최종 갱신**: 2026-08-14
+**최종 갱신**: 2026-08-21
 
 ## 1. 목적
 
@@ -101,6 +101,7 @@ Codex가 제안·생성·수정한 항목
 | CX-M00-005 | 2026-08-21 | M00 | Formal Easy E1 판정과 phase 종료 | M00·protocol·progress | n=5, I0·first PULSE·solve·recall 모두 5/5, 반복 P0 0 | 오너가 aggregate-only 제한을 인지하고 종료 승인 | 완료 |
 | CX-H00-001 | 2026-08-21 | H00 | 5일 제출 슬라이스 범위 고정 | ADR-0010·H00 phase·traceability | DoR 6/6, 구현 검증 대기 | 콘텐츠→AXIS 연출 우선, 3D·새 모드 제외 | 진행 중 |
 | CX-H00-002 | 2026-08-21 | H00 | 18신호·AXIS 연출 local vertical slice | prototype·Pages test·H00 증거 | campaign 217, browser 891, Pages 27/27, 오류 0 | 3D 대신 콘텐츠·축 인과·모바일 완성도 채택 | local 완료 / E4 대기 |
+| CX-H00-003 | 2026-08-21 | H00 | 공개 배포 회귀와 제출 패키지 준비 | PR #1·#2, Pages, private submission package | public Pages 27/27, browser 891, 외부 요청·콘솔 오류 0 | 오너가 라이선스·개인정보·동의·최종 Submit 책임 유지 | release record 진행 |
 
 ## 8. 상세 로그 템플릿
 
@@ -133,6 +134,18 @@ Codex가 제안·생성·수정한 항목
 - 발견한 실패와 수정: invalid `signal`이 앱을 중단하던 경로, control fixture의 실패하는 replay/불일치 CTA, forced-colors 셀 상태 가림, 전역 seed 결합을 정적 리뷰에서 발견해 수정했다. Pages title 기대값 실패 3건은 H00 제목·signal route 계약으로 테스트를 갱신해 27/27로 복구했다.
 - 검증: M00 verifier 200,967/0; H00 campaign 217/0; browser 891/0, 320/360/390/960, 외부 요청·콘솔 오류 0; Node 24 verify 10단계; Pages 3엔진 27/27; a11y failures=0; 360·390 완료 캡처 육안 PASS.
 - 사람이 확인할 남은 일: commit/push와 공개 E4, LICENSE, tag, 실제 제출 양식·썸네일·영상·2중 백업. H00은 M02~M11을 완료시키지 않는다.
+
+### CX-H00-003 — 공개 배포 회귀 검증과 제출 패키지 준비
+
+- 날짜: 2026-08-21
+- Phase / DoD: H00 / DOD-08·09·11·12 진행
+- 관련 INV / ADR: INV-001~002, 014~015, 017~020 / ADR-0010
+- 사람 결정: 게임 방향과 beta 증거를 제공하고 공개 라이선스 결정권, Google 계정·개인정보·법적 동의·최종 Submit 책임을 유지했다. 별도 공개 라이선스 승인이 없어 H00은 기존 `UNLICENSED`/All Rights Reserved를 보존한다.
+- Codex 역할: feature branch·draft PR·CI·Pages 배포를 운영하고 공개 URL E4를 실행했다. Chromium이 origin root `/favicon.ico`를 요청해 콘솔 오류가 발생하는 것을 재현하고 data URL favicon과 회귀 단언으로 수정했다. 동일 공개 SHA에서 썸네일·13.76초 무음 영상·권리·필드 대조 자료를 만들었다.
+- 변경: PR #1 H00 slice 병합, PR #2 favicon 회귀 수정. application SHA `5e2fe2390ccacd4c5425a476fc13770c524a9517`, Pages run `32451745534`, artifact digest `sha256:43d01cb2b76806eb218bca3c01b32c9aa5af9c5f4155e008f730b643b4df6f74`.
+- 검증: 공개 Pages Chromium·Firefox·WebKit `27/27`; browser smoke `891`; `externalRequests=0`; `consoleErrors=0`; 썸네일 1920×1080; 영상 1920×1080·13.76초; 제출 필드 독립 검사 2회 PASS.
+- 역할 경계: Codex는 제출 가능한 패키지를 준비·검증했지만 공식 양식의 개인 식별 정보, 약관·개인정보·국외 이전 동의와 최종 Submit은 수행하거나 완료로 주장하지 않는다.
+- 남은 일: final release-record SHA clean checkout·public E4, tag와 두 위치 backup, phase·progress 완료 기록.
 
 ### CX-M01-001 — M00 formal gate 전 제한 스캐폴딩 착수
 
