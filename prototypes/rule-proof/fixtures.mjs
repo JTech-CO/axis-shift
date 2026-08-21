@@ -17,6 +17,10 @@ const freezeFixture = (fixture) =>
     expectedStates: Object.freeze(fixture.expectedStates.map(freezeRows)),
   });
 
+export const CAMPAIGN_SIGNALS_PER_STAGE = 3;
+export const CAMPAIGN_SIGNAL_COUNT = 18;
+const CAMPAIGN_SEED_NAMESPACE = "h00-campaign-v1";
+
 const easyStage = freezeFixture({
   id: "M00-MAIN-v1",
   stageId: "easy",
@@ -26,6 +30,10 @@ const easyStage = freezeFixture({
   title: "기본 신호",
   profileId: "easy-4",
   structuralClass: "intro",
+  campaignSignal: 1,
+  campaignPosition: 1,
+  campaignCount: CAMPAIGN_SIGNAL_COUNT,
+  campaignSeed: null,
   size: 4,
   initialRows: [0, 0, 0, 0],
   targetRows: [11, 6, 13, 6],
@@ -49,6 +57,10 @@ const normalStage = freezeFixture({
   title: "교차 신호",
   profileId: "normal-4",
   structuralClass: "standard",
+  campaignSignal: 1,
+  campaignPosition: 4,
+  campaignCount: CAMPAIGN_SIGNAL_COUNT,
+  campaignSeed: null,
   size: 4,
   initialRows: [0, 0, 0, 0],
   targetRows: [5, 9, 6, 3],
@@ -74,6 +86,10 @@ const normal5Stage = freezeFixture({
   label: "보통 5×5",
   difficulty: "normal",
   title: "확장 교차 신호",
+  campaignSignal: 1,
+  campaignPosition: 7,
+  campaignCount: CAMPAIGN_SIGNAL_COUNT,
+  campaignSeed: null,
 });
 
 const fullRankStage = freezeFixture({
@@ -112,6 +128,10 @@ const hard4Stage = freezeFixture({
   label: "어려움 4×4",
   difficulty: "hard",
   title: "압축 비교 4×4",
+  campaignSignal: 1,
+  campaignPosition: 10,
+  campaignCount: CAMPAIGN_SIGNAL_COUNT,
+  campaignSeed: null,
 });
 
 const hard5Stage = freezeFixture({
@@ -123,6 +143,10 @@ const hard5Stage = freezeFixture({
   title: "압축 비교 5×5",
   profileId: "hard-5",
   structuralClass: "anti-sweep",
+  campaignSignal: 1,
+  campaignPosition: 13,
+  campaignCount: CAMPAIGN_SIGNAL_COUNT,
+  campaignSeed: null,
   size: 5,
   initialRows: [0, 0, 0, 0, 0],
   targetRows: [25, 19, 13, 30, 7],
@@ -148,6 +172,10 @@ const hard6Stage = freezeFixture({
   title: "압축 비교 6×6",
   profileId: "hard-6",
   structuralClass: "anti-sweep",
+  campaignSignal: 1,
+  campaignPosition: 16,
+  campaignCount: CAMPAIGN_SIGNAL_COUNT,
+  campaignSeed: null,
   size: 6,
   initialRows: [0, 0, 0, 0, 0, 0],
   targetRows: [7, 25, 42, 7, 30, 45],
@@ -249,5 +277,55 @@ export function generateStageFixture(stageId, seed) {
     label: stage.label,
     difficulty: stage.difficulty,
     title: stage.title,
+    campaignSignal: null,
+    campaignPosition: null,
+    campaignCount: CAMPAIGN_SIGNAL_COUNT,
+    campaignSeed: null,
   });
+}
+
+function createCampaignSignal(stage, signalNumber) {
+  if (signalNumber === 1) return stage;
+  const campaignSeed = `${CAMPAIGN_SEED_NAMESPACE}|${stage.stageId}|${signalNumber}`;
+  const generated = generateStageFixture(stage.stageId, campaignSeed);
+  return freezeFixture({
+    ...generated,
+    campaignSignal: signalNumber,
+    campaignPosition:
+      (stage.stageNumber - 1) * CAMPAIGN_SIGNALS_PER_STAGE + signalNumber,
+    campaignCount: CAMPAIGN_SIGNAL_COUNT,
+    campaignSeed,
+  });
+}
+
+export const CAMPAIGN_SIGNALS = Object.freeze(
+  STAGES.flatMap((stage) =>
+    Array.from({ length: CAMPAIGN_SIGNALS_PER_STAGE }, (_, index) =>
+      createCampaignSignal(stage, index + 1),
+    ),
+  ),
+);
+
+export function getCampaignSignal(stageId = "easy", signalNumber = 1) {
+  if (
+    !Number.isInteger(signalNumber) ||
+    signalNumber < 1 ||
+    signalNumber > CAMPAIGN_SIGNALS_PER_STAGE
+  ) {
+    throw new RangeError(`Unknown campaign signal: ${signalNumber}`);
+  }
+  const resolvedStageId = resolveStageId(stageId);
+  const fixture = CAMPAIGN_SIGNALS.find(
+    (candidate) =>
+      candidate.stageId === resolvedStageId &&
+      candidate.campaignSignal === signalNumber,
+  );
+  if (!fixture) throw new RangeError(`Unknown campaign stage: ${stageId}`);
+  return fixture;
+}
+
+export function getNextCampaignSignal(stageId, signalNumber) {
+  const current = getCampaignSignal(stageId, signalNumber);
+  const index = CAMPAIGN_SIGNALS.indexOf(current);
+  return CAMPAIGN_SIGNALS[(index + 1) % CAMPAIGN_SIGNALS.length];
 }

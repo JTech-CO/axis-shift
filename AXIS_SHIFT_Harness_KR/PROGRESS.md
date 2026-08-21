@@ -4,10 +4,10 @@
 
 ## 현재 상태
 
-- **현재 phase**: M01 — Production Scaffolding & Boundaries 완료 (ADR-0008 선행 체크포인트, M02 미착수)
-- **상태**: M01 DOD-01~09·CI·Pages artifact 배포 완료 / M00 formal Easy E1·DOD-02~07은 출시 직전 playable beta까지 미완료 유지
-- **마지막 갱신**: 2026-08-14 / deployed `93a4359`, CI·Pages success, 공개 M00 573단언·M01 smoke 8/8
-- **목표 릴리스**: OpenAI Game Builders Seoul Track 1 제출 빌드
+- **현재 phase**: H00 — Hackathon Submission Slice 진행 중 (ADR-0010, 정규 M02 미착수 유지)
+- **상태**: M00 DOD-01~07·M01 완료 / H00 local DOD-01~07·10 통과, DOD-08~09·11~12 대기
+- **마지막 갱신**: 2026-08-21 / H00 campaign=18, browser=891, Pages=27/27, local P0/P1=0
+- **목표 릴리스**: `v0.1.0-hackathon` — OpenAI Game Builders Seoul Track 1 제출 슬라이스
 - **제출 접수 종료**: 2026-08-26
 
 ## 이미 끝낸 것
@@ -42,20 +42,30 @@
 - [x] PR CI — Node 24 `npm ci`부터 동일 품질 명령·non-root build·Chromium core E2E까지 연결
 - [x] Pages artifact 호환 배포 구현 — M00 루트·stage/seed·anchor·직접 경로와 M01 hash route를 한 artifact에 조립, 3엔진 24/24
 - [x] Pages artifact 공개 전환 — legacy SHA `576e6db` 백업, `build_type=workflow`, commit `93a4359` 배포, CI·Pages Actions와 공개 M00/M01 smoke 통과
+- [x] 2026-08-16 formal Easy `M00-R1` — 신규 인터넷 익명 사용자 5명, 동일 Pages `b0f935e`·`M00-MAIN-v1`, I0 5/5, 첫 PULSE≤30초 5/5, 첫 성공≤90초 5/5, 규칙 회상 5/5
+- [x] M00 DOD-01~07 완료 — aggregate-only E1 제한과 비공개 로컬 증거·2026-08-26 제출 후 삭제 경계를 보존
+- [x] ADR-0010 채택 — 정규 M02~M11과 분리된 H00 `v0.1.0-hackathon` lane, 3D·새 모드·대형 dependency 제외
+- [x] H00 campaign 카탈로그 — 기존 6 profile × 고정 signal 3개, 총 18개·중복 0·canonical/Par/Hard gate 검증
+- [x] H00 반복 UX — signal 1→18 순차 CTA, 18→1 wrap, 결과 패널 같은 구역 랜덤 재플레이, invalid signal=1 정규화
+- [x] H00 AXIS 연출 — 선택 행·열 rail, PULSE 360ms 양축 charge·교차 impact, 완료 Signal Lock, reduced motion·forced colors 유지
+- [x] H00 local E2/E1 — verifier 217, browser 891, 320/360/390/960, externalRequests=0, Pages 27/27, 360·390 완료 화면 육안 PASS
 
 ## 다음 할 일
 
-1. M02는 별도 착수 지시 전 시작하지 않는다.
-2. M01 완료를 M00 formal E1이나 DOD-02~07 통과로 해석하지 않는다.
-3. 출시 직전 playable beta의 SHA·공개 URL이 고정되면 신규 사용자 n≥5, 표본 구성, 비공개 원시 기록 위치·삭제 예정일을 확정한다.
+1. 프로젝트 오너의 commit/push 지시 후 H00 RC SHA를 고정하고 `npm ci` clean checkout을 실행해 DOD-08을 닫는다.
+2. 같은 SHA를 Pages에 배포해 root·stage/signal/seed·직접 prototype·M01 `/#/`의 desktop/mobile public E4를 기록한다.
+3. 공개 라이선스와 실제 제출 양식·마감 시각을 사람이 결정한다.
+4. 동일 SHA 16:9 썸네일·3분 이하 영상·Codex/사람 역할·2회 필드 대조·2중 백업으로 DOD-11~12를 닫는다.
+5. H00은 M02~M11 완료를 뜻하지 않으며 제출 후 M02는 원래 DoR에서 시작한다.
 
-### Formal Easy 게이트 연기 경계
+### Formal Easy 게이트 종료 경계
 
-- 2026-08-10 프로젝트 오너 결정으로 참가자 수·개별 기록을 검증할 지표가 없는 현시점의 formal Easy 자료 수집을 출시 직전 playable beta까지 연기한다.
-- 연기는 `PASS`, 면제, 표본 축소가 아니다. n≥5, 4/5, 30초 첫 PULSE, 90초 첫 성공, 규칙 회상 기준은 바꾸지 않는다.
-- verifier 200,967개 단언과 Edge 573개 단언은 구현·구조 E2 완료 증거일 뿐 사람 대상 E1을 대체하지 않는다.
-- DOD-02~05와 그 결론에 의존하는 DOD-06~07은 베타 증거가 기록될 때까지 미완료다. 별도 지시에 따른 구현 체크포인트 push와 M00 phase 완료·마일스톤 DoD push는 서로 다른 상태다.
-
+- 2026-08-16 서로 다른 신규 인터넷 익명 사용자 5명이 동일 Pages 배포 `b0f935e396805bab9c0847847068cb9a3522968f`의 루트 기본 Easy `M00-MAIN-v1`을 플레이했다.
+- 진행자 개입 없음(I0 5/5), 30초 첫 PULSE 5/5, 90초 첫 성공 5/5, 핵심 규칙 회상 5/5로 4/5 기준을 모두 초과했다. 반복 P0 규칙 혼동 보고는 0건이다.
+- 4명은 PC, 1명은 mobile Chrome을 사용했다. 참가자별 ID·정확한 초·PULSE 수·PC 환경·전문성 층화는 기록되지 않았다.
+- 프로젝트 오너는 2026-08-21 aggregate-only E1 한계를 인지하고 M00 종료를 승인했다. 누락값을 생성하지 않으며 M06/M10 증거로 재사용하지 않는다.
+- 비공개 집계는 `<PROJECT_ROOT>/.private/playtests/M00-R1-2026-08-16.md`에 Git 미추적으로 보관하고 2026-08-26 제출 완료 후 삭제한다.
+- verifier 200,967개와 browser 573개는 E2, M00-R1은 E1로 분리해 유지한다.
 ## 현재 미결 질문 / 사용자 결정 대기
 
 - 공개 저장소의 최종 라이선스: 결정 전 package는 `private: true`·`UNLICENSED`로 유지한다.
@@ -71,8 +81,9 @@
 
 | Phase | 이름 | 상태 | 핵심 출구 게이트 |
 |---|---|---|---|
-| M00 | Rule Proof & Scope Lock | 진행 중 — 구현·E2 완료 / formal E1은 출시 직전 베타로 연기 | 베타 n≥5에서 4/5 기준 판정; 현재 미완료 |
+| M00 | Rule Proof & Scope Lock | 완료 — DOD-01~07, M00-R1 행동 기준 5/5 | aggregate-only E1 제한 보존, M06/M10 재사용 금지 |
 | M01 | Production Scaffolding | 완료 — ADR-0008 제한 체크포인트, DOD-01~09·CI·Pages smoke 통과 | 완료 |
+| H00 | Hackathon Submission Slice | 진행 중 — local DOD-01~07·10 통과 | clean checkout·public E4·릴리스 정직성·제출 패키지 |
 | M02 | Board & GF(2) Core | 미시작 | 3×3 전수에서 brute-force = rank |
 | M03 | Generator & Content Pipeline | 미시작 | 10년 Daily 감사, 54개 정적 레벨 검증 |
 | M04 | Session, Persistence & Scoring | 미시작 | reducer·저장·시간·등급 정합 |
@@ -102,12 +113,33 @@
 | 2026-08-09 | M00 | 비게이트 난도 비교 관찰 | 사람 대상 5×5·6×6 비교 플레이 후기 | 둘 다 4×4보다 생각할 거리가 있고 지나치게 쉽지 않음; 난도별 크기 풀 채택; 참가자 수·시간·기기·개입 미보고로 DOD 미집계 | `docs/PLAYTEST_PROTOCOL.md` §13 |
 | 2026-08-10 | M00 | formal Easy E1 일정 결정 | 프로젝트 오너 결정 | 출시 직전 playable beta까지 자료 수집·DOD-02~07 판정 연기; PASS·면제 아님 | `phases/M00_rule_proof.md` §3.1, `docs/PLAYTEST_PROTOCOL.md` §13 |
 | 2026-08-11 | M00 | 구현 체크포인트 Pages 배포 | application=`5d57e09d250859b4eccdf64bca784f8ae527f6ce`, Pages `built` → 공개 URL Edge smoke | assertions=573; viewport=320/360/960; consoleErrors=0 | `https://jtech-co.github.io/axis-shift/`, `phases/M00_rule_proof.md` §10 |
+| 2026-08-21 | M00 | DOD-02~07 formal Easy 종료 판정 | 2026-08-16 동일 beta `b0f935e`의 M00-R1 오너 집계 대조 | n=5; I0=5/5; firstPulse≤30s=5/5; solve≤90s=5/5; recall=5/5; repeatedP0=0; aggregate-only 제한 | `phases/M00_rule_proof.md` §10, `docs/PLAYTEST_PROTOCOL.md` §13; 원자료 Git 미추적 |
+| 2026-08-21 | H00 | DOD-02 campaign 콘텐츠 E3 | `node prototypes/rule-proof/verify-h00-campaign.mjs` | signals=18, perStage=3, uniquePairs=18, assertions=217, failures=0 | `phases/H00_hackathon_submission_slice.md` §10 |
+| 2026-08-21 | H00 | DOD-03~07·10 browser/visual | `node prototypes/rule-proof/browser-smoke.cjs` + 360·390 캡처 육안 검토 | assertions=891; 320/360/390/960; replay·axis 360ms·Signal Lock; externalRequests=0; consoleErrors=0 | `evidence/H00/*.png` |
+| 2026-08-21 | H00 | local build·Pages·a11y | Node 24 `npm run verify` + `npm run test:pages` + `npm run test:a11y` | verify steps=10; artifact files=14 bytes=336407; 3 engines 27/27; a11y failures=0 | `phases/H00_hackathon_submission_slice.md` §10 |
 | 2026-08-14 | M01 | DOD-02~05·07·09 로컬 품질·경계 | Node 24 `npm run verify` + `npm run test:a11y` | scripts=14/14; unit=5/5; boundaries files=37, violations=0, cycles=0, lintAssertions=7; secret findings=0; a11y targets=6 | `phases/M01_scaffolding.md` §10 |
 | 2026-08-14 | M01 | DOD-03 zero-target validator 안전성 | `validate:levels` + `audit:daily` | level files=0/selfChecks=2; Daily implementations=0/detectorSelfChecks=2; 무조건 통과 stub 아님 | `phases/M01_scaffolding.md` §10 |
 | 2026-08-14 | M01 | DOD-06 non-root route·AppShell target | Node 24 `npm run test:e2e` | Chromium·Firefox·WebKit 12/12; 3 routes HTTP 200; computed target ≥44px | `tests/e2e/routes.spec.ts`, `phases/M01_scaffolding.md` §10 |
 | 2026-08-14 | M01 | ADR-0009 Pages artifact 호환 E2 | final clean checkout `npm run build:pages` + `npm run test:pages` | files=14, bytes=327103, M00 runtime=10; Chromium·Firefox·WebKit 24/24; asset HTTP 200; 오류 0 | `tests/pages/pages-artifact.spec.ts`, `phases/M01_scaffolding.md` §10 |
 | 2026-08-14 | M01 | DOD-01 재현 설치 | commit `bf3d1fe` detached clean checkout, Node 24 `npm ci` → `npm run verify` | 261 packages, vulnerabilities=0, lock hash 동일, tracked changes=0, verify 10단계 통과 | `phases/M01_scaffolding.md` §10 |
 | 2026-08-14 | M01 | CI·Pages artifact 공개 배포 | legacy backup → Pages workflow 전환 → `main` push → Actions → 공개 smoke | deployed=`93a4359`; CI run 31733232235 success; Pages run 31733232206 success; public M01 8/8; M00 573단언·오류 0 | `https://jtech-co.github.io/axis-shift/`, `phases/M01_scaffolding.md` §10 |
+
+### H00 최신 local 검증 출력
+
+```text
+environment: Windows, node=v24.19.0, npm=11.6.2
+M00 core: assertions=200967 bfsVisited=65536 failures=0
+H00 campaign: signals=18 perStage=3 uniqueBoardPairs=18 assertions=217 failures=0
+H00 browser: assertions=891 viewport=320/360/390/960 externalRequests=0 consoleErrors=0
+interaction: replay=result-cta axisChoreography=360ms+signal-lock reducedMotion=reduce
+visual E1: 360×640 PASS, 390×844 PASS
+verify: scriptContract=14/14 unit=5/5 boundaries=0 cycles=0 secretFindings=0 steps=10
+Pages artifact: files=14 bytes=336407 prototypeFiles=10
+Pages Playwright: chromium+firefox+webkit tests=27 passed
+a11yTargetAudit: files=12 interactiveTargets=6 failures=0
+scope: src/domain changes=0 dependencies=0 newModes=0
+remaining H00: clean checkout npm ci, public E4, tag/license, submission assets
+```
 
 ### M01 최신 검증 출력
 
@@ -175,7 +207,7 @@ public browserAssertions=140 viewport=360x640 easyMoves=2 normalMoves=3 hardMove
 
 51개·140개 단언 출력은 단일-stage와 P0 발견 전 4×4 다단계의 역사 기준선으로 보존한다. 동일 캡처 경로는 현재 573개 단언 E2 이미지로 교체됐다. `hardGate`는 anti-sweep 구조 적격성만 뜻하며 Easy도 통과하므로 체감 Hard 승인이 아니다. 5×5·6×6의 `bfs=not-run`은 이동 거리 전수 BFS를 큰 보드에 적용하지 않았다는 범위 표기다. 자동 검증과 내부 파일럿은 DOD-02~04의 E1 본 표본을 대체하지 않는다.
 
-현재 구현은 체크포인트 `5d57e09d250859b4eccdf64bca784f8ae527f6ce`로 `main`에 push됐고 GitHub Pages `built` 뒤 공개 URL Edge 573 단언·320/360/960px·콘솔 오류 0으로 통과했다. formal Easy E1과 DOD-02~07은 출시 직전 beta에서 별도 판정하며, 이 구현 체크포인트 push를 M00 phase 완료로 해석하지 않는다.
+현재 M00 application 구현은 체크포인트 `5d57e09d250859b4eccdf64bca784f8ae527f6ce`에서 시작해 Pages artifact commit `b0f935e396805bab9c0847847068cb9a3522968f`로 배포됐다. 공개 URL Edge 573 단언·320/360/960px·콘솔 오류 0 E2와 2026-08-16 M00-R1 행동 기준 5/5 E1을 분리 기록하며, 2026-08-21 DOD-01~07과 M00을 완료했다.
 
 ## 활성 위험
 
@@ -187,7 +219,7 @@ public browserAssertions=140 viewport=360x640 easyMoves=2 normalMoves=3 hardMove
 | R-04 | PWA 캐시가 제출 직전 구버전을 제공 | 중 | 높음 | prompt update, 실제 URL cache reset·smoke | M09·M10 |
 | R-05 | 모바일 6×6에서 축 타깃과 PULSE가 겹침 | 중 | 높음 | 360×640 fixture와 실기기 테스트 | M05·M10 |
 | R-06 | 공유 서명이 정답/이동을 간접 노출 | 낮음 | 높음 | 금지 필드 invariant, payload snapshot, 수동 검토 | M09 |
-| R-07 | 기능 범위가 일정 안에 과도함 | 중 | 매우 높음 | phase gate, 8/21 scope freeze, P0/P1 우선 | 전역 |
+| R-07 | 정규 v1 범위가 8/26 제출 일정 안에 과도함 | 높음 | 매우 높음 | ADR-0010 H00 v0.1 lane, 8/21 scope freeze, 8/23 hard freeze | H00·전역 |
 | R-08 | rank/Par만으로 난도를 정하면 단일 축 순회가 최적 또는 준최적이 됨 | 높음 | 매우 높음 | `sweepBound`·`compressionGap` 검증, full-rank를 난도 stage가 아닌 대조군으로 분리, 사람 비교 | M00·M03·M06 |
 
 해소된 위험: R-09는 ADR-0009 artifact workflow 전환, legacy backup branch, 공개 M00 573단언·M01 8/8 smoke로 2026-08-14 닫았다.
@@ -219,6 +251,7 @@ STOP 발동 시 아래 형식으로 추가한다.
 - ADR-0005: DOM/CSS Grid 보드, Canvas 공유 카드만 사용한다.
 - ADR-0006: Signal Signature 기반 스포일러 없는 공유를 채택한다.
 - ADR-0007: 로컬 전용 데이터와 런타임 AI API 없음 원칙을 채택한다.
+- ADR-0010: 정규 M02~M11과 분리한 H00 `v0.1.0-hackathon` 제출 lane을 채택한다.
 - ADR-0008: M00 formal E1을 통과 처리하지 않은 채 M01의 도구·경계·라우팅·CI 체크포인트만 선행 착수한다.
 - Workspace-2026-08-09: 부모 `AXIS SHIFT (Tensor)`를 Git·구현 루트로, `AXIS_SHIFT_Harness_KR`를 가이드·증거 폴더로 유지한다.
 - 2026-08-09: 내부 파일럿 run 2회에서 Easy stage의 관측 최저는 3 PULSE였고, 초기 계산이 어긋난 흐름은 4~5 PULSE까지 이어질 수 있었다. 이는 수학적 Par 2를 바꾸지 않으며 참가자 수·시간·개입은 미보고로 둔다.
@@ -231,3 +264,6 @@ STOP 발동 시 아래 형식으로 추가한다.
 - 2026-08-09: 위 난도 비교의 참가자 수·시간·기기·개입·DOD-02~04 지표는 보고되지 않았다. 이를 추정하거나 Easy 본 표본에 합산하지 않으며 M00 완료와 DOD-06 Scope Lock은 계속 보류한다.
 - 2026-08-10: 참가자 수·개별 기록을 검증할 지표가 없는 현시점에는 formal Easy n≥5 자료를 수집하지 않는다. 출시 직전 동일 playable beta 빌드에서 §3.1 표본·보관 게이트를 먼저 충족한 뒤 DOD-02~05와 그 결론에 의존하는 DOD-06~07을 판정한다. 이는 PASS·면제·임계치 완화가 아니며, 별도 구현 체크포인트 push도 M00 phase 완료를 뜻하지 않는다.
 - 2026-08-14: 프로젝트 오너가 M00 사람 대상 gate 전 M01 체크포인트 착수를 승인했다. ADR-0008에 따라 스캐폴딩·라우팅·경계·CI에만 한정하며 M00 DOD-02~07, M02 착수, 릴리스 승인을 대신하지 않는다.
+- 2026-08-21: M00-R1은 행동 기준 5/5로 DOD-02~05를 통과했다. 개별 ID·정확한 초·전문성 층화가 없는 aggregate-only E1 제한을 오너가 인지하고 DOD-06~07과 M00 종료를 승인했다. 누락값을 만들거나 M06/M10 증거로 재사용하지 않는다.
+- 2026-08-21: 해커톤까지 5일인 STOP 일정 조건에 따라 ADR-0010과 H00을 채택했다. 우선순위는 18개 이상 campaign signal 가시화 → AXIS/PULSE/Signal Lock 연출 → 2D 표현 완성도이며, 3D·새 모드·대형 dependency는 제외한다. M02~M11은 미시작으로 남는다.
+- 2026-08-21: H00 local 후보는 기존 수학·generator version을 바꾸지 않고 6×3 campaign, 결과 랜덤 재플레이, 정적 축 rail·360ms 교차 연출·Signal Lock을 구현했다. verifier 217·browser 891·Pages 27/27·E1 캡처를 통과했으며 clean checkout/public E4/제출 자료 전까지 H00은 진행 중이다.

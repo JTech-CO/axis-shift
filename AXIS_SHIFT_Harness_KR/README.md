@@ -91,6 +91,8 @@ M00 Rule Proof
   ↓
 M01 Production Scaffolding
   ↓
+H00 Hackathon Submission Slice (한시적 v0.1 lane)
+  ↓ 제출 후 정규 roadmap 복귀
 M02 Board & GF(2) Core
   ↓
 M03 Generator & Content Pipeline
@@ -151,12 +153,4 @@ AXIS//SHIFT에서 완료는 다음 세 조건을 동시에 만족하는 상태�
 
 ## 7. 첫 실행
 
-현재 시작점은 `M00_rule_proof.md`다.
-
-```text
-1. PROGRESS.md 확인
-2. phases/M00_rule_proof.md의 DoR 확인
-3. 4×4 규칙 증명용 플레이 화면 구현
-4. 5명 플레이테스트
-5. 4/5 이상이 개입 없이 90초 내 첫 성공하면 M00 통과
-```
+현재 시작점은 `PROGRESS.md`와 `phases/H00_hackathon_submission_slice.md`다. M00·M01은 완료됐고 H00은 2026-08-26 제출을 위한 한시적 v0.1 lane이다. H00 종료는 정규 M02~M11 완료를 뜻하지 않으며 제출 후 M02의 원래 DoR로 복귀한다.

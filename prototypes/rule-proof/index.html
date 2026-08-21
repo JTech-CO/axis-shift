@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="dark" />
-    <title>AXIS//SHIFT — Rule Proof</title>
+    <title>AXIS//SHIFT — Tensor Puzzle</title>
     <link rel="icon" href="data:," />
     <link rel="stylesheet" href="./styles.css" />
     <script type="module" src="./game.mjs"></script>
@@ -15,7 +15,7 @@
     <main class="shell" id="app">
       <header class="masthead">
         <div>
-          <p class="eyebrow">M00 · RULE PROOF</p>
+          <p class="eyebrow">H00 · HACKATHON PROTOTYPE</p>
           <h1 class="wordmark" aria-label="AXIS SHIFT">
             <span>AXIS</span><b aria-hidden="true">//</b>SHIFT
           </h1>
@@ -48,6 +48,7 @@
           role="group"
           aria-label="난이도와 보드 크기 선택"
         ></div>
+        <p class="stage-catalog-note"><strong>18 SIGNALS</strong> · 6개 구역마다 고정 신호 3개, 이후 랜덤 신호를 계속 플레이할 수 있습니다.</p>
         <p class="sr-only" id="stage-status" role="status" aria-live="polite" aria-atomic="true"></p>
       </section>
 
@@ -68,7 +69,7 @@
           ></div>
           <p class="target-caption"><span aria-hidden="true">◇</span> 다이아몬드가 목표의 켜진 셀입니다.</p>
           <button class="secondary-button target-refresh-button" id="new-target-button" type="button">
-            <span aria-hidden="true">⟳</span> 새 목표 신호
+            <span aria-hidden="true">⟳</span> 랜덤 목표 신호
           </button>
         </aside>
 
@@ -149,15 +150,20 @@
             <p class="result-guidance" id="result-guidance" hidden>
               한 축씩 맞추는 방식으로 정렬했습니다. 이번에는 여러 행과 열을 한 번에 묶는 다른 방법으로도 풀어 보세요.
             </p>
-            <button class="next-stage-button" id="next-stage-button" type="button">
-              다음 단계 · 보통
-            </button>
+            <div class="result-actions">
+              <button class="next-stage-button" id="next-stage-button" type="button">
+                다음 신호 · 2 / 3
+              </button>
+              <button class="secondary-button replay-stage-button" id="replay-stage-button" type="button">
+                같은 구역 · 랜덤 신호
+              </button>
+            </div>
           </section>
         </section>
       </div>
 
       <footer class="prototype-footer">
-        <span>STATIC PROTOTYPE</span>
+        <span>V0.1 HACKATHON PROTOTYPE</span>
         <span aria-hidden="true">·</span>
         <span>NO DATA SAVED</span>
       </footer>

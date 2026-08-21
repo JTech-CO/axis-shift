@@ -98,8 +98,41 @@ Codex가 제안·생성·수정한 항목
 | CX-M00-003 | 2026-08-09 | M00 | 규칙 증명 프로토타입·E2 검증 | `prototypes/rule-proof/`·M00 증거 | core 196,674 + browser 51 단언, 오류 0 | 프로토타입 이후 모집·임계치 유지 | E2 완료 / E1 대기 |
 | CX-M00-004 | 2026-08-09 | M00 | 파일럿 관찰·다단계 난도 범위 정리 | 폐기형 stage·하네스 문서 | verifier 196,708 + browser 140 단언, 오류 0 | Easy 정식 조건·Daily 비독점·공유 레이아웃 한정 | E2 완료 / E1 대기 |
 | CX-M01-001 | 2026-08-14 | M01 | 제한 스캐폴딩·Pages artifact 전환 | ADR-0008·0009·생산 기반 | clean verify, 경계 0, route 12/12, Pages 24/24, 공개 M00 573 | 오너가 예외 범위와 artifact 전환 승인, M00 미완료 유지 | 완료 |
+| CX-M00-005 | 2026-08-21 | M00 | Formal Easy E1 판정과 phase 종료 | M00·protocol·progress | n=5, I0·first PULSE·solve·recall 모두 5/5, 반복 P0 0 | 오너가 aggregate-only 제한을 인지하고 종료 승인 | 완료 |
+| CX-H00-001 | 2026-08-21 | H00 | 5일 제출 슬라이스 범위 고정 | ADR-0010·H00 phase·traceability | DoR 6/6, 구현 검증 대기 | 콘텐츠→AXIS 연출 우선, 3D·새 모드 제외 | 진행 중 |
+| CX-H00-002 | 2026-08-21 | H00 | 18신호·AXIS 연출 local vertical slice | prototype·Pages test·H00 증거 | campaign 217, browser 891, Pages 27/27, 오류 0 | 3D 대신 콘텐츠·축 인과·모바일 완성도 채택 | local 완료 / E4 대기 |
 
 ## 8. 상세 로그 템플릿
+
+### CX-M00-005 — Formal Easy E1 판정과 M00 종료
+
+- 날짜: 2026-08-21 (테스트 실행 2026-08-16)
+- Phase / DoD: M00 / DOD-02~07
+- 관련 INV / ADR: INV-004~006, INV-015, INV-018 / ADR-0002, ADR-0008
+- 사람 결정: 오너가 신규 인터넷 익명 사용자 5명, 동일 Pages URL·beta SHA, 4 PC·1 mobile Chrome, 진행자 개입 없음과 3개 행동 지표 5/5를 제공했다. 참가자별 ID·정확한 초·전문성 층화가 없는 제한을 인지하고 M00 종료를 승인했다.
+- Codex 역할: 8월 16일 실제 Pages deployment run과 SHA를 대조하고, 누락된 개인별 행·중앙값을 만들지 않은 aggregate E1로 phase·protocol·progress를 갱신했다. 원자료를 `.private/` Git 제외 경로에 보관했다.
+- 검증: Pages run `31733835031` / `b0f935e` success; firstPulse≤30s=5/5; solve≤90s=5/5; recall=5/5; I0=5/5; repeatedP0=0.
+- 남은 위험: 표본의 전문성 구성·정확한 시간·개별 환경은 검증할 수 없으며 M06/M10 증거로 재사용하지 않는다.
+
+### CX-H00-001 — 해커톤 제출 슬라이스 범위 고정
+
+- 날짜: 2026-08-21
+- Phase / DoD: H00 / DoR 01~06
+- 관련 INV / ADR: INV-001~002, 004~006, 014~015, 017~020 / ADR-0010
+- 사람 결정: 8월 26일 마감과 베타 피드백을 근거로 M00을 닫고 콘텐츠량, AXIS 연출, 2D 표현 순으로 작업하도록 승인했다.
+- Codex 역할: 정규 M02~M11 완료를 주장하지 않는 `v0.1.0-hackathon` lane, allowlist, 18+ signal·연출·접근성·Pages E4·제출 DoD를 정의했다.
+- 상태: 구현과 E2/E4 증거 대기. 완료 수치는 실제 실행 후 갱신한다.
+
+### CX-H00-002 — 18신호 캠페인과 AXIS 인과 연출
+
+- 날짜: 2026-08-21
+- Phase / DoD: H00 / DOD-01~07·10 local
+- 관련 INV / ADR: INV-001~002, 004~006, 014~015, 017~020 / ADR-0010
+- 사람 결정: 베타 의견의 우선순위를 단계 부족 → AXIS 표현 부족 → 2D 완성도로 두고, 3D 전환 없이 5일 제출 슬라이스를 진행했다.
+- Codex 역할: 기존 6 profile과 `m00-seeded-v1`을 재사용해 18개 고정 signal을 만들고, 순차/랜덤 CTA와 URL 재현을 추가했다. 선택 mask에서 axis rail·intersection 상태를 파생하고 PULSE 360ms·Signal Lock CSS를 논리 상태와 분리했다.
+- 발견한 실패와 수정: invalid `signal`이 앱을 중단하던 경로, control fixture의 실패하는 replay/불일치 CTA, forced-colors 셀 상태 가림, 전역 seed 결합을 정적 리뷰에서 발견해 수정했다. Pages title 기대값 실패 3건은 H00 제목·signal route 계약으로 테스트를 갱신해 27/27로 복구했다.
+- 검증: M00 verifier 200,967/0; H00 campaign 217/0; browser 891/0, 320/360/390/960, 외부 요청·콘솔 오류 0; Node 24 verify 10단계; Pages 3엔진 27/27; a11y failures=0; 360·390 완료 캡처 육안 PASS.
+- 사람이 확인할 남은 일: commit/push와 공개 E4, LICENSE, tag, 실제 제출 양식·썸네일·영상·2중 백업. H00은 M02~M11을 완료시키지 않는다.
 
 ### CX-M01-001 — M00 formal gate 전 제한 스캐폴딩 착수
 
