@@ -6,7 +6,9 @@
 
 **[공개 퍼즐 플레이하기](https://jtech-co.github.io/axis-shift/)**
 
-이 저장소의 H00 `v0.1` 공개 후보는 M00 사람 대상 규칙 게이트를 통과한 해커톤 프로토타입입니다. 6개 난도·크기 구역에 고정 신호 3개씩 총 18개가 순서대로 이어지고, 각 구역에서 랜덤 신호를 계속 생성할 수 있습니다. Daily·Archive·Sprint·PWA와 프로덕션 v1은 아직 구현되지 않았습니다.
+이 저장소의 H00 `v0.1` 공개 릴리스는 M00 사람 대상 규칙 게이트를 통과한 해커톤 프로토타입입니다. 6개 난도·크기 구역에 고정 신호 3개씩 총 18개가 순서대로 이어지고, 각 구역에서 랜덤 신호를 계속 생성할 수 있습니다. Daily·Archive·Sprint·PWA와 프로덕션 v1은 아직 구현되지 않았습니다.
+
+릴리스: [`v0.1.0-hackathon`](https://github.com/JTech-CO/axis-shift/releases/tag/v0.1.0-hackathon) · tag target `6690f5778f706e1875b452d552bd75ba1c06ee9a`
 
 M01 생산 AppShell은 [해시 라우트](https://jtech-co.github.io/axis-shift/#/)에서 확인할 수 있습니다. 아직 완성된 게임 화면이 아니며 공개 퍼즐 링크와 분리되어 있습니다.
 
@@ -36,4 +38,4 @@ node prototypes/rule-proof/serve.cjs
 
 ## 라이선스
 
-최종 공개 라이선스가 결정될 때까지 이 저장소의 package는 `private: true`·`UNLICENSED`로 유지됩니다. 명시적인 라이선스 부여 전에는 코드 재사용 권한이 허여되지 않습니다.
+H00 릴리스에는 별도 공개 라이선스 승인이 없으므로 package는 `private: true`·`UNLICENSED`, 코드는 All Rights Reserved로 유지되며 `LICENSE` 파일을 추가하지 않았습니다. 명시적인 라이선스 부여 전에는 코드 재사용 권한이 허여되지 않습니다.

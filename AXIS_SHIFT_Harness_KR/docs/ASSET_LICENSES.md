@@ -1,7 +1,7 @@
 # AXIS//SHIFT Asset & License Registry
 
 **문서 버전**: 1.0.0  
-**상태**: H00 제출 자산 등록 완료 / M11 production inventory·공개 라이선스 결정 대기
+**상태**: H00 제출·릴리스 자산 및 무결성 기록 완료 / M11 production inventory·공개 라이선스 결정 대기
 **최종 갱신**: 2026-08-21
 **관련 불변식**: INV-001, INV-002, INV-017, INV-019
 
@@ -35,7 +35,7 @@ Decision/ADR:
 
 ## 3. 현재 자산 inventory
 
-H00 제출 전용 자산 AST-007·AST-008은 등록·검증을 마쳤다. AST-001~AST-006은 향후 production 계획 또는 OS 제공 항목이므로 기존 `Included=No`·`No file` 상태를 유지한다.
+H00 제출 전용 자산 AST-007~AST-009는 등록·검증을 마쳤다. AST-001~AST-006은 향후 production 계획 또는 OS 제공 항목이므로 기존 `Included=No`·`No file` 상태를 유지한다.
 
 | ID | 자산 | Source/Author | License/권리 | 수정 | 사용 위치 | Included | 상태 |
 |---|---|---|---|---|---|---:|---|
@@ -45,33 +45,46 @@ H00 제출 전용 자산 AST-007·AST-008은 등록·검증을 마쳤다. AST-00
 | AST-004 | Share card background·signature glyph | CSS/Canvas로 직접 생성 예정 | 프로젝트 original | runtime 생성 | share PNG | No | 계획 |
 | AST-005 | Selection/PULSE/completion tones | Web Audio oscillator로 코드 생성 예정 | 프로젝트 code output | runtime 파라미터 | audio service | No | 계획 |
 | AST-006 | System UI font stack | 사용자 OS 제공 | 각 OS/브라우저 환경 | 재배포 없음 | UI·Canvas fallback | No file | 허용 |
-| AST-007 | H00 submission thumbnail | application SHA `5e2fe239…` 실제 공개 게임 캡처 | All Rights Reserved; 외부 자산 없음 | 1920×1080 화면 구성·crop 없음 | private submission package | Yes | H00 검증 완료 |
-| AST-008 | H00 demo video | application SHA `5e2fe239…` 실제 공개 게임 캡처 | All Rights Reserved; 외부 자산·오디오 없음 | WebM 캡처, H.264 MP4 변환 | private submission package | Yes | H00 검증 완료 |
+| AST-007 | H00 submission thumbnail | release/tag SHA `6690f577…` 실제 공개 게임 캡처 | All Rights Reserved; 외부 자산 없음 | 1920×1080 화면 구성·crop 없음 | private submission package | Yes | H00 검증 완료 |
+| AST-008 | H00 demo video | release/tag SHA `6690f577…` 실제 공개 게임 캡처 | All Rights Reserved; 외부 자산·오디오 없음 | WebM 캡처, H.264 MP4 변환 | private submission package | Yes | H00 검증 완료 |
+| AST-009 | H00 package review·manifest | release/tag SHA `6690f577…`의 tag·run·archive 기록 | All Rights Reserved; 프로젝트 통제 정보만 포함 | 1920×1080 review capture·SHA-256 manifest | private submission package | Yes | H00 검증 완료 |
 
 실제 포함 시 `No`를 `Yes`로 바꾸고 정확한 file path·hash·source URL 또는 생성 기록을 입력한다.
 
 ### AST-007 — H00 submission thumbnail
 
 - 경로: `.private/submission/H00/axis-shift-submission-thumbnail-v0.1.0.png`
-- 생성 기록: `https://jtech-co.github.io/axis-shift/`의 application SHA `5e2fe2390ccacd4c5425a476fc13770c524a9517` 실제 6×6 게임 화면 캡처
+- 생성 기록: `https://jtech-co.github.io/axis-shift/`의 release/tag SHA `6690f5778f706e1875b452d552bd75ba1c06ee9a` 실제 6×6 게임 화면 캡처
 - 권리: 프로젝트 통제 UI 캡처, All Rights Reserved; H00에서 별도 라이선스 부여 없음
 - 외부 입력 자산: 없음
-- 규격: PNG, 1920×1080, 293,827 bytes
-- SHA-256: `69d19cccc8a2435e66f23dd5c45d692c0d4d79fc49e8a799ad2caef1e54bb8f1`
-- 검토: 2026-08-21 자동 field check 2회 및 사람 육안 검토 통과
+- 규격: PNG, 1920×1080, 293,879 bytes
+- SHA-256: `49a4b7a279256046264aa03cecd1be205983045f54137b659e05021cedd70a2f`
+- 검토: 2026-08-21 final release-SHA 독립 field check 2회 및 사람 육안 검토 통과; 교체 전 자산의 pre-tag 검사 2회는 준비 이력으로 별도 보존
 
 ### AST-008 — H00 demo video
 
 - 경로: `.private/submission/H00/axis-shift-demo-v0.1.0.mp4`
 - 원본 캡처: `.private/submission/H00/axis-shift-demo-v0.1.0.webm`
-- 생성 기록: 위 application SHA의 실제 공개 플레이를 Playwright로 캡처하고 FFmpeg로 H.264 MP4 변환
+- 생성 기록: 위 release/tag SHA의 실제 공개 플레이를 Playwright로 캡처하고 FFmpeg로 H.264 MP4 변환
 - 권리: 프로젝트 통제 UI 캡처, All Rights Reserved; 외부 영상·이미지·폰트·음원 없음
 - 오디오: 없음
-- 규격: MP4 1920×1080, 25fps, 13.76초, 1,478,118 bytes; WebM 1920×1080, 13.76초, 1,316,500 bytes
-- MP4 SHA-256: `a2450610eeaf637df7451eaf6e40f88fe034b10794bb7ca11ba044e4b5f07c93`
-- WebM SHA-256: `6c9415266268834422026f0a37a3491e0a24581f4f3d5970a9d6474e720590ac`
+- 규격: MP4 1920×1080, 25fps, 14.84초, 1,366,482 bytes; WebM 1920×1080, 14.84초, 1,458,929 bytes
+- MP4 SHA-256: `d0eaf60887cf94154d074297d8a6ba530d08abab8f158ab3a9e21ea3021cd990`
+- WebM SHA-256: `79f31acc48c45778fbd5ca59a07304ff1d60fb24e5dee75a8803aa406506e6db`
 - 권리 근거: `.private/submission/H00/RIGHTS.md`
-- 검토: 2026-08-21 대표 프레임 3개 육안 확인과 독립 field check 2회 통과
+- 검토: 2026-08-21 대표 프레임 3개 육안 확인과 final release-SHA 독립 field check 2회 통과; 교체 전 자산의 pre-tag 검사 2회는 준비 이력으로 별도 보존
+
+### AST-009 — H00 package review·manifest
+
+- 경로: `.private/submission/H00/release-package-review.png`, `.private/submission/H00/MANIFEST.sha256`
+- 생성 기록: release/tag SHA `6690f5778f706e1875b452d552bd75ba1c06ee9a`, final CI `32453169036`, Pages `32453169029`, archive hash를 사람이 대조할 수 있도록 프로젝트 통제 데이터만 1920×1080으로 렌더링
+- 권리: 프로젝트 통제 UI·릴리스 메타데이터, All Rights Reserved; 외부 이미지·폰트·상표 자산 없음
+- review SHA-256: `7cfc102b2dbe84b6afb11058a3d0908b720d4636f0686ee35940bec0f62a7679`
+- manifest SHA-256: `ae37db3ed60b0c7a751865b3cc1e078a812fbc069335b02c6954cbd3043cd3b0`; entries=14, failures=0
+- source archive: 1,059,850 bytes, SHA-256 `69d623eac50d186f52cb88e2dd451ebb4859fd475151dc76ad1a4e4c243b919a`
+- Pages archive: 103,088 bytes, SHA-256 `34a0601312712a5d7fa20c544960975cdfe3e1b5a2795e65036bc38dae663f01`
+- 백업: primary `.private/submission/H00`, secondary `<USER_DOCUMENTS>/AXIS_SHIFT_H00_Backup/v0.1.0-hackathon`; 각 15 files, hash delta=0
+- 검토: 2026-08-21 15:41:32·15:42:06 KST final release-SHA 독립 검사와 1920×1080 육안 검토 PASS
 
 ## 4. 자산 등록 필수 필드
 
@@ -180,13 +193,15 @@ hotlinks=0
 
 ### H00 v0.1 체크포인트
 
-- [x] submission asset inventory와 AST-007·AST-008 일치
+- [x] submission asset inventory와 AST-007~AST-009 일치
 - [x] 제출 자산의 unknown/custom third-party license 0
 - [x] 외부 attribution·third-party notice 의무 없음
 - [x] public browser smoke의 external font/audio/image request 0
-- [x] 실제 공개 빌드 캡처와 application SHA 기록
-- [x] 자산 hash·규격 독립 검사 2회 및 육안 검토 기록
+- [x] 실제 공개 빌드 캡처와 release/tag SHA 기록
+- [x] 최종 자산 hash·규격의 final release-SHA 독립 검사 2회 및 육안 검토 기록; 교체 전 자산 pre-tag 검사 2회는 준비 이력으로 분리
 - [x] `UNLICENSED` / All Rights Reserved 유지와 신규 LICENSE 부재 명시
+- [x] source·Pages archive와 14-entry manifest, final release review hash 기록
+- [x] 두 backup 각 15 files의 hash delta 0 확인
 
 ### M11 v1.0 최종 릴리스 체크리스트
 
