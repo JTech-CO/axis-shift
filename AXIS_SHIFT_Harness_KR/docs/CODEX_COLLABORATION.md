@@ -102,6 +102,7 @@ Codex가 제안·생성·수정한 항목
 | CX-H00-001 | 2026-08-21 | H00 | 5일 제출 슬라이스 범위 고정 | ADR-0010·H00 phase·traceability | DoR 6/6, 최종 DOD 12/12 | 콘텐츠→AXIS 연출 우선, 3D·새 모드 제외 | 완료 |
 | CX-H00-002 | 2026-08-21 | H00 | 18신호·AXIS 연출 vertical slice | prototype·Pages test·H00 증거 | campaign 217, browser 891, Pages 27/27, 오류 0 | 3D 대신 콘텐츠·축 인과·모바일 완성도 채택 | 완료 |
 | CX-H00-003 | 2026-08-21 | H00 | 공개 배포 회귀와 submission-ready 패키지 | PR #1·#2·#3, tag·Pages·private package | clean E3, public E4, 14-entry manifest, backup delta 0 | 오너가 라이선스·개인정보·동의·최종 Submit 책임 유지 | 완료 |
+| CX-M02-001 | 2026-08-21 | M02 | 순수 보드·PULSE·rank·factorization 코어 | `55b0b55273aff6803191bb9812927c622721bd2f` / PR `#5` | 512 전수·50,000 property 오류 0, 5파일 coverage 100% | 공개 규칙·bit·pivot 계약과 milestone commit/push 승인 | 로컬 DoD 완료 / 원격 CI 검증 중 |
 
 ## 8. 상세 로그 템플릿
 
@@ -290,25 +291,30 @@ Codex가 제안·생성·수정한 항목
 
 ---
 
-```markdown
 ### CX-M02-001 — GF(2) rank와 독립 오라클
 
-- 날짜:
-- Phase / DoD:
-- 관련 INV / ADR:
-- 시작 상태·실패:
-- Codex 요청 요약:
+- 날짜: 2026-08-21
+- Phase / DoD: M02 / DOD-01~10 완료
+- 관련 INV / ADR: INV-003~007, INV-018 / ADR-0001, ADR-0002
+- 시작 상태·실패: production `src/domain`의 board·algebra entrypoint는 비어 있었고, 레벨 validator는 로컬 PULSE 합성을 중복 구현했다. 3×3 전수 BFS, 4~8 property, 파일별 coverage gate와 production 중복 구현 검사가 없었으며 기술 백서의 pivot 방향 한 문장이 authoritative `PUZZLE_MATH`와 달랐다.
+- Codex 요청 요약: 오너가 M02를 DoR·DoD 순서로 구현하고 완료 시 milestone 단위로 commit·push하도록 요청했다.
 - Codex 제안·변경:
-- 사람이 채택한 것:
-- 사람이 수정·거절한 것과 이유:
-- 변경 파일:
-- Commit / PR:
+  - 3~8 보드 guard와 구분 가능한 오류, 순수 board helper, 빈 축 no-op을 포함한 정확한 PULSE, 낮은 열·행 우선 결정적 rank, rank 개수의 canonical factorization을 public domain API로 구현했다.
+  - 구현 독립 BFS 오라클로 3×3 전수 상태를 비교하고, 4~8 각 10,000개의 고정 시드 행렬에 factorization roundtrip·PULSE 불변식·결정성을 검증했다.
+  - 레벨 validator가 domain API를 소비하게 바꾸고, 경계 검사에 production PULSE·rank·factorization 구현 중복 AST 검사와 5형태 self-check를 추가했다.
+  - 전역 coverage 보고 범위를 보존한 별도 domain config에 5파일 per-file 100% threshold를 두고 M02 exhaustive 명령과 함께 CI에 연결했다. 비관찰 pivot 순서는 raw-source 구조 계약으로 고정했다.
+- 사람 결정: 공개 PULSE 규칙, bit 0=왼쪽/위쪽 축, 낮은 열·행 우선 pivot, 엔진 3~8·콘텐츠 3~6 계약을 유지하고 M02 착수 및 완료 후 commit·push를 승인했다.
+- 사람이 수정·거절한 것과 이유: 동결된 `prototypes/rule-proof/core.mjs`는 H00 제출 슬라이스의 재현성을 위해 production 코어로 이관하거나 소급 수정하지 않는다. 신규 production level·generator·session·UI는 M02 범위를 넘어가므로 만들지 않았다.
+- 변경 파일: `src/domain/{types,board,algebra}`, `scripts/{validate-levels,check-boundaries,run-verify}.ts`, `package.json`, `vitest.domain.config.ts`, `tsconfig.node.json`, `.github/workflows/ci.yml`, M02 phase와 수학·백서·파일 트리·추적성·협업 문서
+- Commit / PR: implementation `55b0b55273aff6803191bb9812927c622721bd2f` / PR `#5` (`codex/m02-domain-core` → `main`)
 - 검증:
-  - `npm run test:math:exhaustive`
-  - matrixCount=512, mismatch=0
-- 남은 위험:
-- 다음 작업:
-```
+  - `npm run typecheck`, `npm run test -- src/domain`, `npm run test:coverage`, `npm run test:coverage:domain`, `npm run test:math:exhaustive`, `npm run check:boundaries`, `npm run verify` 모두 exit 0
+  - `matrixCount=512 oracleUnvisited=0 rankMismatch=0 factorizationMismatch=0 pulseInvariantFailures=0 randomMatrices=50000 determinismFailures=0`
+  - `src/domain` 6 files/27 tests; `board`·`pulse`·`guards`·`gf2-rank`·`factorization` 파일별 statements/branches/functions/lines 100%
+  - `files=43 edges=40 violations=0 cycles=0 coreFiles=27 coreFixtureImplementations=5 coreFixtureAssertions=2`
+- Codex 기여 경계: Codex는 core·test·validator·boundary·CI·문서를 구현했지만 공개 규칙이나 production 콘텐츠를 새로 결정하지 않았다.
+- 남은 위험: FR-CORE-003과 FR-HINT-001의 session·selector·UI는 M04/M06, seed·generator와 signature 결정성은 M03/M09에 남아 있다.
+- 다음 작업: PR `#5`의 원격 CI를 통과·병합한 뒤 M03 콘텐츠·결정적 generator DoR를 확인한다.
 
 ## 9. 품질 분류
 
