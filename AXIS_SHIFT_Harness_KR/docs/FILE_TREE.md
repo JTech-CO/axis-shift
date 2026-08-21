@@ -1,8 +1,8 @@
 # AXIS//SHIFT 파일 트리·모듈 경계 계약
 
-**버전**: 1.0.0  
-**상태**: M01 제한 체크포인트 구현 + 후속 phase 목표 계약
-**최종 갱신**: 2026-08-14
+**버전**: 1.1.0
+**상태**: M01·M02 구현 + 후속 phase 목표 계약
+**최종 갱신**: 2026-08-21
 **관련 불변식**: INV-002, INV-003, INV-017, INV-019
 
 ## 1. 목표
@@ -14,7 +14,7 @@
 
 ## 2. 목표 저장소 트리
 
-> **물리 배치 주의 (2026-08-14)**: 아래 트리는 M11까지의 목표 구조이며 모든 항목이 M01에 존재한다는 뜻이 아니다. 구현 항목(`prototypes/`, `src/`, `public/`, `tests/`, `scripts/`, 설정 파일)은 부모 `PROJECT_ROOT` 기준이고, phase·ADR·불변식·증거 문서는 개발 중 `PROJECT_ROOT/AXIS_SHIFT_Harness_KR/`에 유지한다. 바로 아래 §2.1에 M01 실제 범위를 별도로 적는다.
+> **물리 배치 주의 (2026-08-21)**: 아래 트리는 M11까지의 목표 구조이며 모든 항목이 현재 존재한다는 뜻이 아니다. 구현 항목(`prototypes/`, `src/`, `public/`, `tests/`, `scripts/`, 설정 파일)은 부모 `PROJECT_ROOT` 기준이고, phase·ADR·불변식·증거 문서는 개발 중 `PROJECT_ROOT/AXIS_SHIFT_Harness_KR/`에 유지한다. 바로 아래 §2.1~2.2에 M01·M02 실제 범위를 별도로 적는다.
 
 ```text
 axis-shift/
@@ -68,11 +68,25 @@ axis-shift/
 │   │   └── generator-map.json
 │   ├── domain/
 │   │   ├── algebra/
+│   │   │   ├── bruteforce-oracle.test.ts
+│   │   │   ├── factorization.test.ts
+│   │   │   ├── factorization.ts
+│   │   │   ├── gf2-rank.test.ts
+│   │   │   ├── gf2-rank.ts
+│   │   │   └── index.ts
 │   │   ├── board/
+│   │   │   ├── board.test.ts
+│   │   │   ├── board.ts
+│   │   │   ├── guards.test.ts
+│   │   │   ├── guards.ts
+│   │   │   ├── index.ts
+│   │   │   ├── pulse.test.ts
+│   │   │   └── pulse.ts
 │   │   ├── generator/
 │   │   ├── scoring/
 │   │   ├── session/
 │   │   ├── sprint/
+│   │   ├── index.ts
 │   │   └── types.ts
 │   ├── features/
 │   │   ├── about/
@@ -131,7 +145,8 @@ axis-shift/
 ├── playwright.pages.config.ts
 ├── tsconfig.json
 ├── vite.config.ts
-└── vitest.config.ts
+├── vitest.config.ts
+└── vitest.domain.config.ts
 ```
 
 ### 2.1 M01 제한 체크포인트의 실제 구현 범위
@@ -146,6 +161,23 @@ axis-shift/
 - 생성되지만 commit하지 않는 `pages-dist/`: Vite M01 bundle, `.nojekyll`, whitelist된 M00 브라우저 runtime
 
 아직 생성하지 않은 목표 항목은 `public/` PWA 자산, 실제 level JSON, 퍼즐 수학·generator 구현, M02 이후 feature와 visual fixture다. 빈 public entrypoint는 구현 완료 주장이 아니라 경계 위치 고정용이다.
+
+### 2.2 M02 순수 수학 코어의 실제 구현 범위
+
+2026-08-21 현재 M02에서 실제 생성·활성화한 생산 트리는 다음 범위다.
+
+- `src/domain/types.ts`: 보드·PULSE·퍼즐 정의 공용 타입과 모드·난도·태그 allowlist
+- `src/domain/board/board.ts`: 보드 생성·셀 조회·열 마스크·차이·완료 판정
+- `src/domain/board/guards.ts`: 엔진 크기 3~8, 행·축·좌표·비자명 퍼즐의 구분 가능한 오류 guard
+- `src/domain/board/pulse.ts`: 외적 마스크와 단일·연속 PULSE 순수 함수
+- `src/domain/algebra/gf2-rank.ts`: 낮은 열·행 우선 pivot의 결정적 `GF(2)` rank
+- `src/domain/algebra/factorization.ts`: rank 개수의 canonical PULSE 분해
+- 위 다섯 구현 파일의 인접 unit test와 `bruteforce-oracle.test.ts`: 3×3 전수 BFS 및 4~8 고정 시드 property 검증
+- `src/domain/{board,algebra}/index.ts`, `src/domain/index.ts`: 생산 코드와 script가 사용하는 public API
+- `scripts/validate-levels.ts`: 로컬 PULSE·rank 구현을 제거하고 위 public API를 소비
+- `vitest.domain.config.ts`: 전역 coverage 보고 범위와 분리한 M02 5파일 per-file 100% threshold
+
+`generator`·`session`·`scoring`·`sprint` 구현과 실제 level JSON은 이 범위에 포함하지 않는다. M00/H00의 `prototypes/rule-proof/core.mjs`는 제출 슬라이스의 재현성을 위한 동결된 역사 구현이며 M02 production API로 간주하지 않는다.
 
 ## 3. 계층별 책임
 
@@ -260,14 +292,14 @@ CI artifact나 외부 보관 경로를 `PROGRESS.md`에 기록한다.
 
 ## 10. 경계 집행
 
-M01에서 다음을 자동화한다.
+M01~M02에서 다음을 자동화한다.
 
 ```bash
 npm run lint
 npm run check:boundaries
 ```
 
-M01에서 실제 집행하는 검사 항목:
+M01에서 활성화한 검사 항목:
 
 1. `domain`의 외부·비도메인 import, 브라우저 global, `Math.random()` 사용
 2. feature 간 import와 feature·component의 직접 `fetch`·storage·navigator 사용
@@ -278,4 +310,17 @@ M01에서 실제 집행하는 검사 항목:
 
 의도적 위반 fixture가 실패하는지를 CI에서 확인하고 제거한다. 경계 규칙 완화는 ADR과 INV-003 검토가 필요하다.
 
-`sharing`의 raw session/puzzle 타입 차단은 DTO가 생기는 M09에서, `scripts`의 규칙 중복 의미 검사는 도메인 코어와 생성기가 생기는 M02~M03에서 활성화한다. M01은 존재하지 않는 API를 검사한 것처럼 보고하지 않는다.
+M02는 DOD-08용 named AST 중복 구현 보조 검사를 추가한다.
+
+1. `features`·`components`·`services`·`scripts`에서 PULSE·rank·factorization 핵심 함수의 로컬 구현 선언을 금지한다.
+2. public domain API의 import와 호출은 허용한다.
+3. `tests`·fixture·`prototypes`는 의미가 다른 독립 오라클과 회귀 자료이므로 production 중복 검사에서 제외한다.
+4. 임시 self-check가 함수 선언, 함수식, 화살표 함수, 객체 메서드, 클래스 메서드의 5개 구현 형태를 모두 탐지하고 import·호출 2건은 허용하는지 확인한 뒤 fixture를 정리한다.
+
+이 AST 검사는 정확한 이름을 가진 재정의의 회귀를 빠르게 막는 보조 gate다. 이름을 바꾼 동일 알고리즘을 의미적으로 판별하거나, domain API에 단순 위임하는 같은 이름 wrapper와 실제 복제를 구분하지는 못한다. 따라서 DOD-08은 named gate 통과만으로 주장하지 않고 occurrence 검색과 diff code review를 함께 요구한다.
+
+전역 `npm run test:coverage`는 전체 제품 source 보고 용도를 유지한다. M02 지정 코어 5파일의 per-file 100% threshold는 `vitest.domain.config.ts`와 `npm run test:coverage:domain`에만 둔다.
+
+`npm run check:boundaries`의 M02 기준 출력은 `files=43 edges=40 violations=0 cycles=0 coreFiles=27 coreFixtureImplementations=5 coreFixtureAssertions=2`다. 동결된 `prototypes/rule-proof/core.mjs`는 H00 legacy 예외이며, M02를 위해 과거 제출 artifact를 소급 변경하지 않는다.
+
+`sharing`의 raw session/puzzle 타입 차단은 DTO가 생기는 M09에서 활성화한다.

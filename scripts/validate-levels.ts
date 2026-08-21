@@ -1,29 +1,27 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
+
+import {
+  DIFFICULTIES,
+  GAME_MODES,
+  PUZZLE_TAGS,
+  applyPulses,
+  assertBoardRows,
+  assertPlayablePuzzlePair,
+  differenceRows,
+  rankGF2,
+  type EncodedPulse,
+} from '../src/domain/index.ts';
 
 import { PROJECT_ROOT, projectPath, walkFiles } from './lib/project-files.ts';
 
 const LEVEL_ROOT = path.join(PROJECT_ROOT, 'src', 'content', 'levels');
 const ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
-const MODES = new Set(['archive', 'daily', 'lab', 'sprint', 'tutorial']);
-const DIFFICULTIES = new Set(['easy', 'hard', 'intro', 'master', 'normal']);
-const TAGS = new Set([
-  'asymmetric',
-  'dense',
-  'noise',
-  'overlap',
-  'sparse',
-  'symmetric',
-  'tutorial',
-]);
+const MODES: ReadonlySet<string> = new Set(GAME_MODES);
+const ALLOWED_DIFFICULTIES: ReadonlySet<string> = new Set(DIFFICULTIES);
+const TAGS: ReadonlySet<string> = new Set(PUZZLE_TAGS);
 
 type JsonObject = Record<string, unknown>;
-type RankFunction = (rows: readonly number[], size?: number) => number;
-interface EncodedPulse {
-  readonly rowMask: number;
-  readonly colMask: number;
-}
 
 function isObject(value: unknown): value is JsonObject {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -48,11 +46,8 @@ function requireInteger(value: unknown, label: string, minimum: number, maximum:
 }
 
 function requireRows(value: unknown, size: number, label: string): number[] {
-  if (!Array.isArray(value) || value.length !== size) {
-    throw new Error(`${label} must contain exactly ${size} rows.`);
-  }
-  const mask = (1 << size) - 1;
-  return value.map((row, index) => requireInteger(row, `${label}[${index}]`, 0, mask));
+  assertBoardRows(value, size, label);
+  return [...value];
 }
 
 function requireStringEnum(value: unknown, allowed: ReadonlySet<string>, label: string): string {
@@ -78,45 +73,25 @@ function validatePulse(value: unknown, size: number, label: string): EncodedPuls
   };
 }
 
-function applyPulses(
-  initialRows: readonly number[],
-  pulses: readonly EncodedPulse[],
-  size: number,
-): number[] {
-  const rows = [...initialRows];
-  for (const pulse of pulses) {
-    for (let row = 0; row < size; row += 1) {
-      if ((pulse.rowMask & (1 << row)) !== 0) rows[row] = (rows[row] ?? 0) ^ pulse.colMask;
-    }
-  }
-  return rows;
-}
-
 function proveSolutionValidator(): number {
+  const initialRows = [0, 0, 0];
+  const targetRows = [3, 0, 3];
   const pulse = { rowMask: 0b101, colMask: 0b011 };
-  const toggled = applyPulses([0, 0, 0], [pulse], 3);
-  const restored = applyPulses(toggled, [pulse], 3);
-  if (toggled.join(',') !== '3,0,3' || restored.some((row) => row !== 0)) {
+
+  assertBoardRows(initialRows, 3, 'validator.initialRows');
+  assertBoardRows(targetRows, 3, 'validator.targetRows');
+  assertPlayablePuzzlePair(initialRows, targetRows, 3);
+  const difference = differenceRows(initialRows, targetRows, 3);
+  const toggled = applyPulses(initialRows, 3, [pulse]);
+  const restored = applyPulses(toggled, 3, [pulse]);
+
+  if (toggled.join(',') !== targetRows.join(',') || restored.some((row) => row !== 0)) {
     throw new Error('Canonical solution validator self-check failed.');
   }
+  if (rankGF2(difference, 3) !== 1) {
+    throw new Error('Canonical rank validator self-check failed.');
+  }
   return 2;
-}
-
-async function loadRankFunction(): Promise<RankFunction> {
-  const entrypoint = path.join(PROJECT_ROOT, 'src', 'domain', 'index.ts');
-  let domain: Record<string, unknown>;
-  try {
-    domain = (await import(pathToFileURL(entrypoint).href)) as Record<string, unknown>;
-  } catch (error) {
-    throw new Error('Level files exist, but the domain public entrypoint could not be loaded.', {
-      cause: error,
-    });
-  }
-
-  if (typeof domain.rankGF2 !== 'function') {
-    throw new Error('Level files exist, but src/domain/index.ts does not export rankGF2.');
-  }
-  return domain.rankGF2 as RankFunction;
 }
 
 async function main(): Promise<void> {
@@ -140,7 +115,6 @@ async function main(): Promise<void> {
     for (const record of levelRecords(value, filename)) parsed.push({ filename, record });
   }
 
-  const rankGF2 = await loadRankFunction();
   const ids = new Set<string>();
   const boardPairs = new Set<string>();
   let solutionChecks = 0;
@@ -156,12 +130,12 @@ async function main(): Promise<void> {
 
     requireNonEmptyString(record.generatorVersion, `${record.id}.generatorVersion`);
     requireStringEnum(record.mode, MODES, `${record.id}.mode`);
-    requireStringEnum(record.difficulty, DIFFICULTIES, `${record.id}.difficulty`);
+    requireStringEnum(record.difficulty, ALLOWED_DIFFICULTIES, `${record.id}.difficulty`);
     const size = requireInteger(record.size, `${record.id}.size`, 3, 8);
     const initialRows = requireRows(record.initialRows, size, `${record.id}.initialRows`);
     const targetRows = requireRows(record.targetRows, size, `${record.id}.targetRows`);
-    const difference = initialRows.map((row, index) => row ^ (targetRows[index] ?? 0));
-    if (difference.every((row) => row === 0)) throw new Error(`${record.id} is already solved.`);
+    assertPlayablePuzzlePair(initialRows, targetRows, size);
+    const difference = differenceRows(initialRows, targetRows, size);
 
     const pairKey = `${size}:${initialRows.join(',')}:${targetRows.join(',')}`;
     if (boardPairs.has(pairKey)) throw new Error(`${record.id} duplicates another board pair.`);
@@ -196,7 +170,7 @@ async function main(): Promise<void> {
       const pulses = record.canonicalSolution.map((pulse, index) =>
         validatePulse(pulse, size, `${record.id}.canonicalSolution[${index}]`),
       );
-      const solvedRows = applyPulses(initialRows, pulses, size);
+      const solvedRows = applyPulses(initialRows, size, pulses);
       if (solvedRows.some((row, index) => row !== targetRows[index])) {
         throw new Error(`${record.id}.canonicalSolution does not produce targetRows.`);
       }

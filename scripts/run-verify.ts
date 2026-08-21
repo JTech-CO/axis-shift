@@ -8,6 +8,8 @@ const requiredScripts = [
   'typecheck',
   'test',
   'test:coverage',
+  'test:coverage:domain',
+  'test:math:exhaustive',
   'validate:levels',
   'audit:daily',
   'build',

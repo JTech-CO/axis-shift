@@ -16,6 +16,8 @@
     "typecheck": "tsc -b",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
+    "test:coverage:domain": "vitest run --config vitest.domain.config.ts --coverage src/domain",
+    "test:math:exhaustive": "vitest run src/domain/algebra/bruteforce-oracle.test.ts --reporter=verbose",
     "validate:levels": "tsx scripts/validate-levels.ts",
     "audit:daily": "tsx scripts/audit-daily-generator.ts",
     "audit:secrets": "tsx scripts/check-secrets.ts",

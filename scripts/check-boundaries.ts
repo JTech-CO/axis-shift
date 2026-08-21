@@ -19,6 +19,24 @@ const ASSET_EXTENSIONS = new Set([
   '.webp',
 ]);
 const SRC_ROOT = path.join(PROJECT_ROOT, 'src');
+const SCRIPTS_ROOT = path.join(PROJECT_ROOT, 'scripts');
+const CORE_IMPLEMENTATION_NAMES = new Set([
+  'applyPulse',
+  'applyPulses',
+  'factorizeGF2',
+  'gf2Rank',
+  'rankGF2',
+]);
+const CORE_SCAN_EXCLUDED_SEGMENTS = new Set([
+  '__fixtures__',
+  '__tests__',
+  'fixture',
+  'fixtures',
+  'prototype',
+  'prototypes',
+  'test',
+  'tests',
+]);
 
 type Layer =
   | 'app'
@@ -31,6 +49,13 @@ type Layer =
   | 'root'
   | 'services'
   | 'unknown';
+
+const CORE_IMPLEMENTATION_LAYERS = new Set<Layer>([
+  'components-common',
+  'components-game',
+  'features',
+  'services',
+]);
 
 interface ModuleInfo {
   readonly layer: Layer;
@@ -318,6 +343,86 @@ function browserServiceGlobalViolations(sourceText: string, filename: string): s
   return [...new Set(violations)];
 }
 
+function declaredName(name: ts.DeclarationName | undefined): string | undefined {
+  if (name && (ts.isIdentifier(name) || ts.isStringLiteralLike(name))) return name.text;
+  return undefined;
+}
+
+function isFunctionInitializer(node: ts.Expression | undefined): boolean {
+  return Boolean(node && (ts.isArrowFunction(node) || ts.isFunctionExpression(node)));
+}
+
+function coreImplementationViolations(sourceText: string, filename: string): string[] {
+  const sourceFile = ts.createSourceFile(
+    filename,
+    sourceText,
+    ts.ScriptTarget.Latest,
+    true,
+    sourceKind(filename),
+  );
+  const violations: string[] = [];
+
+  const report = (node: ts.Node, name: string | undefined): void => {
+    if (!name || !CORE_IMPLEMENTATION_NAMES.has(name)) return;
+    const line = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
+    violations.push(
+      `${projectPath(filename)}:${line} duplicates domain core implementation ${name}`,
+    );
+  };
+
+  const visit = (node: ts.Node): void => {
+    if (ts.isFunctionDeclaration(node) && node.body) {
+      report(node, node.name?.text);
+    } else if (
+      ts.isVariableDeclaration(node) &&
+      ts.isIdentifier(node.name) &&
+      isFunctionInitializer(node.initializer)
+    ) {
+      report(node, node.name.text);
+    } else if (ts.isMethodDeclaration(node) && node.body) {
+      report(node, declaredName(node.name));
+    } else if (
+      (ts.isPropertyAssignment(node) || ts.isPropertyDeclaration(node)) &&
+      isFunctionInitializer(node.initializer)
+    ) {
+      report(node, declaredName(node.name));
+    }
+    ts.forEachChild(node, visit);
+  };
+
+  visit(sourceFile);
+  return violations;
+}
+
+function isCoreImplementationScanFile(filename: string): boolean {
+  if (!SOURCE_EXTENSIONS.has(path.extname(filename))) return false;
+
+  const relative = toPosix(path.relative(PROJECT_ROOT, filename));
+  const segments = relative.toLowerCase().split('/');
+  const basenameSegments = path.basename(relative).toLowerCase().split('.');
+  if (
+    segments.some((segment) => CORE_SCAN_EXCLUDED_SEGMENTS.has(segment)) ||
+    basenameSegments.some((segment) => CORE_SCAN_EXCLUDED_SEGMENTS.has(segment)) ||
+    /\.(?:test|spec)\.[^.]+$/u.test(relative)
+  ) {
+    return false;
+  }
+
+  if (segments[0] === 'scripts') return true;
+  return CORE_IMPLEMENTATION_LAYERS.has(moduleInfo(filename).layer);
+}
+
+async function findCoreImplementationViolations(files: readonly string[]): Promise<string[]> {
+  const violations: string[] = [];
+  for (const filename of files) {
+    if (!isCoreImplementationScanFile(filename)) continue;
+    violations.push(
+      ...coreImplementationViolations(await readFile(path.resolve(filename), 'utf8'), filename),
+    );
+  }
+  return violations;
+}
+
 async function buildGraph(files: readonly string[]): Promise<GraphResult> {
   const graph = new Map<string, Set<string>>();
   const violations: string[] = [];
@@ -544,6 +649,64 @@ async function proveCycleDetection(): Promise<void> {
   }
 }
 
+async function proveCoreImplementationDetection(): Promise<void> {
+  const fixtureRoot = await mkdtemp(path.join(tmpdir(), 'axis-shift-core-boundary-'));
+  const duplicateFixture = path.join(fixtureRoot, 'duplicate.ts');
+  const allowedFixture = path.join(fixtureRoot, 'allowed.ts');
+
+  try {
+    await writeFile(
+      duplicateFixture,
+      [
+        'function applyPulse() {}',
+        'const applyPulses = () => undefined;',
+        'const rankGF2 = function () {};',
+        'class Fixture { gf2Rank() {} }',
+        'const fixture = { factorizeGF2() {} };',
+        '',
+      ].join('\n'),
+      'utf8',
+    );
+    await writeFile(
+      allowedFixture,
+      [
+        "import { applyPulse, applyPulses, factorizeGF2, gf2Rank, rankGF2 } from './domain';",
+        'export const result = [applyPulse(), applyPulses(), factorizeGF2(), gf2Rank(), rankGF2()];',
+        '',
+      ].join('\n'),
+      'utf8',
+    );
+
+    const duplicateViolations = coreImplementationViolations(
+      await readFile(duplicateFixture, 'utf8'),
+      duplicateFixture,
+    );
+    const allowedViolations = coreImplementationViolations(
+      await readFile(allowedFixture, 'utf8'),
+      allowedFixture,
+    );
+    const detectedNames = new Set(
+      duplicateViolations.map((violation) => violation.slice(violation.lastIndexOf(' ') + 1)),
+    );
+
+    if (
+      duplicateViolations.length !== CORE_IMPLEMENTATION_NAMES.size ||
+      [...CORE_IMPLEMENTATION_NAMES].some((name) => !detectedNames.has(name))
+    ) {
+      throw new Error(
+        `Core implementation fixture failed to detect all duplicates: ${JSON.stringify(duplicateViolations)}`,
+      );
+    }
+    if (allowedViolations.length > 0) {
+      throw new Error(
+        `Core implementation fixture rejected imports or calls: ${JSON.stringify(allowedViolations)}`,
+      );
+    }
+  } finally {
+    await rm(fixtureRoot, { force: true, recursive: true });
+  }
+}
+
 async function main(): Promise<void> {
   const files = (await walkFiles(SRC_ROOT)).filter((filename) => {
     const relative = toPosix(path.relative(SRC_ROOT, filename));
@@ -558,9 +721,13 @@ async function main(): Promise<void> {
   }
 
   const { graph, violations } = await buildGraph(files);
+  const scriptFiles = await walkFiles(SCRIPTS_ROOT);
+  const coreScanFiles = [...files, ...scriptFiles].filter(isCoreImplementationScanFile);
+  violations.push(...(await findCoreImplementationViolations(coreScanFiles)));
   const cycles = findCycles(graph);
   await proveEslintBoundaries();
   await proveCycleDetection();
+  await proveCoreImplementationDetection();
 
   for (const violation of violations) console.error(`boundary: ${violation}`);
   for (const cycle of cycles) {
@@ -568,7 +735,7 @@ async function main(): Promise<void> {
   }
 
   console.log(
-    `boundaries files=${files.length} edges=${[...graph.values()].reduce((sum, edges) => sum + edges.size, 0)} violations=${violations.length} cycles=${cycles.length} lintFixtures=4 lintAssertions=7 cycleFixtures=1`,
+    `boundaries files=${files.length} edges=${[...graph.values()].reduce((sum, edges) => sum + edges.size, 0)} violations=${violations.length} cycles=${cycles.length} lintFixtures=4 lintAssertions=7 cycleFixtures=1 coreFiles=${coreScanFiles.length} coreFixtureImplementations=${CORE_IMPLEMENTATION_NAMES.size} coreFixtureAssertions=2`,
   );
   if (violations.length > 0 || cycles.length > 0) process.exitCode = 1;
 }

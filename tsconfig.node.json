@@ -25,8 +25,11 @@
     "playwright.config.ts",
     "playwright.pages.config.ts",
     "scripts/**/*.ts",
+    "src/domain/**/*.ts",
     "tests/**/*.ts",
     "vite.config.ts",
+    "vitest.domain.config.ts",
     "vitest.config.ts"
-  ]
+  ],
+  "exclude": ["src/domain/**/*.test.ts"]
 }

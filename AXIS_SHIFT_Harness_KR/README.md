@@ -4,7 +4,7 @@
 **작성일**: 2026-08-09  
 **프로젝트**: AXIS//SHIFT — A Daily Tensor Puzzle  
 **대상 에이전트**: OpenAI Codex 우선, Claude Code 호환  
-**상태**: Pre-Production / M00 진입 준비
+**상태**: M00·M01·M02 및 H00 완료 / M03 진입 전
 
 AXIS//SHIFT를 여러 세션에 걸쳐 구현하더라도 게임 규칙, 수학적 정확성, 디자인 품질, 검증 기준이 표류하지 않도록 만든 다중 파일 작업 하네스다. 이 팩은 단순 작업 목록이 아니라 다음을 분리해 관리한다.
 
@@ -153,4 +153,4 @@ AXIS//SHIFT에서 완료는 다음 세 조건을 동시에 만족하는 상태�
 
 ## 7. 첫 실행
 
-현재 시작점은 `PROGRESS.md`와 `phases/H00_hackathon_submission_slice.md`다. M00·M01은 완료됐고 H00은 2026-08-26 제출을 위한 한시적 v0.1 lane이다. H00 종료는 정규 M02~M11 완료를 뜻하지 않으며 제출 후 M02의 원래 DoR로 복귀한다.
+현재 시작점은 `PROGRESS.md`와 다음 정규 phase인 `phases/M03_generator_content.md`다. M00·M01·M02와 한시적 H00 v0.1 제출 lane은 완료됐으며, M03은 자신의 원래 DoR를 충족한 뒤 별도 오너 지시로 착수한다. H00 완료는 정규 M03~M11 완료를 뜻하지 않는다.
