@@ -1,8 +1,8 @@
 # AXIS//SHIFT 플레이테스트 프로토콜
 
 **버전**: 1.0.0  
-**상태**: M00 구현·E2 완료 / formal Easy n≥5·DOD-02~07 판정은 출시 직전 playable beta로 연기
-**최종 갱신**: 2026-08-11
+**상태**: M00 formal Easy 완료 / 2026-08-16 행동 기준 5/5, aggregate-only E1 제한 보존
+**최종 갱신**: 2026-08-21
 
 ## 1. 목적
 
@@ -194,6 +194,7 @@ Recording consent: yes / no
 | P03 | — | — | — | — | — | — | — | — | — | — |
 | P04 | — | — | — | — | — | — | — | — | — | — |
 | P05 | — | — | — | — | — | — | — | — | — | — |
+| M00-R1 aggregate | PC 4 / mobile Chrome 1 | 미기록 | ≤30s 5/5 | ≤90s 5/5 | 미기록 | I0 5/5 | 5/5 | 반복 P0 0 | 미기록 | 개별 ID·정확한 값은 복구하지 않음 |
 
 시간은 초 단위로 기록한다. 미완료는 `>limit`, 중단은 `DNF`로 쓴다.
 
@@ -248,15 +249,35 @@ Recording consent: yes / no
 
 ## 13. 현재 결과
 
-정식 M00 본 플레이테스트는 아직 실행하지 않았다. 참가자 수·개별 기록을 확인할 지표가 없는 현시점에는 수집하지 않고 출시 직전 playable beta까지 연기한다.
+### Formal Easy beta 본 표본 — `M00-R1`
 
-### Formal Easy 실행 시점 결정
+- Build/fixture: `b0f935e396805bab9c0847847068cb9a3522968f` / `M00-MAIN-v1` / Easy / seed 없음
+- Deployment: GitHub Pages run `31733835031` success
+- URL: `https://jtech-co.github.io/axis-shift/`
+- Date: 2026-08-16
+- Sample: n=5, 전원 신규 인터넷 익명 사용자, 프로젝트 구현 비참여
+- Environment: PC 4명, mobile Chrome 1명; 개인별 매핑과 PC 세부 환경 미기록
+- Intervention: I0 5/5, 진행자 개입 없음
+- Independent first pulse ≤30s: 5/5 — PASS
+- Independent solve ≤90s: 5/5 — PASS
+- Correct rule recall: 5/5 — PASS
+- Median first pulse / solve: not recorded
+- Pulses used: not recorded
+- Repeated P0 confusion: 0건 보고
+- Mobile blockers: none reported; 상세 실기기 검증으로 재사용하지 않음
+- Gate result: `PASS — project-owner-attested aggregate E1`
+- Private evidence: `<PROJECT_ROOT>/.private/playtests/M00-R1-2026-08-16.md`, Git 미추적
+- Deletion: 2026-08-26 해커톤 제출 완료 후
 
-- 결정: 출시 직전 동일 playable beta의 build SHA·공개 URL을 고정한 뒤 신규 사용자 n≥5를 모집하고 Easy `M00-MAIN-v1`을 실행한다.
-- 유지 기준: 4/5, 30초 첫 PULSE, 90초 첫 성공, 규칙 회상과 개입 코드를 그대로 사용한다.
-- 판정 경계: 연기는 `PASS`, 면제, 표본 축소가 아니다. DOD-02~07은 beta 증거가 기록될 때까지 미완료다.
-- Git 경계: 별도 오너 지시에 따른 구현 체크포인트 push는 M00 phase 완료나 formal DoD 통과를 뜻하지 않는다.
+참가자별 ID·정확한 초·PULSE 수·PC 브라우저/OS·전문성 층화는 보존되지 않았다. 프로젝트 오너는 2026-08-21 이 제한을 인지하고 M00 종료를 승인했다. 중앙값·개별 행을 추정하지 않으며 M06/M10 증거로 재사용하지 않는다.
 
+### 정성 피드백과 결정
+
+1. 유사 규칙이 드물어 신선하다 — 코어 차별점으로 유지하고 제출 피치에서 강조한다.
+2. 생각할 거리는 있으나 단계가 적다 — 첫 우선순위로 기존 6 profile의 반복 콘텐츠와 제출용 신호 카탈로그를 가시화한다.
+3. 3D 경쟁작 대비 우려 — 일정·가독성·접근성 위험이 큰 3D 전환은 보류하고 규칙·콘텐츠·완성도로 차별화한다.
+4. AXIS 변화가 잘 보이지 않는다 — 선택 축 진행선, 교차점 충격, 완료 Signal Lock 연출을 두 번째 우선순위로 둔다.
+5. 2D가 밋밋하다 — 로컬 CSS 기반 깊이·상태·모션을 보강하되 대형 의존성·외부 자산은 추가하지 않는다.
 ### 내부 파일럿 관찰
 
 - run: 2회, 본 표본 미포함
