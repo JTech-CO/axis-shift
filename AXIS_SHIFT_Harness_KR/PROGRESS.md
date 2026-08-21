@@ -135,6 +135,7 @@
 | 2026-08-21 | M02 | DOD-09 core coverage E3 | `npm run test:coverage`; `npm run test:coverage:domain` | 공통 report 8 files/32 tests, S=99.38/B=100/F=97.5/L=99.32; 추가 domain gate는 board·pulse·gf2-rank·factorization·guards 각각 S/B/F/L=100%, total 131/59/26/117 | `phases/M02_core_math.md` §10 |
 | 2026-08-21 | M02 | M00 fixture 호환 | `M00-MAIN-v1` 정규 분해 적용 | diff=`[11,6,13,6]`, rank=2, canonical 2 PULSE, solved=true | `phases/M02_core_math.md` §9~10 |
 | 2026-08-21 | M02 | DOD-07~08·통합 검증 | `npm run check:boundaries` + `npm run verify` | boundary files=43, violations=0, cycles=0, named-duplicate self-check=5/5; occurrence review 병행; scriptContract=16/16, unit=32/32, secret findings=0, verify steps=10 | `phases/M02_core_math.md` §10 |
+| 2026-08-21 | M02 | commit·PR·main CI·Pages E4 | implementation `55b0b55` + evidence `3fc095a` → PR `#5` merge | merge=`b38084e`; PR CI `32461938140` success; main CI `32462073073` success; Pages `32462073080` success | `phases/M02_core_math.md` §10, `https://github.com/JTech-CO/axis-shift/pull/5` |
 
 ### M02 최신 검증 출력
 

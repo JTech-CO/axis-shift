@@ -149,6 +149,12 @@ npm run check:boundaries:
 npm run verify:
   scriptContract required=16 missing=0; test files=8 tests=32 failures=0
   secretFindings=0; build=pass; pagesArtifact files=14; passed steps=10
+remote evidence:
+  implementation=55b0b55273aff6803191bb9812927c622721bd2f
+  evidence=3fc095a0cb2376301265244ca71b94796aefddeb
+  PR=#5 merged; merge=b38084e31d10c2445c7bca91afec1b02ff6da180
+  PR_CI=32461938140 success; main_CI=32462073073 success
+  Pages=32462073080 success
 ```
 
 전역 `npm run test:coverage`는 기존 공개 명령과 실행된 전체 제품 source 보고 범위를 그대로 유지하며 임계치를 좁히지 않는다. M02의 지정 5파일 per-file 100% 검증은 이를 대체하지 않는 추가 gate로서 `vitest.domain.config.ts`와 `npm run test:coverage:domain`에 분리한다. 두 명령 모두 로컬 최종 검증과 CI에 연결한다.

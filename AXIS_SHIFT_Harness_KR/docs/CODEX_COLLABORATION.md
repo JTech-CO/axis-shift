@@ -102,7 +102,7 @@ Codex가 제안·생성·수정한 항목
 | CX-H00-001 | 2026-08-21 | H00 | 5일 제출 슬라이스 범위 고정 | ADR-0010·H00 phase·traceability | DoR 6/6, 최종 DOD 12/12 | 콘텐츠→AXIS 연출 우선, 3D·새 모드 제외 | 완료 |
 | CX-H00-002 | 2026-08-21 | H00 | 18신호·AXIS 연출 vertical slice | prototype·Pages test·H00 증거 | campaign 217, browser 891, Pages 27/27, 오류 0 | 3D 대신 콘텐츠·축 인과·모바일 완성도 채택 | 완료 |
 | CX-H00-003 | 2026-08-21 | H00 | 공개 배포 회귀와 submission-ready 패키지 | PR #1·#2·#3, tag·Pages·private package | clean E3, public E4, 14-entry manifest, backup delta 0 | 오너가 라이선스·개인정보·동의·최종 Submit 책임 유지 | 완료 |
-| CX-M02-001 | 2026-08-21 | M02 | 순수 보드·PULSE·rank·factorization 코어 | `55b0b55273aff6803191bb9812927c622721bd2f` / PR `#5` | 512 전수·50,000 property 오류 0, 5파일 coverage 100% | 공개 규칙·bit·pivot 계약과 milestone commit/push 승인 | 로컬 DoD 완료 / 원격 CI 검증 중 |
+| CX-M02-001 | 2026-08-21 | M02 | 순수 보드·PULSE·rank·factorization 코어 | `55b0b55273aff6803191bb9812927c622721bd2f` / PR `#5` | 512 전수·50,000 property 오류 0, 5파일 coverage 100% | 공개 규칙·bit·pivot 계약과 milestone commit/push 승인 | 완료 / PR·main CI·Pages PASS |
 
 ## 8. 상세 로그 템플릿
 
@@ -306,15 +306,16 @@ Codex가 제안·생성·수정한 항목
 - 사람 결정: 공개 PULSE 규칙, bit 0=왼쪽/위쪽 축, 낮은 열·행 우선 pivot, 엔진 3~8·콘텐츠 3~6 계약을 유지하고 M02 착수 및 완료 후 commit·push를 승인했다.
 - 사람이 수정·거절한 것과 이유: 동결된 `prototypes/rule-proof/core.mjs`는 H00 제출 슬라이스의 재현성을 위해 production 코어로 이관하거나 소급 수정하지 않는다. 신규 production level·generator·session·UI는 M02 범위를 넘어가므로 만들지 않았다.
 - 변경 파일: `src/domain/{types,board,algebra}`, `scripts/{validate-levels,check-boundaries,run-verify}.ts`, `package.json`, `vitest.domain.config.ts`, `tsconfig.node.json`, `.github/workflows/ci.yml`, M02 phase와 수학·백서·파일 트리·추적성·협업 문서
-- Commit / PR: implementation `55b0b55273aff6803191bb9812927c622721bd2f` / PR `#5` (`codex/m02-domain-core` → `main`)
+- Commit / PR: implementation `55b0b55273aff6803191bb9812927c622721bd2f`, evidence `3fc095a0cb2376301265244ca71b94796aefddeb` / PR `#5` merged as `b38084e31d10c2445c7bca91afec1b02ff6da180`
 - 검증:
   - `npm run typecheck`, `npm run test -- src/domain`, `npm run test:coverage`, `npm run test:coverage:domain`, `npm run test:math:exhaustive`, `npm run check:boundaries`, `npm run verify` 모두 exit 0
   - `matrixCount=512 oracleUnvisited=0 rankMismatch=0 factorizationMismatch=0 pulseInvariantFailures=0 randomMatrices=50000 determinismFailures=0`
   - `src/domain` 6 files/27 tests; `board`·`pulse`·`guards`·`gf2-rank`·`factorization` 파일별 statements/branches/functions/lines 100%
   - `files=43 edges=40 violations=0 cycles=0 coreFiles=27 coreFixtureImplementations=5 coreFixtureAssertions=2`
+  - PR CI `32461938140`, main CI `32462073073`, Pages `32462073080` 모두 success
 - Codex 기여 경계: Codex는 core·test·validator·boundary·CI·문서를 구현했지만 공개 규칙이나 production 콘텐츠를 새로 결정하지 않았다.
 - 남은 위험: FR-CORE-003과 FR-HINT-001의 session·selector·UI는 M04/M06, seed·generator와 signature 결정성은 M03/M09에 남아 있다.
-- 다음 작업: PR `#5`의 원격 CI를 통과·병합한 뒤 M03 콘텐츠·결정적 generator DoR를 확인한다.
+- 다음 작업: M03 콘텐츠·결정적 generator의 원래 DoR를 확인하고 오너 착수 지시 전에는 구현하지 않는다.
 
 ## 9. 품질 분류
 
