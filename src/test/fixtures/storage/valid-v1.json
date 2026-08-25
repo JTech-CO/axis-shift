@@ -1,0 +1,16 @@
+{
+  "case": "valid-v1",
+  "keyKind": "settings",
+  "raw": {
+    "schemaVersion": 1,
+    "locale": "en",
+    "theme": "dark",
+    "soundEnabled": true,
+    "soundVolume": 0.5,
+    "hapticsEnabled": false,
+    "reducedMotion": "on",
+    "highContrastCells": true,
+    "showKeyboardHints": false
+  },
+  "expected": "deep-equal"
+}

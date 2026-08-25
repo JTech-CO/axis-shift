@@ -1,0 +1,9 @@
+{
+  "case": "partial-v1",
+  "keyKind": "settings",
+  "raw": {
+    "schemaVersion": 1,
+    "locale": "ko"
+  },
+  "expected": "quarantine-and-default"
+}

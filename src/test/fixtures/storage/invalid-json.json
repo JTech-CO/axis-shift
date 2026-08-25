@@ -1,0 +1,6 @@
+{
+  "case": "invalid-json",
+  "keyKind": "settings",
+  "raw": "{not-json",
+  "expected": "quarantine-and-default"
+}

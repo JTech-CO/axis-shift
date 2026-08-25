@@ -4,9 +4,9 @@
 
 ## 현재 상태
 
-- **현재 phase**: M03 — Generator & Content Pipeline 완료; 다음 M04 진입 전
-- **상태**: M03 DOD-01~11 완료; candidate exact-SHA 감사 2회와 사람 큐레이션 승인까지 고정, M00·M01·M02·H00 완료 상태 유지
-- **마지막 갱신**: 2026-08-26 / closure commit `5050551796fde4c9255349775e685c932060c58e` 원격 push, PR [#7](https://github.com/JTech-CO/axis-shift/pull/7) CI run [`32870894868`](https://github.com/JTech-CO/axis-shift/actions/runs/32870894868) quality PASS, M03 원격 폐쇄 완료
+- **현재 phase**: M04 — Session, Persistence, Clock & Scoring 완료; 다음 M05 진입 전
+- **상태**: M04 DoR 5/5·DOD-01~13 통과; session·clock·scoring·storage v1 순수 계약 완료, 실제 화면 연결은 M05·M06
+- **마지막 갱신**: 2026-08-26 / focused 12파일 92테스트·migration 3테스트, M04 S98.90/B98.79/F100/L98.95·per-file branch 11/11, global 23파일 147테스트 통과
 - **목표 릴리스**: `v0.1.0-hackathon` — OpenAI Game Builders Seoul Track 1 제출 슬라이스 완료
 - **제출 접수 종료**: 2026-08-26
 
@@ -62,13 +62,20 @@
 - [x] M03 환경 parity — PRNG 20 seed×100 출력과 Daily golden 20개를 Chromium·Firefox·WebKit 9/9로 확인, UTC·서울·LA 시간대별 프로세스 3개에서 각각 10회 해시 불일치 0
 - [x] M03 DOD-10 fixed-SHA 종료 — candidate `1c313bd29e1d24c483749af90a8734542988be5d`, clean Node `v24.19.0`/npm `11.6.2`, verify 10/10·3브라우저 9/9, 서로 다른 출력 경로의 3,650일 감사 2회 report SHA `b1102aee…6d49` 동일
 - [x] H00 공식 제출 — 프로젝트 오너가 공식 양식 제출 완료를 확인했다. 정확한 접수 시각·접수 ID·확인 화면은 제공되지 않아 생성하지 않으며 Codex는 인증·개인정보·동의·Submit을 수행하지 않았다.
+- [x] M04 session reducer·selector — actionId append-only ledger, 원자 PULSE·완료 event, Undo·호출자 고유-ID Reset, Hint 1~3, `TIMER_TICK` high-water와 visibility pause
+- [x] M04 ID service — issued ledger seed·reserve·invalid/duplicate retry·128회 exhaustion; M06 singleton·crypto source integration 경계 보존
+- [x] M04 scoring·clock — `WeakSet` provenance completion→opaque record projection, S/A/B/C·Hint cap, `grade→PULSE→active elapsed` best tuple, 주입 Clock·year≥1 canonical UTC 변환
+- [x] M04 persistence v1 — 네 root, pre-start canonical ready·started-unsolved paused snapshot, exact ledger/clock guard·null-prototype Lab map, quarantine backup-before-delete·collision retry·progress salvage 재저장·경고 dedupe
+- [x] M04 품질 게이트 — focused 12파일 92테스트, migration 3테스트, aggregate S98.90/B98.79/F100/L98.95, per-file branch 11/11·최저 95.45%, global 23파일 147테스트, lint·format·typecheck·boundaries 통과
+- [x] M04 build hardening — 기존 `dist`에서 발생한 Vite 8 Windows native cleanup crash 회피용 검증된 preclean + `emptyOutDir=false` canonical build
 
 ## 다음 할 일
 
-1. 다음 구현은 `phases/M04_session_persistence_scoring.md`의 DoR를 확인하고 프로젝트 오너 착수 지시에 따라 시작한다. M03 완료는 M04 reducer·저장·시간·등급 gate를 면제하지 않는다.
-2. PR #7은 closure commit `5050551796fde4c9255349775e685c932060c58e`에서 CI run `32870894868` quality PASS다. PR은 열려 있으며 main 병합은 프로젝트 오너 결정 전에는 수행하지 않는다.
-3. H00 비공개 playtest·submission 자료와 두 backup은 Git에 넣지 않는다. 제출 완료 조건은 충족됐지만 이번 작업에서는 삭제하지 않았으며, 프로젝트 오너의 명시적 정리 결정 전까지 보존한다.
-4. H00의 권리 상태는 `UNLICENSED` / All Rights Reserved로 고정했다. 공개 OSS 라이선스 채택 여부는 M11 오너 결정으로 남긴다.
+1. 다음 구현은 `phases/M05_design_system.md`의 DoR를 확인하고 M04 action·selector·6개 session 상태 fixture를 shared game UI에 연결한다.
+2. M06는 M04 `IdGenerator`를 앱 singleton·crypto-backed source로 연결하고 hydrated ID를 seed/reserve한다. 또한 `TIMER_TICK`·Page Visibility dispatch, paused snapshot resume, completion projection·Lab best 저장과 실제 reload E2E를 담당한다. M07은 UTC Daily·streak·Archive를 추가한다.
+3. Sprint 180초 절대 종료·총점·동점 규칙은 계속 M08까지 결정하지 않는다.
+4. H00 비공개 playtest·submission 자료와 두 backup은 Git에 넣지 않는다. 제출 완료 조건은 충족됐지만 이번 작업에서는 삭제하지 않았으며, 프로젝트 오너의 명시적 정리 결정 전까지 보존한다.
+5. H00의 권리 상태는 `UNLICENSED` / All Rights Reserved로 고정했다. 공개 OSS 라이선스 채택 여부는 M11 오너 결정으로 남긴다.
 
 ### Formal Easy 게이트 종료 경계
 
@@ -99,7 +106,7 @@
 | H00 | Hackathon Submission Slice | 완료 — DOD-01~12, tag/pre-release `v0.1.0-hackathon`, 오너 공식 제출 확인 | clean checkout·public E4·릴리스 정직성·제출 패키지·2중 backup; 접수 시각/ID 미제공 경계 보존 |
 | M02 | Board & GF(2) Core | 완료 — DOD-01~10 | 3×3 전수 512 mismatch 0, 4~8 총 50,000 round-trip·결정성 실패 0, core coverage 각 100% |
 | M03 | Generator & Content Pipeline | 완료 — DOD-01~11 | 오너 전체 승인 + candidate `1c313bd…98be5d` exact-SHA 감사 2회 동일 + PR #7 CI PASS |
-| M04 | Session, Persistence & Scoring | 미시작 | reducer·저장·시간·등급 정합 |
+| M04 | Session, Persistence & Scoring | 완료 — DOD-01~13 | 12파일 92테스트, B98.79%, 11/11 per-file branch·네 v1 root·격리·재개 정규화 |
 | M05 | Design System & Shared UI | 미시작 | 360px·테마·키보드·상태 fixture |
 | M06 | Tutorial & Lab | 미시작 | 튜토리얼 6 + Lab 48 전체 플레이 가능 |
 | M07 | Daily & Archive | 미시작 | 날짜 결정성·streak·archive 회귀 |
@@ -120,6 +127,9 @@
 | 2026-08-26 | M03 | DOD-03·11 단위·경계 회귀 E3 | focused unit + `npm run test` + `npm run check:boundaries` + `npm run verify` | focused generator+curation+catalog 3 files/23 tests; full unit 11 files/55 tests; boundary files=55, edges=81, violations=0, cycles=0, coreFiles=30; verify 10/10 | `src/domain/generator/`, `scripts/lib/curation-evidence.test.ts`, `scripts/check-boundaries.mjs` |
 | 2026-08-26 | M03 | DOD-10 fixed-SHA 재현성 E3 | candidate `1c313bd29e1d24c483749af90a8734542988be5d` clean detached worktree, Node 24 `npm ci` → verify·3브라우저 parity → 서로 다른 경로의 3,650일 감사 2회 | **PASS** — verify 10/10, parity 9/9, report/json SHA `b1102aee…6d49`·MD SHA `3149a492…a036`·checksum-file SHA `8a827506…a893` 각각 2회 동일, worktree status 0 | `phases/M03_generator_content.md` §10 |
 | 2026-08-26 | M03 | DOD-11 원격 폐쇄 E3 | closure commit `5050551796fde4c9255349775e685c932060c58e` push → PR #7 CI | **PASS** — Actions run `32870894868`, head SHA 일치, quality 1분 57초, 전체 step success | PR `#7`, Actions `32870894868` |
+| 2026-08-26 | M04 | DOD-01~10 session·scoring·ID·storage E3 | focused unit + `npm run test:storage:migrations` | **PASS** — 12 files/92 tests, migration 3/3; ID seed/reserve/retry·ledger replay·timer high-water·WeakSet projection·4-root round-trip·10 fixture 오류 0 | `phases/M04_session_persistence_scoring.md` §10 |
+| 2026-08-26 | M04 | DOD-11~13 경계·coverage·문서 E3 | lint·format check·typecheck·boundaries + M04/global coverage | **PASS** — M04 S98.90/B98.79/F100/L98.95, per-file branch 11/11·최저 95.45%; global 23 files/147 tests S93.06/B91.81/F97.61/L94.31; 정적 gate exit 0 | `vitest.m04.config.ts`, `phases/M04_session_persistence_scoring.md` §10 |
+| 2026-08-26 | M04 | 최종 통합 품질 게이트 E3 | `npm run verify` | **PASS** — scriptContract 19/19, steps 10/10; unit 23파일/147테스트, boundaries files=67 edges=112 violations=0 cycles=0, levels 54 failures=0, Daily 3,650일 failures=0, secret files=234 findings=0, app·Pages build 2/2 | `phases/M04_session_persistence_scoring.md` §10 |
 | 2026-08-09 | M00 | DoR fixture readiness | Node 4×4 전체 상태 BFS 준비 계산 | main rank/BFS=2/2, backup=3/3 | `AXIS_SHIFT_Harness_KR/phases/M00_rule_proof.md` §3.2 |
 | 2026-08-09 | M00 | Workspace root contract | GitHub metadata + `git init -b main` + origin 연결 | root=`AXIS SHIFT (Tensor)`, remote public/main/empty, push 없음 | 루트 `AGENTS.md` |
 | 2026-08-09 | M00 | DOD-01 초기 4×4 다단계 E2 | `node prototypes/rule-proof/verify-fixture.mjs` | stageSequence=easy:2>normal:3>hard:4, assertions=196708, failures=0 | `phases/M00_rule_proof.md` §10 역사 로그 |
@@ -151,6 +161,24 @@
 | 2026-08-21 | M02 | M00 fixture 호환 | `M00-MAIN-v1` 정규 분해 적용 | diff=`[11,6,13,6]`, rank=2, canonical 2 PULSE, solved=true | `phases/M02_core_math.md` §9~10 |
 | 2026-08-21 | M02 | DOD-07~08·통합 검증 | `npm run check:boundaries` + `npm run verify` | boundary files=43, violations=0, cycles=0, named-duplicate self-check=5/5; occurrence review 병행; scriptContract=16/16, unit=32/32, secret findings=0, verify steps=10 | `phases/M02_core_math.md` §10 |
 | 2026-08-21 | M02 | commit·PR·main CI·Pages E4 | implementation `55b0b55` + evidence `3fc095a` → PR `#5` merge | merge=`b38084e`; PR CI `32461938140` success; main CI `32462073073` success; Pages `32462073080` success | `phases/M02_core_math.md` §10, `https://github.com/JTech-CO/axis-shift/pull/5` |
+
+### M04 최신 검증 출력
+
+```text
+status: COMPLETE; DOD-01~13 PASS
+focused M04 unit: files=12 tests=92 failures=0
+storage migrations: tests=3 failures=0
+M04 aggregate coverage: statements=98.90% branches=98.79% functions=100% lines=98.95%
+lint=pass formatCheck=pass typecheck=pass boundaries=pass
+perFileBranches=11/11 minimum=95.45% bestRecord selectors=95.65% repository=97.67%
+global coverage: files=23 tests=147 statements=93.06% branches=91.81% functions=97.61% lines=94.31%
+storage roots=4 fixtures=10 quarantine=backup-before-delete+collision-retry salvage=persist-after-quarantine warningDedupe=keyKind+code
+idGenerator=issued-ledger+seed+reserve+retry; M06=singleton+crypto-source
+canonicalBuild=validated-dist-preclean+emptyOutDir-false
+handoff: M05 shared UI; M06 ID singleton/crypto+visibility/resume/result persistence; M07 UTC Daily/streak/archive; M08 Sprint scoring
+```
+
+실제 화면의 reload·visibility·Result 저장을 M04에서 통과했다고 주장하지 않는다. M04는 순수 reducer·clock·scoring·repository E3를 닫았고 사용자 흐름 E2E는 M05·M06에 남겼다.
 
 ### M03 최종 검증 출력
 
@@ -363,3 +391,4 @@ STOP 발동 시 아래 형식으로 추가한다.
 - 2026-08-26: 프로젝트 오너가 공식 해커톤 양식 제출 완료를 확인했다. 정확한 접수 시각·접수 ID·확인 화면은 미제공이며 누락값을 생성하지 않는다. Codex는 인증·개인정보·동의·최종 Submit을 수행하지 않았다.
 - 2026-08-26: 프로젝트 오너가 54개 패턴과 progression 5행을 전체 승인해 DOD-04를 통과했다. approval fingerprint가 full manifest·순서 있는 catalog·machine scaffold를 묶으며 변경 시 재승인하도록 fail-closed한다. candidate `1c313bd29e1d24c483749af90a8734542988be5d`의 clean Node 24 worktree에서 verify 10/10·3브라우저 9/9와 3,650일 감사 2회 동일 report SHA `b1102aee…6d49`를 확인해 DOD-10과 M03을 완료했다.
 - 2026-08-26: closure evidence `5050551796fde4c9255349775e685c932060c58e`를 `codex/m03-generator-content`에 push하고 PR #7을 열었다. Actions run `32870894868`은 해당 head SHA에서 quality 전체 단계를 1분 57초에 통과했다. main 병합은 수행하지 않았다.
+- 2026-08-26: M04에서 append-only action ledger, `TIMER_TICK` high-water, `WeakSet` completion provenance, Hint cap·best tuple, issued-ledger ID service, 네 v1 storage root와 canonical ready/paused normalization·격리·부분 복구를 고정했다. focused 12파일 92테스트와 migration 3테스트, aggregate B98.79%·per-file branch 11/11, global 23파일 147테스트, 정적 gate와 `npm run verify`(scriptContract 19/19, steps 10/10)를 통과해 DOD-01~13을 닫았다. M06은 ID singleton·crypto source와 실제 UI·visibility·reload, M07은 UTC Daily·streak·Archive, M08은 Sprint 산식을 맡는다.

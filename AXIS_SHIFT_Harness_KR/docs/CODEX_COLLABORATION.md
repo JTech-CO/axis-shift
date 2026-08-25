@@ -104,6 +104,7 @@ Codex가 제안·생성·수정한 항목
 | CX-H00-003 | 2026-08-21~26 | H00 | 공개 배포 회귀·submission-ready 패키지·오너 제출 | PR #1·#2·#3, tag·Pages·private package | clean E3, public E4, 14-entry manifest, backup delta 0 | 오너가 개인정보·동의·Submit을 직접 수행하고 완료 확인 | 완료 / 접수 metadata 미제공 |
 | CX-M02-001 | 2026-08-21 | M02 | 순수 보드·PULSE·rank·factorization 코어 | `55b0b55273aff6803191bb9812927c622721bd2f` / PR `#5` | 512 전수·50,000 property 오류 0, 5파일 coverage 100% | 공개 규칙·bit·pivot 계약과 milestone commit/push 승인 | 완료 / PR·main CI·Pages PASS |
 | CX-M03-001 | 2026-08-21~26 | M03 | 결정적 Daily·54레벨 공급망 | candidate `1c313bd29e1d24c483749af90a8734542988be5d`; closure `5050551796fde4c9255349775e685c932060c58e`; PR #7 | 20×100 PRNG, 3브라우저 9/9, 3,650일 exact-SHA 감사 2회 동일, DOD-04 승인, remote CI PASS | 오너 전체 승인·M04 전환 | Accepted / DOD-01~11 PASS |
+| CX-M04-001 | 2026-08-26 | M04 | 세션·일반 타이머·점수·ID·storage v1 | `codex/m04-session-persistence-scoring`; commit/PR 없음 | focused 12파일/92테스트, migration 3/3, M04 B98.79%·per-file 11/11, global 23파일/147테스트, 정적 gate PASS | M04 착수; M06 singleton/crypto·Sprint M08·UI 경계 유지 | 자동 검증 완료 / DOD-01~13 PASS, 오너 리뷰·커밋 대기 |
 
 ## 8. 상세 로그 템플릿
 
@@ -357,6 +358,37 @@ Codex가 제안·생성·수정한 항목
 - 현재 분류: `Accepted` — 사람 큐레이션 DOD-04와 candidate exact-SHA DOD-10을 포함한 M03 DOD-01~11이 모두 통과했고, closure commit 대상 PR #7의 원격 CI도 PASS했다.
 - 남은 위험: 이번 승인은 현재 atlas·progression에 한정된다. catalog·manifest·scaffold 변경 시 재승인이 필요하며 M06/M07 UI 연결 뒤 실제 progression 회귀도 별도 검증해야 한다.
 - 다음 작업: `phases/M04_session_persistence_scoring.md`의 DoR를 확인한다. PR #7의 main 병합은 프로젝트 오너 결정에 따르며, M06/M07 UI progression 검증은 여전히 후속 범위다.
+
+---
+
+### CX-M04-001 — 세션·Persistence·Clock·Scoring v1
+
+- 날짜: 2026-08-26
+- Phase / DoD: M04 / DOD-01~13 PASS, phase 완료
+- 관련 INV / ADR: INV-003~006·010~012·018 / ADR-0001·0002·0007
+- 시작 상태·실패: M03에는 검증된 퍼즐·canonical solution만 있었고 production session reducer, active-time clock, grade/best merge, storage schema·migration·fault recovery가 없었다. 초안의 `moves`만으로 replay를 막으면 Undo 뒤 같은 action ID가 다시 적용되고, active segment를 닫지 않은 reload는 시간을 유실하며, 일반 object record candidate는 완료 event 밖에서도 위조할 수 있었다.
+- Codex 요청 요약: 프로젝트 오너가 M04 Session, Persistence & Scoring을 순서대로 진행하도록 요청했다.
+- Codex 제안·변경:
+  - attempt 수명 동안 줄지 않는 `acceptedPulseActionIds`, 원자 `PULSE_COMMIT`, 시각 전용 animation finish, deterministic completion event, Undo·새-ID Reset·Hint selector를 순수 reducer에 구현했다.
+  - `TIMER_TICK` high-water, clock 역행 no-op, visibility pause/resume와 active elapsed selector를 구현했다.
+  - Par base grade 뒤 Hint 2=A·Hint 3=B cap을 적용하고, completion event에서만 생성되며 reflective symbol 복제도 거부하는 `WeakSet` provenance opaque candidate와 `grade → PULSE → active elapsed` best tuple을 구현했다.
+  - issued ledger를 seed·reserve하고 invalid·duplicate source를 재시도하다 고갈 시 fail-closed하는 `services/id`를 구현했다. 앱 singleton·crypto-backed source 연결은 M06에 남겼다.
+  - settings·progress·session·generator-map 네 v1 root, exact ledger cardinality·paused clock equality·year≥1 UTC guard, null-prototype Lab map과 memory/local adapter를 구현했다. raw quarantine은 최대 128회 collision 탐색으로 기존 key를 덮어쓰지 않고 backup-before-delete 후 progress salvage primary를 재저장하며, 고갈·backup 실패 시 primary raw를 보존한다. 경고는 `keyKind+code`로 dedupe한다.
+  - 시작 전 Hint·visibility는 hint level을 보존한 canonical `ready`, 시작된 미해결 세션은 열린 구간을 한 번 합산하고 `hiddenAtEpochMs === lastObservedEpochMs`인 `paused` snapshot으로 정규화했다. logical pulsing을 보존하고 solved resumable session은 제거했다.
+  - M04 per-file branch 95% config와 migration 명령을 CI·verify contract에 연결하고 하네스·공개 기술 백서·파일 트리·추적표를 동기화했다.
+  - 기존 `dist`의 Vite 8 Windows native cleanup crash를 피해 검증된 `dist` preclean 뒤 `emptyOutDir=false`로 빌드하는 workaround를 추가했다. 저장 JSON byte 상한은 미구현이므로 후속 storage-budget 정책으로 남겼다.
+- 사람이 채택·수정·거절한 결정과 이유: 오너는 M04 착수를 승인했다. PULSE 규칙·Par·Hint·등급 기본 계약은 기존 백서와 phase를 유지했고 Sprint 절대 타이머·총점·동점 규칙은 임의 결정하지 않고 M08에 남겼다. 실제 UI 연결과 사용자 흐름을 M04 PASS로 과장하지 않고 M05·M06·M07에 남겼다.
+- 변경 파일: `src/domain/{session,scoring}/`, `src/services/{clock,id,storage}/`, `src/test/fixtures/storage/partial-v1.json`, `scripts/clean-build-output.ts`, `vitest.m04.config.ts`, package·CI·verify·tsconfig, M04 phase·progress·백서·파일 트리·추적성·협업 문서
+- Commit / PR: 없음. `codex/m04-session-persistence-scoring` 작업트리에 있으며 프로젝트 오너의 별도 지시 없이 commit·push하지 않았다.
+- 검증:
+  - focused M04 unit `12 files / 92 tests`, failures `0`; storage migration `3/3`
+  - M04 aggregate coverage `S=98.90% B=98.79% F=100% L=98.95%`; per-file branches `11/11`, minimum `best-record.ts=95.45%`, selectors `95.65%`, repository `97.67%`
+  - global coverage `23 files / 147 tests`, `S=93.06% B=91.81% F=97.61% L=94.31%`
+  - lint·format check·typecheck·boundaries 모두 exit 0
+  - `npm run verify`: scriptContract `19/19`, steps `10/10`; unit `23 files / 147 tests`, boundaries `files=67 edges=112 violations=0 cycles=0`, levels·Daily·secret audit 실패 0, app·Pages build `2/2`
+- 실패·수정 기록: Windows sandbox의 `apply_patch`가 deny-read ACL 오류로 문서를 읽지 못해 작업공간 경로 확인과 exact-match 단일 발생 검증을 건 제한적 대체를 사용했다. 구현 감사에서 replay ledger·open segment·pulsing/paused persistence·completion projection을 먼저 보강했다. 후속 감사에서는 symbol 복제, pre-start 폐기, phantom ledger, pause clock mismatch, year zero, prototype 오염, salvage 유실, quarantine overwrite를 재현해 `WeakSet`·canonical normalization·exact guard·null-prototype map·repair 재저장·collision 탐색 회귀로 닫았다. 첫 최종 verify는 Vitest 4 기본 15개 fork가 Windows에서 startup timeout을 일으켜 중단됐고, `pool=threads`·`maxWorkers=4`·`testTimeout=30_000`으로 제한한 뒤 동일 unit 23/147과 verify 10/10을 통과했다.
+- Codex 기여 경계: Codex는 reducer·clock·scoring·storage·테스트·문서 구현과 자동 검증을 수행했다. 제품 모드 UI, Sprint 산식, 사람 체감 평가와 릴리스 승인은 결정하지 않았다.
+- 남은 위험·인계: M05는 action/selector fixture를 UI에 연결한다. M06는 `IdGenerator` singleton·crypto-backed source와 hydrate seed/reserve, Page Visibility·tick dispatch, paused resume, Result·Lab best 저장, browser reload E2E를 검증한다. M07은 UTC Daily·streak·Archive와 puzzle/date/version 일치 복구를 추가하고 M08이 Sprint를 소유한다.
 
 ## 9. 품질 분류
 

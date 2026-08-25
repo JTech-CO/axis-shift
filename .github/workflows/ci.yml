@@ -50,6 +50,12 @@ jobs:
       - name: M02 core coverage
         run: npm run test:coverage:domain
 
+      - name: M04 session, scoring, clock, ID, and storage coverage
+        run: npm run test:coverage:m04
+
+      - name: M04 storage migration matrix
+        run: npm run test:storage:migrations
+
       - name: M02 exhaustive math audit
         run: npm run test:math:exhaustive
 

@@ -32,6 +32,7 @@
     "tests/**/*.ts",
     "vite.config.ts",
     "vitest.domain.config.ts",
+    "vitest.m04.config.ts",
     "vitest.config.ts"
   ],
   "exclude": ["src/domain/**/*.test.ts"]

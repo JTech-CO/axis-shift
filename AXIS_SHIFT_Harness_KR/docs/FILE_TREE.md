@@ -1,7 +1,7 @@
 # AXIS//SHIFT 파일 트리·모듈 경계 계약
 
-**버전**: 1.2.0
-**상태**: M01·M02·M03 완료 + 후속 phase 목표 계약
+**버전**: 1.3.0
+**상태**: M01·M02·M03·M04 완료 + 후속 phase 목표 계약
 **최종 갱신**: 2026-08-26
 **관련 불변식**: INV-002, INV-003, INV-017, INV-019
 
@@ -14,7 +14,7 @@
 
 ## 2. 목표 저장소 트리
 
-> **물리 배치 주의 (2026-08-21)**: 아래 트리는 M11까지의 목표 구조이며 모든 항목이 현재 존재한다는 뜻이 아니다. 구현 항목(`prototypes/`, `src/`, `public/`, `tests/`, `scripts/`, 설정 파일)은 부모 `PROJECT_ROOT` 기준이고, phase·ADR·불변식·증거 문서는 개발 중 `PROJECT_ROOT/AXIS_SHIFT_Harness_KR/`에 유지한다. 바로 아래 §2.1~2.3에 M01~M03 실제 범위를 별도로 적는다.
+> **물리 배치 주의 (2026-08-21)**: 아래 트리는 M11까지의 목표 구조이며 모든 항목이 현재 존재한다는 뜻이 아니다. 구현 항목(`prototypes/`, `src/`, `public/`, `tests/`, `scripts/`, 설정 파일)은 부모 `PROJECT_ROOT` 기준이고, phase·ADR·불변식·증거 문서는 개발 중 `PROJECT_ROOT/AXIS_SHIFT_Harness_KR/`에 유지한다. 바로 아래 §2.1~2.4에 M01~M04 실제 범위를 별도로 적는다.
 
 ```text
 axis-shift/
@@ -39,6 +39,7 @@ axis-shift/
 │   ├── audit-daily-generator.ts
 │   ├── audit-network.ts
 │   ├── build-pages.ts
+│   ├── clean-build-output.ts
 │   ├── check-boundaries.ts
 │   ├── check-traceability.ts
 │   ├── export-share-fixtures.ts
@@ -105,6 +106,7 @@ axis-shift/
 │   ├── services/
 │   │   ├── audio/
 │   │   ├── clock/
+│   ├── id/
 │   │   ├── haptics/
 │   │   ├── pwa/
 │   │   ├── sharing/
@@ -146,7 +148,8 @@ axis-shift/
 ├── tsconfig.json
 ├── vite.config.ts
 ├── vitest.config.ts
-└── vitest.domain.config.ts
+├── vitest.domain.config.ts
+└── vitest.m04.config.ts
 ```
 
 ### 2.1 M01 제한 체크포인트의 실제 구현 범위
@@ -228,8 +231,71 @@ tests/e2e/
 - `outputs/m03/`의 Daily 감사 JSON·Markdown·checksum은 재생성 가능한 로컬 산출물이므로 `.gitignore` 대상이고 커밋하지 않는다. DOD-10은 candidate `1c313bd29e1d24c483749af90a8734542988be5d`의 clean detached worktree에서 서로 다른 출력 디렉터리로 2회 재생성해 report/JSON SHA `b1102aee…6d49`, Markdown SHA `3149a492…a036`, checksum-file SHA `8a827506…a893` 일치를 확인하고 닫았다.
 - M03 종료 경계 기준선은 `files=55 edges=81 violations=0 cycles=0 coreFiles=30`이며 exact-SHA verify 10/10에 포함해 통과했다.
 
-아직 구현하지 않은 범위는 Tutorial/Lab/Daily 화면과 session·storage·scoring 연결(M04~M07)이다. 정적 JSON과 생성 API의 존재를 플레이 가능한 프로덕션 모드 완료로 해석하지 않는다. 다음 구현은 M04 DoR 확인부터 시작한다.
+M03 정적 JSON과 생성 API의 존재를 플레이 가능한 프로덕션 모드 완료로 해석하지 않는다. M04가 session·storage·clock·scoring 순수 계약을 추가했으며 실제 화면과 mode controller 연결은 M05~M07 범위다.
 
+### 2.4 M04 세션·저장·시계·점수의 실제 구현 범위
+
+2026-08-26 현재 M04에서 실제 생성·활성화한 production/test 트리는 다음 범위다.
+
+```text
+src/domain/session/
+├── index.ts
+├── session.ts
+├── session-reducer.ts
+├── session-reducer.test.ts
+├── session-selectors.ts
+└── session-selectors.test.ts
+src/domain/scoring/
+├── index.ts
+├── grade.ts
+├── grade.test.ts
+├── best-record.ts
+└── best-record.test.ts
+src/services/clock/
+├── index.ts
+├── clock.ts
+└── clock.test.ts
+src/services/id/
+├── index.ts
+├── id-generator.ts
+└── id-generator.test.ts
+src/services/storage/
+├── index.ts
+├── local-storage-adapter.ts
+├── local-storage-adapter.test.ts
+├── migrations.ts
+├── migrations.test.ts
+├── repository.ts
+├── repository.test.ts
+├── repository-coverage.test.ts
+├── schema.ts
+├── schema.test.ts
+└── schema-coverage.test.ts
+src/test/fixtures/storage/
+├── missing.json
+├── empty.json
+├── valid-v1.json
+├── invalid-json.json
+├── invalid-fields.json
+├── future-version.json
+├── write-failure.json
+├── resumable-solved.json
+├── resumable-pulsing.json
+└── partial-v1.json
+scripts/clean-build-output.ts
+vitest.m04.config.ts
+```
+
+- `domain/session`은 actionId append-only ledger, 원자 PULSE·완료 event, Undo·Reset·Hint, `TIMER_TICK`·visibility 상태를 순수 reducer와 selector로 제공한다. 저장 ledger cardinality는 `moves.length + undoCount`이며 Reset ID의 앱·저장 수명 고유성은 호출자 계약이다.
+- `domain/scoring`은 Par 기반 base grade와 Hint cap, 완료 event에서만 만드는 runtime opaque candidate, `grade → PULSE → active elapsed` best tuple을 제공한다. candidate authenticity는 module-private `WeakSet` provenance가 보장하며 symbol brand만 복사한 객체는 거부한다.
+- `services/clock`만 `Date.now()`와 epoch→canonical UTC ISO 변환을 소유한다. domain은 `Date`를 import하지 않는다.
+- `services/id`는 scope별 issued ledger, hydrated seed, `reserveId()`, invalid·duplicate retry와 exhaustion을 제공한다. M06가 이를 앱 singleton과 crypto-backed source에 연결한다.
+- `services/storage`는 settings·progress·session·generator-map 네 v1 root와 `StoragePort`를 제공한다. 시작 전 Hint·visibility는 canonical `ready`, 시작된 미해결 snapshot은 open segment를 한 번 합산하고 `hiddenAtEpochMs === lastObservedEpochMs`인 `paused`로 정규화한다. null-prototype Lab map·year≥1 UTC guard를 적용하고, 손상 raw는 기존 quarantine key를 덮어쓰지 않는 최대 128회 collision 탐색과 backup 성공 뒤에만 제거한다. progress salvage는 제거 성공 뒤 repaired primary로 다시 저장한다.
+- v1은 최초 공개 schema이므로 migration registry는 비어 있는 상태가 정상이다. 실제 이전 schema가 생길 때만 순차 단계를 추가한다.
+- `vitest.m04.config.ts`는 M04 핵심 구현 11개 파일마다 branches 95%를 요구한다. 완료 기준선은 focused 12파일/92테스트, M04 S98.90/B98.79/F100/L98.95, per-file branch 11/11·최저 `best-record.ts` 95.45%(selectors 95.65%, repository 97.67%), global 23파일/147테스트 S93.06/B91.81/F97.61/L94.31이다.
+- canonical app build는 기존 `dist`에서 발생한 Vite 8 Windows native cleanup crash를 피하려 `scripts/clean-build-output.ts`가 검증된 `dist`만 preclean하고 Vite는 `emptyOutDir=false`로 실행한다.
+- 공통 `vitest.config.ts`는 Vitest 4의 Windows fork startup 포화를 피하도록 thread pool을 최대 4개로 제한하고, 부하 시 jsdom false-timeout을 피하는 30초 test timeout을 적용한다.
+- React GameScreen, `IdGenerator` singleton·crypto source, Page Visibility dispatch, paused resume, Lab result 저장과 browser reload E2E는 M05·M06에 남아 있다. UTC Daily·streak·Archive는 M07, Sprint 절대 타이머·점수는 M08 범위다.
 
 ## 3. 계층별 책임
 
@@ -268,6 +334,10 @@ tests/e2e/
 
 ```text
 src/domain/index.ts
+src/domain/session/index.ts
+src/domain/scoring/index.ts
+src/services/clock/index.ts
+src/services/id/index.ts
 src/services/storage/index.ts
 src/services/sharing/index.ts
 src/components/common/index.ts

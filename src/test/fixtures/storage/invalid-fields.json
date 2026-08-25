@@ -1,0 +1,31 @@
+{
+  "case": "invalid-fields",
+  "keyKind": "progress",
+  "raw": {
+    "schemaVersion": 1,
+    "tutorialCompleted": "yes",
+    "labRecords": {
+      "lab-valid": {
+        "puzzleId": "lab-valid",
+        "completed": true,
+        "bestGrade": "A",
+        "bestPulseCount": 3,
+        "bestElapsedMs": 12500,
+        "firstCompletedAt": "2026-08-26T00:00:00.000Z",
+        "lastCompletedAt": "2026-08-26T00:01:00.000Z"
+      },
+      "lab-invalid": {
+        "puzzleId": "wrong-id",
+        "completed": true,
+        "bestGrade": "S",
+        "bestPulseCount": -1,
+        "bestElapsedMs": 100,
+        "firstCompletedAt": "not-a-date",
+        "lastCompletedAt": "not-a-date"
+      }
+    },
+    "dailyRecords": {},
+    "sprintBest": null
+  },
+  "expected": "quarantine-and-salvage-valid-record"
+}

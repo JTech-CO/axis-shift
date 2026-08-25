@@ -149,13 +149,14 @@ GitHub Pages의 직접 경로 404를 피하기 위해 Hash Router를 기본으�
 ```text
 loading → ready → selecting → pulsing → selecting
                               └──────→ solved → result
-ready/selecting ─────────────→ paused
+ready/selecting/pulsing ─────→ paused → ready/selecting/solved
 loading/ready ───────────────→ error → recover
 ```
 
-- `pulsing` 중에는 중복 입력을 잠시 잠그며, 애니메이션 종료 후 안정 상태에서 저장한다.
+- `PULSE_COMMIT`은 보드·move·완료 event를 먼저 원자 확정하고 즉시 저장 가능한 논리 snapshot을 만든다. `pulsing`은 중복 입력을 잠그는 시각 상태이며 애니메이션 종료가 논리 commit 조건은 아니다.
+- `acceptedPulseActionIds`는 attempt 수명 동안 줄지 않는 ledger다. Undo 뒤에도 수락 ID를 보존해 같은 UI token의 replay를 다시 적용하지 않는다.
 - 모션 감소가 활성화되면 `pulsing` 시각 지연을 최소화하되 상태 전이는 동일하게 유지한다.
-- 결과 화면에서 보드로 돌아가 풀이를 검토할 수 있으나 완료 기록은 최초 확정 결과를 기준으로 저장한다.
+- 결과 화면에서 보드로 돌아가 풀이를 검토할 수 있으나 완료 event와 기록 후보는 최초 해결 경계에서 고정한다.
 
 ### 2.2. 사용자 상호작용 로직 (Interaction Logic)
 
@@ -196,37 +197,52 @@ loading/ready ───────────────→ error → recover
 - 선택은 `selectedRowsMask`, `selectedColsMask` 두 정수 비트마스크로 관리한다.
 - 선택된 행 또는 열을 다시 누르면 해제한다.
 - 행이나 열 중 하나가 비어 있으면 PULSE 버튼은 `disabled` 상태다.
-- PULSE를 누른 순간 입력 스냅샷을 생성하고 애니메이션이 끝날 때까지 추가 입력을 차단한다.
-- 로직 계산과 기록 추가는 동일한 reducer action 안에서 원자적으로 처리한다.
-- 애니메이션 실패나 탭 비활성화 여부와 관계없이 보드의 논리 상태는 즉시 확정한다.
-- 포인터를 빠르게 연타해도 동일한 펄스가 중복 기록되지 않아야 한다.
+- PULSE를 누른 순간 입력 스냅샷과 수명 내 고유한 `actionId`를 생성하고 애니메이션이 끝날 때까지 추가 입력을 차단한다.
+- `PULSE_COMMIT`은 unseen `actionId`만 받아 보드, `PulseMove`, 완료 event를 한 reducer 결과에서 원자 확정한다.
+- `PULSE_ANIMATION_FINISHED`는 마지막 move ID와 일치할 때 시각 잠금만 해제한다. 애니메이션 실패나 탭 비활성화 여부와 관계없이 보드의 논리 상태는 이미 확정돼 있다.
+- `TIMER_TICK`은 시작된 `selecting`·`pulsing`에서 `lastObservedEpochMs` high-water만 전진시키며 역행·중복 시각은 no-op이다.
+- 호출자가 같은 token을 재전송하거나 Undo 뒤 재사용해도 append-only ledger가 같은 PULSE의 중복 적용을 막는다.
+
+| Action | 허용 상태 | 핵심 결과 |
+|---|---|---|
+| `TOGGLE_ROW/COL` | `ready`, `selecting` | 축 토글, 첫 선택에서 timer 시작 |
+| `TIMER_TICK` | 시작된 `selecting`, `pulsing` | 관측 시각 high-water 전진 |
+| `PULSE_COMMIT` | 두 축이 선택된 `selecting` | 원자 commit 후 `pulsing` |
+| `PULSE_ANIMATION_FINISHED` | 마지막 ID가 일치하는 `pulsing` | `selecting` 또는 `solved` |
+| `UNDO` | move가 있는 `selecting` | 마지막 PULSE 역산, ledger 보존 |
+| `RESET_CONFIRMED` | `pulsing` 외 | 새 `sessionId`의 `ready` attempt |
+| `USE_HINT` | `ready`, `selecting` | 더 높은 hint level 기록 |
+| `VISIBILITY_CHANGED` | visible 상태 또는 `paused` | pause 또는 visible resume |
+| `SESSION_ERROR/RECOVER` | `ready` / `error` | `error` / `ready` |
 
 #### 2.2.4. Undo·Reset·Hint
 
-- **Undo**: 마지막 `PulseMove`의 동일한 행·열 마스크를 다시 XOR하면 원상 복구된다. 이동 이력이 비어 있으면 비활성화한다.
-- **Reset**: 최초 상태로 복귀하고 이동 이력·타이머·힌트 사용 상태를 초기화한다. Daily 완료 기록 자체는 삭제하지 않는다.
+- **Undo**: 마지막 `PulseMove`의 동일한 행·열 마스크를 다시 XOR하면 원상 복구된다. move는 제거하지만 그 `actionId`는 수락 ledger에 남긴다. 이동 이력이 비어 있으면 비활성화한다.
+- **Reset**: 최초 상태의 새 attempt로 복귀하고 이동 이력·타이머·힌트 사용 상태를 초기화한다. 새 `sessionId`는 현재 ID와 다르고 앱·저장 수명 동안 재사용되지 않아야 한다. Daily 완료 기록 자체는 삭제하지 않는다.
 - **Hint 1 — Depth**: 현재 차이 행렬의 랭크, 즉 남은 최소 펄스 수를 공개한다.
-- **Hint 2 — Axis**: 정규 최적 분해의 다음 펄스에서 행 또는 열 한쪽만 표시한다.
-- **Hint 3 — Pulse**: 다음 최적 펄스의 행·열을 모두 표시한다. 사용자가 적용을 선택할 수 있다.
+- **Hint 2 — Axis**: 정규 최적 분해의 다음 펄스에서 행 축 `rowMask`만 표시한다.
+- **Hint 3 — Pulse**: Hint 2와 같은 다음 최적 펄스의 행·열 마스크를 모두 표시한다. 사용자가 적용을 선택할 수 있다.
 - Hint 2 이상을 사용한 경우 결과 카드에 `Hint Used`를 기록하고 최고 등급을 제한한다.
 
 #### 2.2.5. 타이머 및 등급
 
 - Lab·Daily 타이머는 최초 행/열 선택 시 시작한다.
-- 일반 모드에서는 탭이 `hidden` 상태가 된 시간을 제외한다.
+- 일반 모드에서는 탭이 `hidden` 상태가 된 시간을 제외한다. reducer와 저장 guard는 마지막 관측 시각보다 작은 clock 값을 무시하고 열린 활성 구간을 pause·완료·저장 경계마다 한 번만 합산한다.
 - Sprint는 `sessionEndAt` 절대 시각으로 계산하여 백그라운드 전환으로 시간이 늘어나지 않게 한다.
 - M00 폐기형 프로토타입은 `performance.now()` 기반 스톱워치를 사용한다. 첫 축 선택에서 시작하고, 문서가 `hidden`이면 일시정지하며, 다시 보이면 미해결 세션만 재개한다.
 - M00의 완료 시각은 보드 잠금과 함께 고정한다. Reset·stage 전환·새 목표 전환은 선택·이동·타이머를 함께 초기화하고, 결과에는 PULSE 수와 0.1초 단위 경과 시간을 표시한다.
-- 이 M00 계약은 브라우저 가시성 전환과 반복 목표 UX를 검증하기 위한 경계다. Sprint의 절대 종료 시각·점수 계산은 M04에서 별도로 검증한다.
-- 결과 등급은 아래를 기본값으로 사용하며 플레이테스트 후 조정할 수 있다.
+- 이 M00 계약은 브라우저 가시성 전환과 반복 목표 UX를 검증하기 위한 경계다. Sprint의 절대 종료 시각·점수 계산은 M08에서 별도로 검증한다.
+- 결과 등급은 `사용 PULSE - Par`의 기본 등급을 먼저 계산한다.
 
-| 등급 | 조건 |
+| 기본 등급 | 조건 |
 |---|---|
-| S | 최소 펄스 수와 동일, Hint 2·3 미사용 |
-| A | 최소 +1 이하, 또는 최소해지만 Hint 2 사용 |
-| B | 최소 +2~3, 또는 Hint 3 사용 |
-| C | 그 외 완료 |
+| S | 차이 0 |
+| A | 차이 1 |
+| B | 차이 2~3 |
+| C | 차이 4 이상 |
 
+- Hint 1은 등급을 제한하지 않는다. Hint 2는 최고 A, Hint 3은 최고 B로 제한하며 cap은 이미 더 나쁜 기본 등급을 올리지 않는다.
+- 완료 PULSE 수가 증명된 Par보다 작으면 기록 불변식 오류로 거부한다.
 - Undo는 학습과 실험을 장려하기 위해 등급을 직접 낮추지 않는다.
 - 결과에는 `사용 펄스 / 최소 펄스`, 완료 시간, 힌트 여부, 모드별 추가 점수를 표시한다.
 
@@ -321,6 +337,7 @@ export interface EncodedPulse {
 
 ```ts
 export interface PulseMove {
+  actionId: string;
   rowMask: number;
   colMask: number;
   appliedAtMs: number;
@@ -334,6 +351,16 @@ export type SessionStatus =
   | 'solved'
   | 'error';
 
+export interface SessionCompletionEvent {
+  eventId: string;                 // `${sessionId}:completed`
+  sessionId: string;
+  puzzleId: string;
+  pulseCount: number;
+  activeElapsedMs: number;
+  hintLevelUsed: 0 | 1 | 2 | 3;
+  completedAtEpochMs: number;
+}
+
 export interface GameSession {
   sessionId: string;
   puzzleId: string;
@@ -342,14 +369,20 @@ export interface GameSession {
   selectedRowsMask: number;
   selectedColsMask: number;
   moves: PulseMove[];
+  acceptedPulseActionIds: string[]; // attempt-lifetime append-only ledger
   startedAtEpochMs: number | null;
   activeElapsedMs: number;
+  activeSinceEpochMs: number | null;
+  lastObservedEpochMs: number | null;
   hiddenAtEpochMs: number | null;
   hintLevelUsed: 0 | 1 | 2 | 3;
   undoCount: number;
   completedAtEpochMs: number | null;
+  completionEvent: SessionCompletionEvent | null;
 }
 ```
+
+`acceptedPulseActionIds.length === moves.length + undoCount`는 현재 move와 Undo된 수락 action을 합친 exact persisted invariant다. `services/id`의 `IdGenerator`는 hydrated ID seed, `reserveId()`, scope 검증, invalid·duplicate retry와 exhaustion을 제공한다. Reset `sessionId`를 앱·저장 수명 동안 재사용하지 않는 것은 호출자 계약이며 M06가 singleton·crypto-backed source로 연결한다.
 
 #### 2.3.4. 기록과 설정
 
@@ -381,7 +414,7 @@ export interface UserSettings {
   showKeyboardHints: boolean;
 }
 
-export interface PersistedAppState {
+export interface ProgressEnvelopeV1 {
   schemaVersion: 1;
   tutorialCompleted: boolean;
   labRecords: Record<string, PuzzleBestRecord>;
@@ -392,6 +425,21 @@ export interface PersistedAppState {
     sGradeCount: number;
     achievedAt: string;
   } | null;
+}
+
+export interface SessionEnvelopeV1 {
+  schemaVersion: 1;
+  resumableSession: GameSession | null;
+}
+
+export interface GeneratorMapSnapshotV1 {
+  schemaVersion: 1;
+  defaultVersion: string;
+  schedule: Array<{ effectiveFrom: string; version: string }>;
+}
+
+// progress와 session을 합친 runtime view이며 별도 저장 root가 아니다.
+export interface PersistedAppState extends ProgressEnvelopeV1 {
   resumableSession: GameSession | null;
 }
 ```
@@ -405,10 +453,11 @@ axis-shift:session:v1
 axis-shift:generator-map:v1
 ```
 
-- 모든 루트 객체는 `schemaVersion`을 가진다.
-- 마이그레이션은 `migrateV1ToV2()` 형태의 순차 함수로만 수행한다.
-- 지원할 수 없는 미래 버전은 덮어쓰지 않고 별도 백업 키로 이동한다.
-- 쓰기 중 예외가 발생하면 게임을 계속 진행하되 저장 실패 토스트를 한 번만 표시한다.
+- settings·progress·session·generator-map은 서로 독립된 네 v1 root다. `PersistedAppState`를 다섯 번째 key로 저장하지 않는다.
+- v1은 최초 공개 schema다. 존재하지 않는 v0을 만들지 않고 실제 이전 버전이 생길 때만 순차 migration registry에 단계를 추가한다.
+- generator-map root는 `schemaVersion`, `defaultVersion`, 정렬된 UTC `schedule`만 저장하며 전체 생성 정책은 정적 M03 content가 기준이다.
+- 손상·빈 값·미지원·미래 버전 raw는 `axis-shift:quarantine:v1:<key-kind>:<reason>:<id>`에 원문 백업이 성공한 뒤에만 primary key에서 제거한다. 백업 실패 시 원키를 보존한다.
+- 읽기·쓰기 실패는 메모리 기본값으로 계속하고 경고는 repository 인스턴스에서 `keyKind+code`당 한 번만 방출한다.
 
 ### 2.4. 출력 및 성능 기준 (Output & Performance)
 
@@ -566,15 +615,18 @@ interface GameState {
   };
 }
 
-type GameAction =
-  | { type: 'TOGGLE_ROW'; index: number }
-  | { type: 'TOGGLE_COL'; index: number }
-  | { type: 'APPLY_PULSE'; now: number }
-  | { type: 'PULSE_ANIMATION_FINISHED' }
-  | { type: 'UNDO' }
-  | { type: 'RESET_CONFIRMED' }
+type GameSessionAction =
+  | { type: 'TOGGLE_ROW'; index: number; nowEpochMs: number }
+  | { type: 'TOGGLE_COL'; index: number; nowEpochMs: number }
+  | { type: 'PULSE_COMMIT'; actionId: string; nowEpochMs: number }
+  | { type: 'PULSE_ANIMATION_FINISHED'; actionId: string }
+  | { type: 'UNDO'; nowEpochMs: number }
+  | { type: 'RESET_CONFIRMED'; sessionId: string }
   | { type: 'USE_HINT'; level: 1 | 2 | 3 }
-  | { type: 'VISIBILITY_CHANGED'; hidden: boolean; now: number };
+  | { type: 'TIMER_TICK'; nowEpochMs: number }
+  | { type: 'VISIBILITY_CHANGED'; hidden: boolean; nowEpochMs: number }
+  | { type: 'SESSION_ERROR' }
+  | { type: 'SESSION_RECOVER' };
 ```
 
 #### 4.1.3. 불변성
@@ -584,6 +636,7 @@ type GameAction =
 - `currentRows.length === puzzle.size`를 항상 유지한다.
 - 선택 마스크는 `size` 바깥 비트를 가질 수 없다.
 - `moves.length`는 현재 보드에 실제로 적용된 펄스 수와 일치한다.
+- `acceptedPulseActionIds`는 수락 순서를 보존하고 Undo로 줄지 않으며 현재 `moves`의 ID를 순서대로 포함한다. 저장 시 정확한 cardinality는 `moves.length + undoCount`다.
 - `solved` 이후 펄스 action은 무시한다.
 
 ### 4.2. 주요 동작 파이프라인 (Main Workflow)
@@ -616,14 +669,13 @@ Route Request
 
 #### 4.2.3. 펄스 처리
 
-1. 행·열 선택 마스크를 검증한다.
-2. 최초 액션이면 타이머를 시작한다.
-3. 선택된 각 행에 대해 `currentRows[row] ^= selectedColsMask`를 실행한다.
-4. `PulseMove`를 이력에 추가한다.
-5. 선택 마스크를 0으로 초기화한다.
-6. 목표 상태와 비교한다.
-7. 완료 시 결과를 계산하고 진행도를 저장한다.
-8. 미완료 시 안정 상태로 돌아간다.
+1. 첫 축 선택에서 일반 타이머를 시작하고 `TIMER_TICK`으로 현재 관측 high-water를 갱신한다.
+2. 행·열 선택 마스크, `IdGenerator.nextId('pulse')`에서 받은 수명 내 고유 `actionId`, 주입 시각을 검증한다.
+3. 이미 수락한 ID면 같은 state를 반환한다.
+4. 선택된 각 행에 대해 `currentRows[row] ^= selectedColsMask`를 실행한다.
+5. `PulseMove`와 `acceptedPulseActionIds`를 같은 reducer 결과에 추가하고 선택 마스크를 0으로 만든다.
+6. 목표 상태와 비교해 해결이면 결정적 완료 event·active elapsed를 같은 commit에서 고정한다.
+7. 논리 snapshot을 저장 가능하게 내보낸 뒤 애니메이션 종료 action은 `selecting` 또는 `solved`의 시각 상태만 확정한다.
 
 #### 4.2.4. 결과 생성
 
@@ -638,7 +690,9 @@ Solved State
   → result scene
 ```
 
-- 최고 기록 갱신은 등급, 펄스 수, 시간 순으로 비교한다.
+- 완료 event는 `projectCompletionRecord()`에서 puzzle·event ID를 대조하고 Par·hint level로 등급을 다시 계산한 뒤 런타임 전용 opaque candidate가 된다. module-private `WeakSet` provenance와 private brand를 함께 검사하므로 reflective symbol 복사본을 포함한 plain object는 merge할 수 없다.
+- 최고 기록은 `S>A>B>C → PULSE 오름차순 → active elapsed 오름차순` tuple로 비교한다. 완료 시각은 tie-break가 아니며 완전 동률은 기존 best를 유지한다.
+- `firstCompletedAt`은 첫 merge 뒤 고정하고 `lastCompletedAt`은 `max(기존, 후보)`로만 전진한다.
 - 공유 횟수는 실제 공유 API 성공을 보장할 수 없으므로 사용자가 공유 CTA를 실행한 횟수만 기록한다.
 - 결과 카드의 생성 실패는 게임 완료 기록에 영향을 주지 않는다.
 
@@ -932,14 +986,17 @@ noise:    lab-04-noise-01 ... lab-04-noise-12
 
 ### 4.6. 저장 및 복구 (Persistence & Recovery)
 
-1. 안정 상태(`ready`, `selecting`, `solved`)에서만 세션을 저장한다.
-2. 펄스 애니메이션 도중 페이지가 종료되더라도 논리 적용이 끝난 상태를 저장한다.
-3. 저장 JSON은 최대 수십 KB 수준으로 제한한다.
-4. 앱 시작 시 JSON parse, schema version, 필드 범위, 퍼즐 존재 여부를 검사한다.
-5. 손상된 세션은 제거하되 Lab·Daily 최고 기록은 별도 객체에서 보존한다.
-6. Private Browsing 또는 저장 용량 예외가 발생하면 세션 내 메모리 모드로 계속 실행한다.
-7. 설정 변경은 즉시 저장하고 진행도 쓰기는 완료·펄스 후에 수행한다.
-8. 세션 복구 안내는 진행 중 퍼즐이 있을 때만 홈에 인라인 카드로 표시한다.
+1. `error` 외 논리 세션은 저장할 수 있다. 시작 전 Hint·visibility 상태는 hint level을 보존한 canonical `ready`와 null clock으로 정규화한다. `PULSE_COMMIT` 직후의 `pulsing`도 이미 적용된 board·move를 보존하며 애니메이션 진행도 자체는 저장하지 않는다.
+2. 시작된 미해결 세션은 저장 guard에서 열린 구간 `lastObservedEpochMs - activeSinceEpochMs`를 정확히 한 번 `activeElapsedMs`에 더하고 `paused` snapshot으로 정규화한다.
+3. 해당 snapshot은 `activeSinceEpochMs=null`, `hiddenAtEpochMs === lastObservedEpochMs`를 강제해 reload와 오프라인 구간을 active time에 포함하지 않는다. M06 controller가 현재 주입 시각으로 visible resume를 dispatch한다.
+4. 해결된 세션은 progress record와 분리해 resumable session에서는 `null`로 정규화한다.
+5. reader는 JSON parse, schema version, exact field·범위, 퍼즐 존재, `acceptedPulseActionIds.length === moves.length + undoCount`, move replay·board 일치, canonical UTC year `1..9999`를 검사한다. `labRecords`는 null-prototype map으로 재구성해 `__proto__` key도 prototype을 변경하지 못하게 한다.
+6. M04에는 serialized JSON byte 제한이 구현되지 않았다. 저장 용량 상한은 실제 payload 계측과 브라우저 quota 회귀를 갖춘 후속 storage-budget 정책에서 고정한다.
+7. settings·progress·session·generator-map 네 root를 독립 복구한다. 손상 raw는 빈 quarantine key를 최대 128회 탐색해 기존 backup을 덮어쓰지 않고, backup 성공 뒤에만 primary에서 제거한다. ID 고갈·backup 실패 시 primary raw를 보존하며, progress 부분 복구는 제거 성공 뒤 salvage한 record를 repaired primary에 다시 저장한다.
+8. Private Browsing·quota·read/write 예외에서는 메모리 모드로 계속하며 경고는 repository 인스턴스의 `keyKind+code`당 한 번이다.
+9. 설정 변경은 즉시 저장하고 진행도 쓰기는 완료·PULSE 후에 수행한다. Reset은 session root만 교체하며 별도 progress root의 Daily best를 보존한다. 세션 복구 안내는 진행 중 퍼즐이 있을 때만 홈에 표시한다.
+10. M04 `IdGenerator`는 issued ledger·seed·reserve·retry·exhaustion을 검증했다. 앱 singleton·crypto source와 hydrate seed/reserve 연결은 M06 범위다.
+11. M04는 reducer·clock·ID·storage 계약까지만 닫는다. 실제 Page Visibility 연결, Result·Lab 저장과 reload E2E는 M05·M06, UTC Daily·streak·Archive는 M07 범위다.
 
 ### 4.7. 공유 파이프라인 (Sharing Pipeline)
 
@@ -1482,6 +1539,7 @@ install
 - PR: lint, typecheck, test, build, 핵심 E2E
 - main 병합: 전체 E2E, 접근성 검사, GitHub Pages 배포
 - 배포 artifact는 CI에서 생성하며 로컬 빌드 결과를 직접 커밋하지 않는다.
+- canonical app build는 기존 `dist`에서 발생한 Vite 8 Windows native cleanup crash를 피하려 `scripts/clean-build-output.ts`가 검증된 `<PROJECT_ROOT>/dist`만 preclean한 뒤 `vite build --emptyOutDir=false`를 실행한다.
 - 배포 후 실제 URL의 manifest, service worker, 주요 라우트, Daily 실행을 smoke test한다.
 
 ### 9.3. 로그와 분석

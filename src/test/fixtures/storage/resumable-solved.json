@@ -1,0 +1,42 @@
+{
+  "case": "resumable-solved",
+  "keyKind": "session",
+  "raw": {
+    "schemaVersion": 1,
+    "resumableSession": {
+      "sessionId": "storage-solved",
+      "puzzleId": "storage-puzzle",
+      "status": "solved",
+      "currentRows": [1, 0, 0],
+      "selectedRowsMask": 0,
+      "selectedColsMask": 0,
+      "moves": [
+        {
+          "actionId": "pulse-solved-1",
+          "rowMask": 1,
+          "colMask": 1,
+          "appliedAtMs": 1100
+        }
+      ],
+      "acceptedPulseActionIds": ["pulse-solved-1"],
+      "startedAtEpochMs": 1000,
+      "activeElapsedMs": 100,
+      "activeSinceEpochMs": null,
+      "lastObservedEpochMs": 1100,
+      "hiddenAtEpochMs": null,
+      "hintLevelUsed": 0,
+      "undoCount": 0,
+      "completedAtEpochMs": 1100,
+      "completionEvent": {
+        "eventId": "storage-solved:completed",
+        "sessionId": "storage-solved",
+        "puzzleId": "storage-puzzle",
+        "pulseCount": 1,
+        "activeElapsedMs": 100,
+        "hintLevelUsed": 0,
+        "completedAtEpochMs": 1100
+      }
+    }
+  },
+  "expected": "resume-null"
+}

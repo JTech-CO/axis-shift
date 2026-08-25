@@ -1,0 +1,9 @@
+{
+  "case": "future-version",
+  "keyKind": "settings",
+  "raw": {
+    "schemaVersion": 2,
+    "opaqueFutureField": "must-be-preserved-byte-for-byte"
+  },
+  "expected": "quarantine-and-default"
+}

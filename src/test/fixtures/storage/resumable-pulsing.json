@@ -1,0 +1,34 @@
+{
+  "case": "resumable-pulsing",
+  "keyKind": "session",
+  "raw": {
+    "schemaVersion": 1,
+    "resumableSession": {
+      "sessionId": "storage-pulsing",
+      "puzzleId": "storage-puzzle",
+      "status": "pulsing",
+      "currentRows": [2, 0, 0],
+      "selectedRowsMask": 0,
+      "selectedColsMask": 0,
+      "moves": [
+        {
+          "actionId": "pulse-pulsing-1",
+          "rowMask": 1,
+          "colMask": 2,
+          "appliedAtMs": 1100
+        }
+      ],
+      "acceptedPulseActionIds": ["pulse-pulsing-1"],
+      "startedAtEpochMs": 1000,
+      "activeElapsedMs": 100,
+      "activeSinceEpochMs": 1100,
+      "lastObservedEpochMs": 1100,
+      "hiddenAtEpochMs": null,
+      "hintLevelUsed": 1,
+      "undoCount": 0,
+      "completedAtEpochMs": null,
+      "completionEvent": null
+    }
+  },
+  "expected": "normalize-paused"
+}

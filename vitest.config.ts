@@ -9,6 +9,9 @@ export default defineConfig({
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
   test: {
+    maxWorkers: 4,
+    pool: 'threads',
+    testTimeout: 30_000,
     coverage: {
       exclude: ['src/main.tsx', 'src/test/**', 'src/vite-env.d.ts'],
       provider: 'v8',

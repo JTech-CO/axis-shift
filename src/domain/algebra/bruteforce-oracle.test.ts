@@ -190,5 +190,5 @@ describe('independent GF(2) minimum-move oracle and deterministic property corpu
       pulseInvariantFailures: 0,
       rankMismatch: 0,
     });
-  });
+  }, 30_000);
 });

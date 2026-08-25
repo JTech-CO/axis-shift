@@ -1,0 +1,6 @@
+{
+  "case": "missing",
+  "keyKind": "settings",
+  "raw": null,
+  "expected": "default-without-warning"
+}

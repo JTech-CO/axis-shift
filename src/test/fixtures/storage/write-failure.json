@@ -1,0 +1,7 @@
+{
+  "case": "write-failure",
+  "keyKind": "settings",
+  "operation": "setItem",
+  "errorName": "QuotaExceededError",
+  "expected": "memory-continues-warning-once"
+}
