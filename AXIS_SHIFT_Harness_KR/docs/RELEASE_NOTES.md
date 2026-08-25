@@ -1,7 +1,7 @@
 # AXIS//SHIFT Release Notes
 
-**상태**: `v0.1.0-hackathon` released / v1.0.0 계획
-**최종 갱신**: 2026-08-21
+**상태**: `v0.1.0-hackathon` released·해커톤 제출 완료 확인 / v1.0.0 계획
+**최종 갱신**: 2026-08-26
 
 > H00 항목만 현재 해커톤 프로토타입을 나타낸다. 아래 v1.0.0 절은 계속 `Planned`이며 H00 제출 문구로 인용하지 않는다.
 
@@ -21,7 +21,8 @@
 | Final Pages artifact digest | `sha256:07a222cc7af5ad221e3d4be3524f53992cdf01823e6af56b7723c00282671998` |
 | Generator version | `m00-seeded-v1` |
 | Storage | 없음 — 새로고침 이후 기록 보존 안 함 |
-| QA decision | H00 DOD-01~12 PASS; submission-ready. 공식 Google 양식 Submit은 오너 작업이며 완료로 주장하지 않음 |
+| Hackathon submission | 프로젝트 오너가 공식 Google 양식 제출 완료를 확인함. 정확한 제출 시각·접수 ID·확인 화면은 제공되지 않았으며 Codex가 Submit을 수행하지 않음 |
+| QA decision | H00 DOD-01~12 PASS; 고정된 submission-ready 기술 증거와 final SHA는 변경 없음 |
 
 ### Shipped prototype slice
 
@@ -53,6 +54,7 @@
 - `MANIFEST.sha256`: SHA-256 `ae37db3ed60b0c7a751865b3cc1e078a812fbc069335b02c6954cbd3043cd3b0`, 14 entries, failures `0`
 - final release review: `release-package-review.png`, SHA-256 `7cfc102b2dbe84b6afb11058a3d0908b720d4636f0686ee35940bec0f62a7679`
 - backup A `.private/submission/H00`, backup B 사용자 Documents의 `v0.1.0-hackathon`: 각 15 files, hash delta `0`
+- 비공개 제출 원자료는 Git에 포함하지 않으며, 제출 완료로 정리 가능하지만 오너의 명시적 정리 결정 전까지 보존
 - final release-SHA 독립 필드 검사: 2026-08-21 15:41:32 KST, 15:42:06 KST — PASS
 - PR 기록: #1 H00 구현, #2 public favicon 회귀, #3 release record
 

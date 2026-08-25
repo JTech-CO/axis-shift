@@ -1,7 +1,7 @@
 # AXIS//SHIFT 요구사항 추적표
 
 **버전**: 1.0.0  
-**상태**: M00·M01·M02 verified / M03 자동 pipeline·사람 큐레이션 verified, DOD-10 pending / H00 v0.1 submission slice verified / v1 roadmap baseline
+**상태**: M00·M01·M02·M03 verified / H00 v0.1 submission slice verified / v1 roadmap baseline
 **최종 갱신**: 2026-08-26
 
 > 기능 요구사항 ID는 기술 백서 §2.2.2를 따른다. `NFR-*`는 백서의 성능·접근성·배포·개인정보 기준을 하네스에서 추적 가능하게 부여한 ID다. 이 표가 새로운 제품 요구를 만드는 것은 아니며, 원문 기준의 검증 경로를 연결한다.
@@ -60,7 +60,7 @@
 
 > **M02 완료 증거 (2026-08-21)**: `matrixCount=512 oracleUnvisited=0 rankMismatch=0 factorizationMismatch=0 pulseInvariantFailures=0`, 고정 시드 `randomMatrices=50000 determinismFailures=0`; `board`·`pulse`·`guards`·`gf2-rank`·`factorization` 5개 파일은 파일별 statements/branches/functions/lines 100%, `src/domain` test 27/27이다. 경계 검사는 `files=43 edges=40 violations=0 cycles=0 coreFiles=27 coreFixtureImplementations=5 coreFixtureAssertions=2`로 production 중복 구현과 의도적 self-check를 함께 검증했다. 이 증거는 M02 수학 계층만 닫으며 FR-CORE-003의 M04/M06 session·UI와 FR-HINT-001의 M04/M06 selector·UI는 아직 완료하지 않는다.
 
-> **M03 진행 증거 (2026-08-26)**: Tutorial 6 + Lab 48(4 chapter×12), fallback 14, catalog hash `c625d54327e5a6c3c6305a373d5199abd01c6fb69415161f9d4aee27c1738484`; level schema·Par·canonical·tag·ID 객관 검증 실패 0이다. 프로젝트 오너는 54개 패턴과 progression 5행을 전체 승인해 DOD-04를 통과시켰다. approval fingerprint `5a60604a…b7e6a`는 full manifest·순서 있는 catalog·human 필드를 정규화한 machine scaffold를 묶고, validator는 exact binding·scaffold comparison을 self-check 22개로 방어한다. PRNG 20 seed×100 출력과 Daily golden 20개는 Chromium·Firefox·WebKit 9/9이며, 변경 없는 미커밋 working tree의 3,650일 audit pre-close rehearsal 2회는 output hash `997df1b0…10b0`, report SHA `b1102aee…6d49`, 예외·invalid·wrong Par·fallback·인접 중복·분포 실패 0, 최대 시도 107을 냈다. 이는 DOD-10 fixed-SHA 증거가 아니다. 아직 없는 candidate implementation commit의 exact SHA에서 감사 2회를 재실행하고 evidence commit을 만들기 전까지, 그리고 M06 화면/진행 E2E·M07 UTC adapter/Archive 회귀·M09 signature가 남아 있으므로 FR-LAB-001·FR-DAILY-001·NFR-CONTENT-001·NFR-DET-001은 `Verified`가 아니라 `In Progress`로 유지한다.
+> **M03 완료 증거 (2026-08-26)**: Tutorial 6 + Lab 48(4 chapter×12), fallback 14, 객관 검증 실패 0이며 프로젝트 오너가 54개 패턴과 progression 5행을 전체 승인했다. approval fingerprint `5a60604a…b7e6a`와 validator self-check 22개가 manifest·catalog·machine scaffold를 fail-closed한다. candidate `1c313bd29e1d24c483749af90a8734542988be5d`의 clean detached worktree는 Node v24.19.0/npm 11.6.2, `npm ci` 취약점 0, browser parity 9/9, verify 10/10, unit 11파일/55테스트, boundary 위반·cycle 0을 통과했다. 서로 다른 출력 디렉터리의 3,650일 audit 2회는 output hash `997df1b0…10b0`와 report/JSON SHA `b1102aee…6d49`가 일치했고 모든 오류 counter 0, 최대 시도 107, 실행 전후 status 0이었다. 이로 M03 DOD-01~11은 완료됐지만 M06 화면/진행 E2E·M07 UTC adapter/Archive 회귀·M09 signature가 남아 있으므로 FR-LAB-001·FR-DAILY-001·NFR-CONTENT-001·NFR-DET-001 행은 `In Progress`로 유지한다.
 
 ## 4. H00 해커톤 제출 슬라이스 추적
 
@@ -74,7 +74,7 @@
 | HS-DEPLOY-001 | 고정 v0.1 SHA Pages root·signal·seed·M01 bridge 공개 smoke | H00 | Pages artifact | CI `32453169036` + Pages `32453169029` + public E4 | 014,017,020 | Verified |
 | HS-SUBMIT-001 | Prototype/v0.1로 정직한 URL·README·영상·썸네일·백업 | H00 | 제출 문서·자산 | 필드 대조 2회 + manifest entries=14 failures=0 + 2중 백업 hashDelta 0 | 018~020 | Verified |
 
-> **H00 완료 증거 (2026-08-21)**: tag/release SHA와 app capture SHA는 모두 `6690f5778f706e1875b452d552bd75ba1c06ee9a`이며 Pages digest는 `sha256:07a222cc7af5ad221e3d4be3524f53992cdf01823e6af56b7723c00282671998`다. H00 경계는 submission-ready 패키지까지이며 공식 Google 양식의 최종 Submit은 오너 작업으로 남아 있고 실행했다고 주장하지 않는다. H00 자체는 v1 FR/NFR 행을 승격하지 않았고, 이후 M02 증거가 연결된 행만 위 표에서 `In Progress` 또는 `Verified`로 갱신했다.
+> **H00 완료 증거 (2026-08-21~26)**: tag/release SHA와 app capture SHA는 모두 `6690f5778f706e1875b452d552bd75ba1c06ee9a`이며 Pages digest는 `sha256:07a222cc7af5ad221e3d4be3524f53992cdf01823e6af56b7723c00282671998`다. 프로젝트 오너가 공식 Google 양식 제출 완료를 확인했으나 정확한 제출 시각·접수 ID·확인 화면은 제공되지 않았고 Codex는 인증·개인정보·동의·Submit을 수행하지 않았다. H00 자체는 v1 FR/NFR 행을 승격하지 않았고, 이후 M02·M03 증거가 연결된 행만 위 표에서 `In Progress` 또는 `Verified`로 갱신했다.
 
 ## 5. 모드별 E2E 추적
 

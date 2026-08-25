@@ -1,7 +1,7 @@
 # AXIS//SHIFT 파일 트리·모듈 경계 계약
 
 **버전**: 1.2.0
-**상태**: M01·M02 완료 + M03 자동 pipeline·사람 큐레이션 승인 완료, DOD-10 대기 + 후속 phase 목표 계약
+**상태**: M01·M02·M03 완료 + 후속 phase 목표 계약
 **최종 갱신**: 2026-08-26
 **관련 불변식**: INV-002, INV-003, INV-017, INV-019
 
@@ -225,10 +225,10 @@ tests/e2e/
 - `generator-parity.html`·bridge·spec은 test-only Vite entry다. production router나 Pages 공개 route에 포함하지 않는다.
 - `.github/workflows/ci.yml`은 Node quality gate 뒤 Chromium·Firefox·WebKit M03 parity를 실행한다.
 - `AXIS_SHIFT_Harness_KR/evidence/M03/content-curation-v1.md`는 작은 텍스트 E1 체크리스트라 추적한다. 프로젝트 오너가 2026-08-26 54개 패턴·progression 5행을 전체 `APPROVED`했으며 evidence SHA-256은 `B81406D8…0214F`다.
-- `outputs/m03/daily-audit-v1-2026-01-01-3650.{json,md,sha256}`는 재생성 가능한 로컬 감사 산출물이므로 `.gitignore` 대상이고 커밋하지 않는다. 현재 hash는 변경 없는 미커밋 working tree의 pre-close rehearsal이다. DOD-10은 candidate implementation commit의 exact SHA에서 2회 재생성하고 phase·PROGRESS에 SHA와 요약 수치를 기록하는 evidence commit으로 닫는다.
-- M03 자동 경계 기준선은 `files=55 edges=81 violations=0 cycles=0 coreFiles=30`이며 candidate implementation commit 전 전체 closure gate에서 다시 실행한다.
+- `outputs/m03/`의 Daily 감사 JSON·Markdown·checksum은 재생성 가능한 로컬 산출물이므로 `.gitignore` 대상이고 커밋하지 않는다. DOD-10은 candidate `1c313bd29e1d24c483749af90a8734542988be5d`의 clean detached worktree에서 서로 다른 출력 디렉터리로 2회 재생성해 report/JSON SHA `b1102aee…6d49`, Markdown SHA `3149a492…a036`, checksum-file SHA `8a827506…a893` 일치를 확인하고 닫았다.
+- M03 종료 경계 기준선은 `files=55 edges=81 violations=0 cycles=0 coreFiles=30`이며 exact-SHA verify 10/10에 포함해 통과했다.
 
-아직 구현하지 않은 범위는 Tutorial/Lab/Daily 화면과 session·storage·scoring 연결(M04~M07)이다. 정적 JSON과 생성 API의 존재를 플레이 가능한 프로덕션 모드 완료로 해석하지 않는다.
+아직 구현하지 않은 범위는 Tutorial/Lab/Daily 화면과 session·storage·scoring 연결(M04~M07)이다. 정적 JSON과 생성 API의 존재를 플레이 가능한 프로덕션 모드 완료로 해석하지 않는다. 다음 구현은 M04 DoR 확인부터 시작한다.
 
 
 ## 3. 계층별 책임

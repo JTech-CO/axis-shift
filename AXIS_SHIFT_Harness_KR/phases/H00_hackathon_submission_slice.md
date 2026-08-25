@@ -1,8 +1,8 @@
 # H00 — Hackathon Submission Slice ★
 
-- **상태**: 완료 — DOD-01~12 통과, 공개 v0.1 prerelease와 submission-ready 패키지 고정
+- **상태**: 완료 — DOD-01~12 통과, 공개 v0.1 prerelease 고정 및 프로젝트 오너의 공식 양식 제출 완료 확인
 - **담당 범위**: M00 프로토타입 콘텐츠 가시성, AXIS 연출, 제출용 v0.1 공개 슬라이스
-- **최종 갱신**: 2026-08-21
+- **최종 갱신**: 2026-08-26
 - **목표 릴리스**: `v0.1.0-hackathon` / 2026-08-26
 
 ## 1. 맥락과 목표
@@ -80,7 +80,7 @@
 - [x] **DOD-09 — 공개 E4**: 고정 SHA artifact가 GitHub Pages에 배포되고 새 desktop/mobile profile에서 root·stage/signal/seed·직접 prototype·M01 `/#/` bridge가 오류 없이 동작한다. (INV-014, INV-020)
 - [x] **DOD-10 — 결함**: 활성 P0/P1·불변식 위반 0건이며 P2 유예는 DOD_GUIDE 절차를 따른다. (INV-018, INV-020)
 - [x] **DOD-11 — 릴리스 정직성**: tag·SHA·artifact hash·URL·README·영상의 기능 주장이 일치하고 Prototype/`v0.1`로 표기된다.
-- [x] **DOD-12 — 제출 패키지**: release/tag SHA와 동일한 공개 화면의 16:9 썸네일, 3분 이하 영상, Codex/사람 역할, 자산 권리, 2회 필드 대조, submission-ready 패키지 검토 캡처와 2중 백업을 고정한다. 공식 양식 제출 확인 화면은 오너 작업이다.
+- [x] **DOD-12 — 제출 패키지**: release/tag SHA와 동일한 공개 화면의 16:9 썸네일, 3분 이하 영상, Codex/사람 역할, 자산 권리, 2회 필드 대조, submission-ready 패키지 검토 캡처와 2중 백업을 고정한다. 프로젝트 오너는 이후 공식 양식 제출 완료를 확인했으며, 정확한 제출 시각·접수 ID·확인 화면은 제공되지 않았다.
 
 ## 8. 검증 명령
 
@@ -163,7 +163,8 @@ manifest audit: entries=14 failures=0
 backup audit: `.private/submission/H00`와 `C:/Users/MSI/Documents/AXIS_SHIFT_H00_Backup/v0.1.0-hackathon` 각각 files=15, hashDelta=0
 submission field checks: 2026-08-21 15:41:32 KST PASS; 2026-08-21 15:42:06 KST PASS
 license: UNLICENSED / All Rights Reserved 유지
-submission boundary: 제출 가능한 패키지까지 H00 완료. Google 계정·개인정보·동의가 필요한 공식 양식의 최종 Submit은 오너 작업이며 실행했다고 주장하지 않는다.
+submission boundary: 제출 가능한 패키지까지 Codex 지원 범위로 완료. Google 계정·개인정보·동의가 필요한 공식 양식의 최종 Submit은 Codex가 수행하지 않았으며, 프로젝트 오너가 이후 제출 완료를 확인했다. 정확한 제출 시각·접수 ID·확인 화면은 제공되지 않아 만들거나 추정하지 않는다.
+private evidence retention: 비공개 제출 원자료는 Git에 포함하지 않는다. 제출 완료로 정리 조건은 충족했지만 별도 삭제 권한이 없으므로 오너의 명시적 정리 결정 전까지 기존 두 위치에 보존한다.
 ```
 
 ## 11. 롤백 계획
@@ -176,7 +177,7 @@ submission boundary: 제출 가능한 패키지까지 H00 완료. Google 계정�
 
 - 18개 고정 signal이 정식 54개 콘텐츠로 오인될 수 있어 제출 copy를 제한한다.
 - 모션이 6×6 모바일 성능이나 가독성을 해칠 수 있어 transform/opacity와 reduced motion만 사용한다.
-- 공개 라이선스는 부여하지 않고 `UNLICENSED`를 유지했다. 공식 Google 양식의 개인정보·동의·최종 Submit은 오너 권한 경계에 남는다.
+- 공개 라이선스는 부여하지 않고 `UNLICENSED`를 유지했다. 공식 Google 양식의 개인정보·동의·최종 Submit은 오너가 직접 수행했고 완료를 확인했으며 Codex는 해당 행위를 수행하지 않았다.
 
 ## 13. STOP 트리거
 
@@ -187,4 +188,4 @@ submission boundary: 제출 가능한 패키지까지 H00 완료. Google 계정�
 
 ## 14. 다음 phase 인계
 
-H00은 submission-ready 패키지까지 완료됐으며 정규 roadmap을 진전시키지 않는다. 오너의 공식 Google 양식 최종 Submit 뒤에도 M02는 원래 DoR에서 시작하고 H00 프로토타입은 기준 fixture·UX 관찰로만 참고한다.
+H00은 submission-ready 패키지와 오너의 공식 Google 양식 제출 완료 확인까지 기록했으며 정규 roadmap을 진전시키지 않는다. 정확한 제출 시각·접수 ID·확인 화면은 제공되지 않았고, 이후 M02는 원래 DoR에서 시작하며 H00 프로토타입은 기준 fixture·UX 관찰로만 참고한다.

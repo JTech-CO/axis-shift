@@ -1,12 +1,13 @@
 # AXIS//SHIFT — OpenAI Game Builders Seoul 제출 패키지
 
 **문서 버전**: 1.0.0  
-**상태**: H00 v0.1 submission-ready 패키지 완료 — 공식 양식 제출은 프로젝트 오너 작업
+**상태**: H00 v0.1 공식 양식 제출 완료 — 프로젝트 오너 확인, 제출 메타데이터 미제공
 **공식 안내 확인일**: 2026-08-21
+**제출 상태 기록 갱신**: 2026-08-26
 **제출 접수 종료**: 2026-08-26  
 **공식 안내**: `https://openaigame2026.com/#main`
 
-> H00 기록은 2026-08-21에 실제 공식 양식을 다시 확인한 결과다. Google 계정 인증, 팀·연락처 정보, 동의 확인과 최종 `Submit`은 프로젝트 오너가 수행하며, 이 문서는 공식 제출 완료를 주장하지 않는다. 아래 M11 v1.0 템플릿은 향후 릴리스를 위해 보존한다.
+> H00 기록은 2026-08-21에 실제 공식 양식을 다시 확인한 결과다. Google 계정 인증, 팀·연락처 정보, 동의 확인과 최종 `Submit`은 프로젝트 오너가 직접 수행했고 이후 제출 완료를 확인했다. Codex는 해당 행위를 수행하지 않았다. 정확한 제출 시각·접수 ID·확인 화면은 제공되지 않아 기록하거나 추정하지 않는다. 아래 M11 v1.0 템플릿은 향후 별도 릴리스를 위해 보존하며 H00 제출 완료와 혼동하지 않는다.
 
 ## H00 v0.1 submission-ready 패키지
 
@@ -28,6 +29,7 @@
 | Final Pages workflow | run `32453169029` | success·배포 SHA 일치 |
 | Final Pages artifact | `sha256:07a222cc7af5ad221e3d4be3524f53992cdf01823e6af56b7723c00282671998` | GitHub Pages artifact digest |
 | Release record PR | `https://github.com/JTech-CO/axis-shift/pull/3` | #1 구현, #2 favicon 수정 뒤 최종 기록 |
+| Official submission | 프로젝트 오너가 공식 Google 양식 제출 완료 확인 | 정확한 제출 시각·접수 ID·확인 화면은 제공되지 않음; Codex는 Submit 미수행 |
 | Thumbnail | `.private/submission/H00/axis-shift-submission-thumbnail-v0.1.0.png` | 1920×1080, 293,879 bytes |
 | Demo video (MP4) | `.private/submission/H00/axis-shift-demo-v0.1.0.mp4` | H.264, 1920×1080, 25fps, 14.84초, 무음, 1,366,482 bytes |
 | Demo capture (WebM) | `.private/submission/H00/axis-shift-demo-v0.1.0.webm` | 1920×1080, 14.84초, 1,458,929 bytes |
@@ -63,7 +65,7 @@
 | final release-SHA 3차 | 2026-08-21T15:41:32+09:00 | PowerShell, HTTP, System.Drawing, `ffprobe`, Git | URL 2/2, 6개 최종 hash, 1920×1080, 영상 14.84초, annotated tag target 통과 |
 | final release-SHA 4차 | 2026-08-21T15:42:06+09:00 | Node `fetch`·crypto·PNG header·`ffprobe`·GitHub API | URL 2/2, hash 6/6, 영상 14.84초, tag target=capture SHA, final link allowlist 통과 |
 
-`submission-package-review.png`와 최종 tag·run·archive를 담은 `release-package-review.png`를 1920×1080에서 육안 검토했다. primary `.private/submission/H00`와 secondary `<USER_DOCUMENTS>/AXIS_SHIFT_H00_Backup/v0.1.0-hackathon`은 각 15 files이며 hash delta는 0이다. 공식 양식의 최종 제출은 Google 계정, 개인·팀 정보, 약관·개인정보·국외 이전 동의를 포함하므로 프로젝트 오너가 직접 수행한다. 제출 시각, submission ID, 확인 화면이 생기기 전에는 `Submitted`로 기록하지 않는다.
+`submission-package-review.png`와 최종 tag·run·archive를 담은 `release-package-review.png`를 1920×1080에서 육안 검토했다. primary `.private/submission/H00`와 secondary `<USER_DOCUMENTS>/AXIS_SHIFT_H00_Backup/v0.1.0-hackathon`은 각 15 files이며 hash delta는 0이다. 공식 양식의 최종 제출은 Google 계정, 개인·팀 정보, 약관·개인정보·국외 이전 동의를 포함하므로 프로젝트 오너가 직접 수행했고 이후 완료를 확인했다. 정확한 제출 시각, submission ID, 확인 화면은 제공되지 않았다. 비공개 원자료는 Git에 포함하지 않으며, 제출 완료로 정리 조건은 충족했지만 삭제 권한은 별도로 부여되지 않았으므로 오너의 명시적 정리 결정 전까지 기존 두 위치에 보존한다.
 
 ## 1. M11 v1.0 공식 제출 필드 스냅샷 — H00 미사용 템플릿
 

@@ -2,7 +2,7 @@
 
 **버전**: 1.0.0  
 **상태**: 기록 중  
-**최종 갱신**: 2026-08-21
+**최종 갱신**: 2026-08-26
 
 ## 1. 목적
 
@@ -101,9 +101,9 @@ Codex가 제안·생성·수정한 항목
 | CX-M00-005 | 2026-08-21 | M00 | Formal Easy E1 판정과 phase 종료 | M00·protocol·progress | n=5, I0·first PULSE·solve·recall 모두 5/5, 반복 P0 0 | 오너가 aggregate-only 제한을 인지하고 종료 승인 | 완료 |
 | CX-H00-001 | 2026-08-21 | H00 | 5일 제출 슬라이스 범위 고정 | ADR-0010·H00 phase·traceability | DoR 6/6, 최종 DOD 12/12 | 콘텐츠→AXIS 연출 우선, 3D·새 모드 제외 | 완료 |
 | CX-H00-002 | 2026-08-21 | H00 | 18신호·AXIS 연출 vertical slice | prototype·Pages test·H00 증거 | campaign 217, browser 891, Pages 27/27, 오류 0 | 3D 대신 콘텐츠·축 인과·모바일 완성도 채택 | 완료 |
-| CX-H00-003 | 2026-08-21 | H00 | 공개 배포 회귀와 submission-ready 패키지 | PR #1·#2·#3, tag·Pages·private package | clean E3, public E4, 14-entry manifest, backup delta 0 | 오너가 라이선스·개인정보·동의·최종 Submit 책임 유지 | 완료 |
+| CX-H00-003 | 2026-08-21~26 | H00 | 공개 배포 회귀·submission-ready 패키지·오너 제출 | PR #1·#2·#3, tag·Pages·private package | clean E3, public E4, 14-entry manifest, backup delta 0 | 오너가 개인정보·동의·Submit을 직접 수행하고 완료 확인 | 완료 / 접수 metadata 미제공 |
 | CX-M02-001 | 2026-08-21 | M02 | 순수 보드·PULSE·rank·factorization 코어 | `55b0b55273aff6803191bb9812927c622721bd2f` / PR `#5` | 512 전수·50,000 property 오류 0, 5파일 coverage 100% | 공개 규칙·bit·pivot 계약과 milestone commit/push 승인 | 완료 / PR·main CI·Pages PASS |
-| CX-M03-001 | 2026-08-21~26 | M03 | 결정적 Daily·54레벨 공급망 | commit/PR 없음 | 20×100 PRNG, 3브라우저 9/9, 3,650일 pre-close 실패 0, DOD-04 승인 | 오너 전체 승인·candidate exact-SHA 감사 대기 | Experimental / DOD-04 PASS·DOD-10 PENDING |
+| CX-M03-001 | 2026-08-21~26 | M03 | 결정적 Daily·54레벨 공급망 | candidate `1c313bd29e1d24c483749af90a8734542988be5d` | 20×100 PRNG, 3브라우저 9/9, 3,650일 exact-SHA 감사 2회 동일, DOD-04 승인 | 오너 전체 승인·M04 전환 | Accepted / DOD-01~11 PASS |
 
 ## 8. 상세 로그 템플릿
 
@@ -142,12 +142,12 @@ Codex가 제안·생성·수정한 항목
 - 날짜: 2026-08-21
 - Phase / DoD: H00 / DOD-08·09·11·12 완료
 - 관련 INV / ADR: INV-001~002, 014~015, 017~020 / ADR-0010
-- 사람 결정: 게임 방향과 beta 증거를 제공하고 공개 라이선스 결정권, Google 계정·개인정보·법적 동의·최종 Submit 책임을 유지했다. 별도 공개 라이선스 승인이 없어 H00은 기존 `UNLICENSED`/All Rights Reserved를 보존한다.
+- 사람 결정: 게임 방향과 beta 증거를 제공하고 공개 라이선스 결정권, Google 계정·개인정보·법적 동의·최종 Submit 책임을 유지했다. 프로젝트 오너는 이후 공식 양식 제출 완료를 확인했다. 별도 공개 라이선스 승인이 없어 H00은 기존 `UNLICENSED`/All Rights Reserved를 보존한다.
 - Codex 역할: feature branch·draft PR·CI·Pages 배포를 운영하고 공개 URL E4를 실행했다. Chromium이 origin root `/favicon.ico`를 요청해 콘솔 오류가 발생하는 것을 재현하고 data URL favicon과 회귀 단언으로 수정했다. 최종 release SHA 공개 화면에서 썸네일·14.84초 무음 영상·권리·필드 대조 자료를 만들었다.
 - 변경: PR #1 H00 slice, PR #2 favicon 회귀, PR #3 release record를 병합했다. annotated remote tag와 GitHub prerelease `v0.1.0-hackathon`은 release SHA `6690f5778f706e1875b452d552bd75ba1c06ee9a`를 가리키며 application capture SHA도 동일하다.
 - 검증: release SHA clean checkout에서 `npm ci` lock 동일·취약점 0, M00 200,967/0, H00 217/0, verify 10단계, E2E 12/12, a11y 0, Pages 27/27, artifact 14 files/336,182 bytes. final CI `32453169036`, Pages `32453169029`, digest `sha256:07a222cc7af5ad221e3d4be3524f53992cdf01823e6af56b7723c00282671998`; 공개 browser 891·외부 요청/콘솔 오류 0을 통과했다. source/Pages archive와 14-entry manifest를 두 위치에 각 15 files로 백업해 hash delta 0을 확인했고 post-tag 독립 검사 2회도 PASS했다.
-- 역할 경계: Codex는 제출 가능한 패키지를 준비·검증했지만 공식 양식의 개인 식별 정보, 약관·개인정보·국외 이전 동의와 최종 Submit은 수행하거나 완료로 주장하지 않는다.
-- 남은 일: H00 내부 작업 없음. 공식 Google 양식 최종 Submit은 프로젝트 오너 작업이며, 정규 M02는 원래 DoR에서 별도로 시작한다.
+- 역할 경계: Codex는 제출 가능한 패키지를 준비·검증했지만 공식 양식의 개인 식별 정보, 약관·개인정보·국외 이전 동의와 최종 Submit은 수행하지 않았다. 프로젝트 오너가 제출 완료를 확인했으며 정확한 제출 시각·접수 ID·확인 화면은 제공되지 않아 생성하지 않는다.
+- 남은 일: H00 내부 작업과 공식 제출은 완료됐다. 비공개 원자료는 Git에서 제외하고, 제출 완료로 정리 조건은 충족됐지만 별도 삭제 권한이 없어 오너의 명시적 정리 결정 전까지 보존한다. 정규 v1의 M11 제출 gate는 별개다.
 
 ### CX-M01-001 — M00 formal gate 전 제한 스캐폴딩 착수
 
@@ -322,8 +322,8 @@ Codex가 제안·생성·수정한 항목
 
 ### CX-M03-001 — 결정적 Daily 생성기와 54레벨 공급망
 
-- 날짜: 2026-08-21
-- Phase / DoD: M03 / DOD-01~09·11 PASS, DOD-10 fixed-SHA gate PENDING
+- 날짜: 2026-08-21~26
+- Phase / DoD: M03 / DOD-01~11 PASS, phase 완료
 - 관련 INV / ADR: INV-003·004·006~009·018 / ADR-0001~0003
 - 시작 상태·실패: M01의 `validate:levels`·`audit:daily`는 실제 콘텐츠/생성기가 없을 때 무조건 통과하지 않는 탐지 골격이었고, production PRNG·UTC date·version registry·Daily policy·fallback·54개 level·장기 감사와 browser parity가 없었다.
 - Codex 요청 요약: 오너가 M03을 DoR·DoD 순서로 진행하고 완료 시 milestone 단위 commit·push하도록 요청했다.
@@ -337,8 +337,8 @@ Codex가 제안·생성·수정한 항목
 - 사람 결정: **APPROVED**. 프로젝트 오너는 2026-08-26 54개 패턴의 가독성·난도/학습 순서·불쾌 패턴과 progression 5행을 전체 승인했고 교체·재분류 없음으로 기록했다.
 - 사람이 수정·거절한 것과 이유: 자동 score·rank·validator를 최종 학습 순서 승인으로 대신하지 않았고 오너가 atlas와 progression을 직접 검토했다. 일반 `validate:levels`는 승인 metadata·fingerprint·machine scaffold 변조를 fail-closed한다.
 - 변경 파일: `src/domain/generator/`, `src/content/`, `scripts/{generate-level-candidates,validate-levels,audit-daily-generator,generator-parity-worker}.ts`, `scripts/lib/curation-evidence*`, `tests/e2e/generator-parity*`, CI·package scripts, M03 phase·수학·백서·파일 트리·추적성 문서
-- Commit / PR: 없음 — fail-closed gate를 통과한 candidate implementation commit을 만들고 그 exact SHA에서 DOD-10 감사를 수행해야 하며, evidence commit 전 push·PR 금지
-- pre-close 자동 검증:
+- Commit / PR: candidate implementation `1c313bd29e1d24c483749af90a8734542988be5d`; closure evidence는 이 기록을 담는 후속 문서 commit이며 push·PR 결과는 별도 원격 증거로 갱신한다.
+- 종료 검증:
   - focused generator+curation+catalog unit `23/23`; 전체 unit `55/55`
   - boundary `files=55 edges=81 violations=0 cycles=0 coreFiles=30`
   - PRNG golden `20 seeds × 100 uint32`; Chromium·Firefox·WebKit parity `9/9`
@@ -349,13 +349,14 @@ Codex가 제안·생성·수정한 항목
   - curation metadata `프로젝트 오너` / `2026-08-26T00:20:42+09:00` / `APPROVED`
   - candidate idempotence: JSON 6파일 hash change `0`, curation evidence hash change `0`, `curation=preserved`
   - 3,650일 audit output hash `997df1b01c8fee746168f6edebb2c549ad859da8f505e414e8eabdb918dd10b0`
-  - normalized report SHA-256 `b1102aee05f5e578894c13d36b0e14af9fb278d6e5af14efb9de49a480d96d49`, 변경 없는 미커밋 working tree rehearsal 2회 동일. DOD-10 fixed-SHA 증거 아님
+  - candidate `1c313bd29e1d24c483749af90a8734542988be5d`의 clean detached worktree에서 Node `v24.19.0`/npm `11.6.2`, `npm ci` 취약점 0, verify `10/10`, Chromium·Firefox·WebKit parity `9/9`
+  - 서로 다른 두 출력 경로의 normalized report/JSON SHA-256 `b1102aee05f5e578894c13d36b0e14af9fb278d6e5af14efb9de49a480d96d49`, Markdown SHA-256 `3149a492592e88ab7329c20343613bac051e7a0719abd744333855d9a7baa036`, checksum-file SHA-256 `8a827506ea0cb296fc0f125f65c08a03230bb67aa9454eaa6f3b5c646b98a893`가 각각 2회 동일
   - exceptions/invalid/wrongPar/fallback/adjacentDuplicates/distributionFailures `0/0/0/0/0/0`, max attempt `107`
   - timezone processes `3`(UTC/Asia-Seoul/America-Los_Angeles), repeats per process `10`, puzzle/diagnostics hash mismatch `0/0`
 - Codex 기여 경계: Codex는 후보·generator·validator·감사·문서 초안을 만들고 자동 정확성을 검증했다. 사람은 학습 순서·체감 난도·시각 패턴·최종 채택과 릴리스 승인을 유지한다.
-- 현재 분류: `Experimental` — 객관 pre-close 검증과 사람 큐레이션은 PASS지만 fixed-SHA 재현성 gate가 미완료다. `Accepted`로 승격하지 않는다.
+- 현재 분류: `Accepted` — 사람 큐레이션 DOD-04와 candidate exact-SHA DOD-10을 포함한 M03 DOD-01~11이 모두 통과했다.
 - 남은 위험: 이번 승인은 현재 atlas·progression에 한정된다. catalog·manifest·scaffold 변경 시 재승인이 필요하며 M06/M07 UI 연결 뒤 실제 progression 회귀도 별도 검증해야 한다.
-- 다음 작업: fail-closed 전체 gate를 통과한 candidate implementation commit을 만든다. 그 exact SHA에서 3,650일 감사를 2회 재실행해 report SHA 일치를 기록하는 evidence commit으로 DOD-10과 M03을 닫는다.
+- 다음 작업: closure evidence commit을 push하고 원격 CI 결과를 기록한 뒤, `phases/M04_session_persistence_scoring.md`의 DoR를 확인한다. M06/M07 UI progression 검증은 여전히 후속 범위다.
 
 ## 9. 품질 분류
 

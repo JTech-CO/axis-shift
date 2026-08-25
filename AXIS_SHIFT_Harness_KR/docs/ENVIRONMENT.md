@@ -48,7 +48,7 @@ Node 24 메이저 안의 정확한 patch는 CI와 개발환경에서 같은 lock
 | Daily audit rehearsal | unchanged working tree, 3,650 dates from `2026-01-01`, 2 runs, failures 0, max attempt 107 |
 | Static content | Tutorial 6 + Lab 48, fallback 14, DOD-04 owner APPROVED |
 
-M03 객관 pre-close 검증은 Node 24 도구 체인에서 통과했고 프로젝트 오너는 2026-08-26 54개 패턴과 progression 5행을 전체 승인했다. 일반 level validator는 승인 metadata·approval fingerprint·machine scaffold가 어긋나면 fail-closed한다. DOD-10은 아직 없는 candidate implementation commit의 exact SHA에서 3,650일 감사를 2회 재실행해야 하며 현재 working-tree rehearsal로 대체하지 않는다.
+M03은 candidate `1c313bd29e1d24c483749af90a8734542988be5d`의 clean detached worktree와 Node v24.19.0/npm 11.6.2에서 `npm ci` 취약점 0, browser parity 9/9, verify 10/10을 통과했다. 서로 다른 출력 디렉터리의 3,650일 감사 2회는 output hash `997df1b0…10b0`와 report/JSON SHA `b1102aee…6d49`가 일치했고 실행 전후 worktree status는 0이었다. 일반 level validator는 승인 metadata·approval fingerprint·machine scaffold가 어긋나면 계속 fail-closed한다.
 
 ## 2. 지원 개발 OS
 
@@ -103,7 +103,7 @@ npm run build:pages
 npm run preview
 npm run test:e2e
 
-M03 closure 재검증에서는 기본 `npm run generate:level-candidates -- --seed axis-shift-curation-v1`가 full manifest·순서 있는 catalog·human 필드를 정규화한 machine scaffold의 approval fingerprint exact match에서 승인 evidence를 byte-preserve하고 `curation=preserved`를 출력해야 한다. catalog·manifest·scaffold 변경은 `PENDING` 재생성, 같은 fingerprint의 machine 편집은 fail-closed한다. `--reset-curation`은 사람 승인을 명시적으로 폐기하므로 closure 명령에 포함하지 않는다.
+M03 종료 재검증에서 기본 `npm run generate:level-candidates -- --seed axis-shift-curation-v1`는 full manifest·순서 있는 catalog·human 필드를 정규화한 machine scaffold의 approval fingerprint exact match에서 승인 evidence를 byte-preserve하고 `curation=preserved`를 출력했다. catalog·manifest·scaffold 변경은 `PENDING` 재생성, 같은 fingerprint의 machine 편집은 fail-closed한다. `--reset-curation`은 사람 승인을 명시적으로 폐기하므로 closure 명령에 포함하지 않는다.
 npm run test:pages
 npm run test:a11y
 npm run verify

@@ -633,11 +633,15 @@ validator self-checks: 22; manifest/physical-profile/section/progression/complet
 candidate idempotence: 6 JSON hash changes=0; curation evidence hash changes=0; curation=preserved
 daily audit: 3650 dates from 2026-01-01
 output SHA-256: 997df1b01c8fee746168f6edebb2c549ad859da8f505e414e8eabdb918dd10b0
-report SHA-256: b1102aee05f5e578894c13d36b0e14af9fb278d6e5af14efb9de49a480d96d49 (unchanged-working-tree pre-close rehearsal, two runs)
+candidate SHA: 1c313bd29e1d24c483749af90a8734542988be5d (clean detached worktree)
+exact-SHA output SHA-256: 997df1b01c8fee746168f6edebb2c549ad859da8f505e414e8eabdb918dd10b0 (two distinct output directories)
+exact-SHA report/JSON SHA-256: b1102aee05f5e578894c13d36b0e14af9fb278d6e5af14efb9de49a480d96d49
+exact-SHA Markdown SHA-256: 3149a492592e88ab7329c20343613bac051e7a0719abd744333855d9a7baa036
+exact-SHA checksum-file SHA-256: 8a827506ea0cb296fc0f125f65c08a03230bb67aa9454eaa6f3b5c646b98a893
 exceptions=0 invalid=0 wrongPar=0 fallback=0 adjacentDuplicates=0 distributionFailures=0 maxAttempt=107
 ```
 
-이 기준선은 수학·결정성·콘텐츠 객관 조건의 pre-close E3 rehearsal이다. 프로젝트 오너는 2026-08-26 54개 패턴과 progression 5행을 전체 승인해 DOD-04를 통과시켰다. 단일 `evidence/M03/content-curation-v1.md`는 full manifest·순서 있는 catalog·human 필드를 정규화한 machine scaffold의 approval fingerprint exact match에서만 byte-preserve된다. catalog·manifest·scaffold 변경은 `PENDING` 재생성, 같은 fingerprint의 machine 편집은 fail-closed하며 `--reset-curation`도 승인을 초기화한다. DOD-10은 아직 없는 candidate implementation commit을 만들고 그 exact SHA에서 3,650일 감사를 2회 재실행해 동일 report SHA를 확인한 다음 evidence commit으로 닫는다.
+변경 없는 working tree의 pre-close rehearsal은 역사 기준선으로 보존한다. DOD-10의 권위 있는 증거는 candidate `1c313bd…be5d` clean detached worktree의 3,650일 감사 2회이며 예외·invalid·wrong Par·fallback·인접 중복·분포 실패는 모두 0, 최대 시도는 107, 실행 전후 status는 0이었다. 프로젝트 오너의 DOD-04 승인과 이 exact-SHA 증거로 M03을 완료한다. 단일 `evidence/M03/content-curation-v1.md`는 full manifest·순서 있는 catalog·human 필드를 정규화한 machine scaffold의 approval fingerprint exact match에서만 byte-preserve되고, 변경 시 `PENDING` 재생성 또는 fail-closed한다.
 
 ## 15. 성능과 수치 안전성
 

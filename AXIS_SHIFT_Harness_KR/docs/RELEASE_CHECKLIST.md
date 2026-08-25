@@ -1,8 +1,8 @@
 # AXIS//SHIFT Release Checklist
 
 **문서 버전**: 1.0.0  
-**상태**: H00 v0.1 완료 / M10·M11 v1 체크 미실행
-**최종 갱신**: 2026-08-21
+**상태**: H00 v0.1 릴리스·해커톤 제출 완료 확인 / M10·M11 v1 체크 미실행
+**최종 갱신**: 2026-08-26
 
 > 체크박스가 비어 있으면 미검증이다. “해당 없음”은 이유와 승인자를 기록해야 하며, 불변식·P0/P1 항목에는 사용할 수 없다.
 
@@ -18,12 +18,13 @@
 - [x] 공개 URL에서 Chromium·Firefox·WebKit Pages `27/27`과 browser smoke `891`, 외부 요청·콘솔 오류 `0`을 확인했다.
 - [x] 동일 공개 release/tag SHA에서 1920×1080 썸네일과 14.84초 무음 데모 영상을 생성했다.
 - [x] H00 전용 제목·95자 소개·URL·자산·권리 문구를 두 구현으로 독립 대조했다.
-- [x] Google 인증·개인정보·법적 동의·최종 Submit은 프로젝트 오너 작업이며 현재 제출 완료로 주장하지 않는다.
+- [x] Google 인증·개인정보·법적 동의·최종 Submit은 프로젝트 오너가 직접 수행했고 제출 완료를 확인했다. Codex는 이 행위를 수행하지 않았으며 정확한 제출 시각·접수 ID·확인 화면은 제공되지 않았다.
 - [x] release/tag SHA `6690f5778f706e1875b452d552bd75ba1c06ee9a` clean checkout에서 `npm ci` lock 동일·취약점 0, M00 200,967/0, H00 217/0, verify 10단계, E2E 12/12, a11y 0, Pages 27/27, artifact 14 files/336,182 bytes로 DOD-08을 통과했다.
 - [x] final CI `32453169036`, Pages `32453169029`, artifact digest `sha256:07a222cc7af5ad221e3d4be3524f53992cdf01823e6af56b7723c00282671998`와 공개 browser 891·외부 요청/콘솔 오류 0으로 DOD-09를 통과했다.
 - [x] `v0.1.0-hackathon` annotated remote tag와 GitHub prerelease가 SHA `6690f577…`를 가리키는지 대조했다.
 - [x] source·Pages archive, 14-entry `MANIFEST.sha256`와 제출 자산을 primary `.private/submission/H00` 및 사용자 Documents `v0.1.0-hackathon`에 각 15 files로 백업하고 hash delta 0을 확인했다.
-- [x] H00 phase·PROGRESS·traceability를 완료 상태로 고정했다. 공식 Google 양식의 최종 Submit은 계속 프로젝트 오너 작업이며 제출 완료로 주장하지 않는다.
+- [x] H00 phase·PROGRESS·traceability를 완료 상태로 고정했고, 이후 프로젝트 오너의 공식 Google 양식 제출 완료 확인을 기록했다. 이는 아래 M10·M11 v1.0 제출 게이트를 완료 처리하지 않는다.
+- [x] 비공개 제출 원자료는 Git에 넣지 않았다. 제출 완료로 정리 조건은 충족했지만 삭제 권한은 별도로 부여되지 않았으므로 오너의 명시적 정리 결정 전까지 보존한다.
 
 현재 공개 자산과 공식 양식 값은 `SUBMISSION_PACKAGE.md`, 자산 권리는 `ASSET_LICENSES.md`, 실제 기능은 `RELEASE_NOTES.md`를 단일 대조 기준으로 사용한다.
 

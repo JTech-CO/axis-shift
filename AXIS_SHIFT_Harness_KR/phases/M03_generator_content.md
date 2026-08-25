@@ -1,6 +1,6 @@
 # M03 — Deterministic Generator & Content Pipeline ★
 
-- **상태**: 진행 중 — DOD-01~09·11 완료, DOD-10 candidate exact-SHA 재실행 대기
+- **상태**: 완료 — DOD-01~11 통과, candidate exact-SHA 감사 2회 일치
 - **담당 범위**: 결정적 PRNG, Daily 생성기, 난도, fallback, Tutorial·Lab 데이터 검증
 - **최종 갱신**: 2026-08-26
 
@@ -98,7 +98,7 @@ scripts/audit-daily-generator.ts
 - [x] **DOD-07 — 날짜 결정성**: UTC·Asia/Seoul·America/Los_Angeles 시간대별 프로세스 3개에서 각각 동일 날짜·version을 10회 반복하고, 직렬화한 결과 해시가 동일하다. E3. (INV-008)
 - [x] **DOD-08 — 과거 보호**: `v1` golden 날짜 최소 20개가 version registry snapshot에 있고, 추후 default version 변경 시에도 명시적으로 `v1`을 요청하면 동일 결과를 낸다. (INV-009)
 - [x] **DOD-09 — 분포 감사**: generator-map에 정의된 size·difficulty 프로파일별 관측 분포가 목표 허용 구간 안에 있고 report에 표로 남는다. 임계치는 코드가 아니라 map과 문서 한 곳에서 관리한다.
-- [ ] **DOD-10 — 재현 가능한 산출물**: 사람 큐레이션 승인 뒤 candidate implementation commit을 만들고, 그 exact SHA에서 감사를 2회 재실행했을 때 정규화 JSON 리포트 SHA-256이 동일하다. 현재 결과는 commit 전 working tree rehearsal이므로 이 gate를 닫지 않는다.
+- [x] **DOD-10 — 재현 가능한 산출물**: candidate commit `1c313bd29e1d24c483749af90a8734542988be5d`의 clean detached worktree에서 감사를 서로 다른 출력 디렉터리에 2회 재실행했고, 정규화 JSON·report SHA-256 `b1102aee…6d49`가 일치했다.
 - [x] **DOD-11 — 문서 정합성**: 콘텐츠 수, generatorVersion, seed 형식, fallback 정책, 감사 결과를 관련 docs와 `PROGRESS.md`에 반영한다.
 
 ## 8. 검증 명령
@@ -132,7 +132,7 @@ adjacentDuplicates, sizeDistribution, difficultyDistribution
 
 ## 10. 증거
 
-### 사전 자동 검증 — PASS / DOD-10 closure PENDING
+### 종료 검증 — PASS / DOD-10 closure COMPLETE
 
 ```text
 focused generator+curation+catalog unit: files=3 tests=23 failures=0
@@ -151,28 +151,37 @@ candidate regeneration: curation=preserved jsonFiles=6 jsonHashChanges=0 curatio
 curation evidence: AXIS_SHIFT_Harness_KR/evidence/M03/content-curation-v1.md
 daily audit: version=v1 startDate=2026-01-01 dayCount=3650
 outputHash=997df1b01c8fee746168f6edebb2c549ad859da8f505e414e8eabdb918dd10b0
-reportSha256=b1102aee05f5e578894c13d36b0e14af9fb278d6e5af14efb9de49a480d96d49
-rehearsalScope=unchanged-working-tree rehearsalReruns=2
+reportAndJsonSha256=b1102aee05f5e578894c13d36b0e14af9fb278d6e5af14efb9de49a480d96d49
+
+historicalPreCloseRehearsalReruns=2
+candidateSha=1c313bd29e1d24c483749af90a8734542988be5d
+auditScope=clean-detached-worktree worktreeStatusBeforeAfter=0 auditOutputDirectoriesDistinct=true
+environment: node=v24.19.0 npm=11.6.2 npmCiVulnerabilities=0
+exactShaParity: browsers=Chromium/Firefox/WebKit tests=9/9
+exactShaVerify: steps=10/10 unitFiles=11 unitTests=55
+exactShaAudit: reruns=2 outputHash=997df1b01c8fee746168f6edebb2c549ad859da8f505e414e8eabdb918dd10b0
+auditMarkdownSha256=3149a492592e88ab7329c20343613bac051e7a0719abd744333855d9a7baa036
+auditChecksumFileSha256=8a827506ea0cb296fc0f125f65c08a03230bb67aa9454eaa6f3b5c646b98a893
 exceptions=0 invalid=0 wrongPar=0 fallbackCount=0 adjacentDuplicates=0
 maxAttemptCount=107 distributionFailures=0 goldenVectors=20 goldenMismatches=0
 timezoneProcesses=3 timezones=UTC/Asia-Seoul/America-Los_Angeles repeatsPerProcess=10 hashMismatches=0
-fixedShaAuditReruns=PENDING
+fixedShaAuditReruns=2 hashesMatch=true
 ```
-- 위 output/report hash 2회 일치는 변경 없는 미커밋 working tree에서 수행한 **pre-close rehearsal**이다. DOD-10의 exact-SHA 증거로 승격하지 않는다.
-- DOD-10 종료 순서는 fail-closed 전체 gate 통과 → candidate implementation commit 생성 → 그 exact SHA에서 3,650일 감사 2회 → SHA·출력을 phase/PROGRESS에 기록하는 evidence commit이다.
+- 변경 없는 미커밋 working tree의 pre-close rehearsal 2회는 역사 기준선으로 보존한다. DOD-10의 권위 있는 증거는 candidate exact SHA `1c313bd…be5d`의 clean detached worktree에서 서로 다른 출력 디렉터리로 수행한 위 2회 감사다.
+- exact-SHA 두 실행은 output hash·정규화 JSON/report·Markdown·checksum-file SHA가 각각 일치했고, 실행 전후 tracked worktree status는 0이었다. 이 문서 evidence commit은 candidate 이후의 종료 기록이며 아직 push·PR을 주장하지 않는다.
 
 - 감사 산출물: `outputs/m03/daily-audit-v1-2026-01-01-3650.{json,md,sha256}`. 이 경로는 재생성 가능한 로컬 출력이므로 Git에 커밋하지 않는다.
 - 후보·카탈로그는 동일 seed 재생성에서 JSON 6파일 hash change 0이며 Prettier 검사를 통과했다. approval fingerprint exact match에서는 승인 evidence hash `B81406D8…0214F`가 그대로 보존되어 `curationEvidenceHashChanges=0`, `curation=preserved`였다.
 - catalog·manifest·machine scaffold 변경은 기존 사람 승인을 자동 `PENDING`으로 무효화한다. 같은 fingerprint의 machine 편집은 fail-closed하며, `--reset-curation`도 같은 입력의 승인을 명시적으로 초기화하므로 실행했다면 DOD-04를 다시 승인하기 전 closure를 진행하지 않는다.
 - 버전 map은 날짜별 `effectiveFrom` schedule과 version별 policy·fallback·golden registry를 분리한다. 기본 version이 바뀌어도 명시적 `v1` 요청은 `v1` resource를 사용한다.
 
-### 종료 게이트 — DOD-10 PENDING
+### 종료 게이트 — PASS
 
 - DOD-04는 자동 수치가 아니라 프로젝트 오너의 2026-08-26 전체 승인으로 통과했다.
 - 승인 evidence metadata는 `프로젝트 오너` / `2026-08-26T00:20:42+09:00` / `APPROVED`이며 54개 패턴과 progression 5행 모두 PASS다.
-- DOD-10은 아직 생성되지 않은 candidate implementation commit의 exact SHA에서 감사 2회를 다시 실행해야 한다. 현재 rehearsal hash가 우연히 같아도 fixed-SHA 재실행을 생략하지 않는다.
+- DOD-10은 candidate `1c313bd29e1d24c483749af90a8734542988be5d`의 clean detached worktree에서 감사 2회와 동일 hash를 확인해 통과했다.
 - 일반 `npm run validate:levels`는 승인 metadata·fingerprint·machine scaffold가 어긋나면 실패하도록 닫혀 있다.
-- DOD-10을 닫기 전에는 M03 완료, PR, push를 주장하지 않는다. candidate implementation commit은 DOD-10 증거 생성을 위한 중간 상태이며, 이후 evidence commit으로 phase를 닫는다.
+- DOD-01~11이 모두 통과해 M03을 완료한다. 이 종료 기록 시점에는 push·PR이 아직 없으며 별도 Git 작업으로 남긴다.
 
 ## 11. 롤백 계획
 
@@ -201,3 +210,4 @@ fixedShaAuditReruns=PENDING
 - Daily 생성 API와 date adapter 계약
 - canonical solution·Par·difficulty를 포함한 fixture
 - 저장·세션이 참조할 변경 불가 puzzle ID 목록
+- 다음 작업은 M04 DoR 확인 후 Session, Persistence & Scoring을 착수한다. Tutorial/Lab/Daily 화면은 여전히 M06/M07 범위다.

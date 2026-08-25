@@ -892,8 +892,8 @@ PRNG       = Mulberry32(prngSeed)
 - `v1`은 7개 profile×2개, 총 14개 fallback을 version resource로 보존한다.
 - 강제 max-attempt fixture가 결정적 fallback 선택과 validator 통과를 검증한다.
 - 2026-01-01부터 3,650일 감사의 정상 생성은 fallback 0회, 최대 시도 107회였다.
-- 변경 없는 미커밋 working tree의 pre-close rehearsal 2회는 동일 output hash `997df1b0…10b0`와 report SHA-256 `b1102aee…6d49`를 냈다. 이는 DOD-10 fixed-SHA 증거가 아니다.
-- DOD-10은 아직 없는 candidate implementation commit을 만들고, 그 exact SHA에서 감사를 2회 재실행해 동일 report SHA를 확인한 다음 evidence commit으로 닫는다.
+- 변경 없는 미커밋 working tree의 pre-close rehearsal 2회는 동일 output hash `997df1b0…10b0`와 report SHA-256 `b1102aee…6d49`를 냈으며 역사 기준선으로 보존한다. DOD-10의 권위 있는 증거는 candidate exact SHA의 clean detached worktree 실행이다.
+- candidate `1c313bd29e1d24c483749af90a8734542988be5d`의 clean detached worktree에서 서로 다른 출력 디렉터리로 감사를 2회 재실행했다. 두 실행은 output hash `997df1b0…10b0`, report/JSON SHA `b1102aee…6d49`, Markdown SHA `3149a492…a036`, checksum-file SHA `8a827506…a893`가 각각 일치해 DOD-10을 닫았다.
 - 감사의 예외·invalid·wrong Par·인접 목표 중복·분포 실패는 모두 0이다.
 
 #### 4.4.6. M00 반복 목표 생성 경계
@@ -919,7 +919,7 @@ M00 폐기형 프로토타입의 반복 목표는 프로덕션 Daily 생성기�
 - validator는 manifest 54 ID exact set/order·canonical physical profile order와 section별 board·판정, progression/completion 각 5행 exact order, metadata/catalog hash/approval fingerprint binding, normalized machine scaffold exact comparison을 22개 self-check와 함께 검증한다. 객관 조건과 사람 E1 gate는 분리해 기록한다.
 - 프로젝트 오너는 2026-08-26 `evidence/M03/content-curation-v1.md`의 54개 패턴과 progression 5행을 전체 승인했다. metadata는 `프로젝트 오너` / `2026-08-26T00:20:42+09:00` / `APPROVED`, evidence SHA-256은 `B81406D8…0214F`다.
 - 일반 validator는 승인 metadata·approval fingerprint·machine scaffold가 어긋나면 실패한다. 후보 작업 중 객관 검증만 명시적 `--allow-pending-curation`으로 허용한다.
-- DOD-04 사람 승인은 완료됐지만 candidate exact-SHA 감사 2회 전에는 M03 완료나 프로덕션 플레이 가능 콘텐츠라고 주장하지 않는다. 화면 연결은 M06·M07 범위다.
+- DOD-04 사람 승인과 DOD-10 candidate exact-SHA 감사 2회가 모두 통과해 M03을 완료했다. 이는 데이터·생성 pipeline 완료이며 프로덕션 플레이 화면 연결은 여전히 M06·M07 범위다.
 - 레벨 ID는 한번 배포하면 변경·재사용하지 않는다.
 
 ```text
@@ -1404,7 +1404,7 @@ axis-shift/
 - 강제 max-attempt에서 14개 fallback 중 profile에 맞는 결과를 결정적으로 고른다.
 - 3,650일 감사는 예외·invalid·wrong Par·fallback·인접 중복·분포 실패 0을 요구한다.
 - 실제 M03 기준은 PRNG/Daily 3브라우저 parity 9/9, generator unit 14/14이다.
-- DOD-10 closure는 candidate implementation commit의 exact SHA에서 감사를 두 번 실행해 report SHA를 비교하고, exact SHA와 결과를 evidence commit에 기록한다.
+- DOD-10 closure는 candidate `1c313bd…be5d` clean detached worktree의 감사 2회에서 report/JSON SHA 일치, 오류 counter 0, maxAttempt 107, 실행 전후 status 0을 확인해 완료했다. exact-SHA parity 9/9와 verify 10/10도 함께 통과했다.
 - 정적 콘텐츠 객관 검증과 사람 큐레이션 승인 상태를 서로 다른 gate로 기록한다.
 - 생성기 버전 변경 전 과거 algorithm·policy·fallback·golden snapshot을 유지한다.
 
