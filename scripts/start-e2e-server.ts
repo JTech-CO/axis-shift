@@ -1,4 +1,5 @@
 process.env.VITE_BASE_PATH = '/axis-shift/';
+process.env.AXIS_SHIFT_E2E_GENERATOR_PARITY = '1';
 
 const { build, preview } = await import('vite');
 

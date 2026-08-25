@@ -71,8 +71,11 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Install core browser
-        run: npx playwright install --with-deps chromium
+      - name: Install browser matrix
+        run: npx playwright install --with-deps chromium firefox webkit
 
       - name: Core non-root route E2E
-        run: npm run test:e2e -- --project=chromium
+        run: npm run test:e2e -- tests/e2e/routes.spec.ts --project=chromium
+
+      - name: M03 generator browser parity
+        run: npm run test:e2e -- tests/e2e/generator-parity.spec.ts

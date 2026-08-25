@@ -10,6 +10,7 @@ const requiredScripts = [
   'test:coverage',
   'test:coverage:domain',
   'test:math:exhaustive',
+  'generate:level-candidates',
   'validate:levels',
   'audit:daily',
   'build',

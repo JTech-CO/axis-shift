@@ -552,12 +552,98 @@ hardCandidatePassed = parMatchesRank
 ```
 
 validator는 `0 <= compressionGap <= N-rank`, `0 < density <= 1`, Par 일치와 난도별 구조 정책을 확인한다. `hardCandidatePassed`는 단일 축 순회를 최적해에서 배제할 구조 적격성일 뿐 체감 Hard 승인이 아니며 Easy도 통과할 수 있다. rank나 이 불리언 하나로 쉬움·보통·어려움 라벨을 자동 결정하지 않고 사람 플레이테스트로 최종 분류한다.
+### 14.1 M03 난도 feature의 정확한 정의
+
+canonical solution의 PULSE 목록을 `p_1...p_rank`, 차이 보드에서 켜진 셀 집합을 `A`라 한다.
+
+```text
+touches(x) = x 셀을 포함하는 canonical PULSE 수
+touched = count(x where touches(x) > 0)
+overlapIndex = touched == 0
+  ? 0
+  : count(x where touches(x) >= 2) / touched
+
+dispersionIndex = |A| < 2
+  ? 0
+  : mean_{unordered a,b in A}(Manhattan(a,b)) / (2 * (N - 1))
+
+horizontal = matching cell ratio under top↔bottom reflection
+vertical = matching cell ratio under left↔right reflection
+rotation = matching cell ratio under 180-degree rotation
+symmetryScore = max(horizontal, vertical, rotation)
+
+gestureCost = sum(popcount(p.rowMask) + popcount(p.colMask))
+normalizedGestureCost = rank == 0
+  ? 0
+  : 10 * gestureCost / (2 * N * rank)
+
+initialDensity = popcount(initialRows) / (N * N)
+noiseRatio = initialDensity
+targetDensity = popcount(targetRows) / (N * N)
+```
+
+실제 `complexityScore`는 다음 값을 반올림하고 0 아래를 자른 정수다.
+
+```text
+complexityScore = max(0, round(
+  20 * (rank - 1)
+  + 5 * (N - 3)
+  + 12 * overlapIndex
+  + 8 * dispersionIndex
+  + 8 * initialDensity
+  + 6 * (1 - symmetryScore)
+  + normalizedGestureCost
+))
+```
+
+`generator-map.json`의 `v1` 태그 임계치는 `sparseMax=0.35`, `denseMin=0.55`, `symmetricMin=0.90`, `overlapMin=0.05`다. 값은 난도 코드에 중복하지 않는다.
+
+### 14.2 M03 결정성·hash·version 계약
+
+```text
+seedInput = "axis-shift|daily|v1|YYYY-MM-DD"
+normalizedSeed = NFKC(seedInput)
+digest = SHA-256(UTF-8(normalizedSeed))
+prngSeed = digest 첫 4바이트의 big-endian uint32
+PRNG = Mulberry32(prngSeed)
+nextInt = rejection sampling 후 modulo
+targetHash = SHA-256(`${size}:${targetRows.join(',')}`)
+puzzleHash = SHA-256(stableSerialize(PuzzleDefinition))
+```
+
+- 날짜는 `Date` 없이 엄격한 proleptic Gregorian `YYYY-MM-DD`로 검증·가감한다. UTC weekday도 동일 ordinal에서 계산한다.
+- domain 경로에서 `crypto`, `Math.random()`, 현지 timezone을 사용하지 않는다.
+- stable serialization은 object key를 사전순으로 정렬하고 `undefined` key를 제외하며 array 순서를 보존한다.
+- 같은 크기의 연속 날짜를 재생성하며 직전 `targetHash`를 금지해 인접 목표 중복을 결정적으로 제거한다.
+- 최대 512회 실패하면 `"${seedInput}|fallback"` PRNG로 해당 profile의 fallback 2개를 결정적으로 순회한다. `v1` fallback은 7 profile×2개=14개다.
+- `generator-map.json`의 `effectiveFrom` schedule이 날짜의 default version을 정하고, version별 policy·fallback·golden resource를 분리한다. 명시적 `v1` 요청은 향후 default 변경과 무관하게 동일 `v1` resource를 사용한다.
+
+### 14.3 M03 검증 기준선
+
+```text
+generator unit: 14/14
+PRNG golden: 20 seeds * first 100 uint32
+browser parity: Chromium + Firefox + WebKit = 9/9
+static content: Tutorial 6 + Lab 48 = 54; four Lab chapters * 12
+fallbacks: 14
+catalog SHA-256: c625d54327e5a6c3c6305a373d5199abd01c6fb69415161f9d4aee27c1738484
+approval fingerprint: 5a60604a91b51c88ab294701b7a1eb286b00700101643807c80d5d10d59b7e6a
+curation: reviewer=프로젝트 오너 reviewedAt=2026-08-26T00:20:42+09:00 decision=APPROVED evidenceSha256=B81406D8DCEE7214692426B112BB5941DBC319CC3FADD070F43F5638D9B0214F
+validator self-checks: 22; manifest/physical-profile/section/progression/completion/metadata/catalog/fingerprint/scaffold binding
+candidate idempotence: 6 JSON hash changes=0; curation evidence hash changes=0; curation=preserved
+daily audit: 3650 dates from 2026-01-01
+output SHA-256: 997df1b01c8fee746168f6edebb2c549ad859da8f505e414e8eabdb918dd10b0
+report SHA-256: b1102aee05f5e578894c13d36b0e14af9fb278d6e5af14efb9de49a480d96d49 (unchanged-working-tree pre-close rehearsal, two runs)
+exceptions=0 invalid=0 wrongPar=0 fallback=0 adjacentDuplicates=0 distributionFailures=0 maxAttempt=107
+```
+
+이 기준선은 수학·결정성·콘텐츠 객관 조건의 pre-close E3 rehearsal이다. 프로젝트 오너는 2026-08-26 54개 패턴과 progression 5행을 전체 승인해 DOD-04를 통과시켰다. 단일 `evidence/M03/content-curation-v1.md`는 full manifest·순서 있는 catalog·human 필드를 정규화한 machine scaffold의 approval fingerprint exact match에서만 byte-preserve된다. catalog·manifest·scaffold 변경은 `PENDING` 재생성, 같은 fingerprint의 machine 편집은 fail-closed하며 `--reset-curation`도 승인을 초기화한다. DOD-10은 아직 없는 candidate implementation commit을 만들고 그 exact SHA에서 3,650일 감사를 2회 재실행해 동일 report SHA를 확인한 다음 evidence commit으로 닫는다.
 
 ## 15. 성능과 수치 안전성
 
 - N<=8이므로 행·열 마스크는 8비트다.
 - JavaScript bitwise 연산은 signed 32비트지만 이 범위에서는 안전하다.
-- floating-point tolerance가 필요한 연산이 없다.
+- rank·factorization·보드 연산은 정수 exact다. 정규화 난도 feature의 부동소수 비교만 감사에서 `1e-12` 허용오차를 사용한다.
 - rank·factorization 시간복잡도는 작은 N에서 사실상 상수이며 목표 10ms 이하를 충분히 만족해야 한다.
 - 성능을 위해 lookup table을 도입하더라도 기준 알고리즘과 패리티를 유지한다.
 

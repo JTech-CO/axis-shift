@@ -103,6 +103,7 @@ Codex가 제안·생성·수정한 항목
 | CX-H00-002 | 2026-08-21 | H00 | 18신호·AXIS 연출 vertical slice | prototype·Pages test·H00 증거 | campaign 217, browser 891, Pages 27/27, 오류 0 | 3D 대신 콘텐츠·축 인과·모바일 완성도 채택 | 완료 |
 | CX-H00-003 | 2026-08-21 | H00 | 공개 배포 회귀와 submission-ready 패키지 | PR #1·#2·#3, tag·Pages·private package | clean E3, public E4, 14-entry manifest, backup delta 0 | 오너가 라이선스·개인정보·동의·최종 Submit 책임 유지 | 완료 |
 | CX-M02-001 | 2026-08-21 | M02 | 순수 보드·PULSE·rank·factorization 코어 | `55b0b55273aff6803191bb9812927c622721bd2f` / PR `#5` | 512 전수·50,000 property 오류 0, 5파일 coverage 100% | 공개 규칙·bit·pivot 계약과 milestone commit/push 승인 | 완료 / PR·main CI·Pages PASS |
+| CX-M03-001 | 2026-08-21~26 | M03 | 결정적 Daily·54레벨 공급망 | commit/PR 없음 | 20×100 PRNG, 3브라우저 9/9, 3,650일 pre-close 실패 0, DOD-04 승인 | 오너 전체 승인·candidate exact-SHA 감사 대기 | Experimental / DOD-04 PASS·DOD-10 PENDING |
 
 ## 8. 상세 로그 템플릿
 
@@ -316,6 +317,45 @@ Codex가 제안·생성·수정한 항목
 - Codex 기여 경계: Codex는 core·test·validator·boundary·CI·문서를 구현했지만 공개 규칙이나 production 콘텐츠를 새로 결정하지 않았다.
 - 남은 위험: FR-CORE-003과 FR-HINT-001의 session·selector·UI는 M04/M06, seed·generator와 signature 결정성은 M03/M09에 남아 있다.
 - 다음 작업: M03 콘텐츠·결정적 generator의 원래 DoR를 확인하고 오너 착수 지시 전에는 구현하지 않는다.
+
+---
+
+### CX-M03-001 — 결정적 Daily 생성기와 54레벨 공급망
+
+- 날짜: 2026-08-21
+- Phase / DoD: M03 / DOD-01~09·11 PASS, DOD-10 fixed-SHA gate PENDING
+- 관련 INV / ADR: INV-003·004·006~009·018 / ADR-0001~0003
+- 시작 상태·실패: M01의 `validate:levels`·`audit:daily`는 실제 콘텐츠/생성기가 없을 때 무조건 통과하지 않는 탐지 골격이었고, production PRNG·UTC date·version registry·Daily policy·fallback·54개 level·장기 감사와 browser parity가 없었다.
+- Codex 요청 요약: 오너가 M03을 DoR·DoD 순서로 진행하고 완료 시 milestone 단위 commit·push하도록 요청했다.
+- Codex 제안·변경:
+  - NFKC UTF-8 SHA-256 상위 32비트 big-endian seed, Mulberry32, rejection-sampled `nextInt`, 엄격 Gregorian date, stable serialization을 순수 TypeScript domain에 구현했다.
+  - `v1` 날짜 schedule과 version별 policy·fallback·golden resource를 분리해 default version 변경 후에도 명시적 `v1` 재현 경계를 고정했다.
+  - 요일별 size/rank/difficulty profile, anti-sweep `compressionGap`, overlap·dispersion·symmetry·gesture·noise feature, 최대 512회와 14개 fallback을 구현했다.
+  - Tutorial 6개와 Lab 4 chapter×12개 후보, manifest·catalog·ID/golden snapshot, ASCII 큐레이션 atlas를 만들었다.
+  - objective level validator, 3,650일 감사, multi-process/timezone 해시 비교, Chromium·Firefox·WebKit parity를 CI에 연결했다.
+  - 독립 review에서 발견한 version resource 결합·큐레이션 `PENDING` 통과·승인 atlas 덮어쓰기·ID 개수-only 검증을 version별 resource lookup과 fail-closed validator로 수정했다. 후속 리뷰 뒤에는 full manifest·순서 있는 catalog·human 필드를 정규화한 machine scaffold의 approval fingerprint exact match만 승인을 보존하게 했다. catalog·manifest·scaffold 변경은 `PENDING` 재생성, 같은 fingerprint의 machine 편집은 fail-closed한다.
+- 사람 결정: **APPROVED**. 프로젝트 오너는 2026-08-26 54개 패턴의 가독성·난도/학습 순서·불쾌 패턴과 progression 5행을 전체 승인했고 교체·재분류 없음으로 기록했다.
+- 사람이 수정·거절한 것과 이유: 자동 score·rank·validator를 최종 학습 순서 승인으로 대신하지 않았고 오너가 atlas와 progression을 직접 검토했다. 일반 `validate:levels`는 승인 metadata·fingerprint·machine scaffold 변조를 fail-closed한다.
+- 변경 파일: `src/domain/generator/`, `src/content/`, `scripts/{generate-level-candidates,validate-levels,audit-daily-generator,generator-parity-worker}.ts`, `scripts/lib/curation-evidence*`, `tests/e2e/generator-parity*`, CI·package scripts, M03 phase·수학·백서·파일 트리·추적성 문서
+- Commit / PR: 없음 — fail-closed gate를 통과한 candidate implementation commit을 만들고 그 exact SHA에서 DOD-10 감사를 수행해야 하며, evidence commit 전 push·PR 금지
+- pre-close 자동 검증:
+  - focused generator+curation+catalog unit `23/23`; 전체 unit `55/55`
+  - boundary `files=55 edges=81 violations=0 cycles=0 coreFiles=30`
+  - PRNG golden `20 seeds × 100 uint32`; Chromium·Firefox·WebKit parity `9/9`
+  - levels `54` = tutorial `6` + Lab `48`; `pulse/echo/rank/noise=12/12/12/12`; fallback `14`
+  - level rank/solution/tag checks `68/68/68`, validator self-checks `22`, ID changes `0`, failures `0`, human review `APPROVED`
+  - catalog hash `c625d54327e5a6c3c6305a373d5199abd01c6fb69415161f9d4aee27c1738484`
+  - approval fingerprint `5a60604a91b51c88ab294701b7a1eb286b00700101643807c80d5d10d59b7e6a`; evidence SHA-256 `B81406D8DCEE7214692426B112BB5941DBC319CC3FADD070F43F5638D9B0214F`
+  - curation metadata `프로젝트 오너` / `2026-08-26T00:20:42+09:00` / `APPROVED`
+  - candidate idempotence: JSON 6파일 hash change `0`, curation evidence hash change `0`, `curation=preserved`
+  - 3,650일 audit output hash `997df1b01c8fee746168f6edebb2c549ad859da8f505e414e8eabdb918dd10b0`
+  - normalized report SHA-256 `b1102aee05f5e578894c13d36b0e14af9fb278d6e5af14efb9de49a480d96d49`, 변경 없는 미커밋 working tree rehearsal 2회 동일. DOD-10 fixed-SHA 증거 아님
+  - exceptions/invalid/wrongPar/fallback/adjacentDuplicates/distributionFailures `0/0/0/0/0/0`, max attempt `107`
+  - timezone processes `3`(UTC/Asia-Seoul/America-Los_Angeles), repeats per process `10`, puzzle/diagnostics hash mismatch `0/0`
+- Codex 기여 경계: Codex는 후보·generator·validator·감사·문서 초안을 만들고 자동 정확성을 검증했다. 사람은 학습 순서·체감 난도·시각 패턴·최종 채택과 릴리스 승인을 유지한다.
+- 현재 분류: `Experimental` — 객관 pre-close 검증과 사람 큐레이션은 PASS지만 fixed-SHA 재현성 gate가 미완료다. `Accepted`로 승격하지 않는다.
+- 남은 위험: 이번 승인은 현재 atlas·progression에 한정된다. catalog·manifest·scaffold 변경 시 재승인이 필요하며 M06/M07 UI 연결 뒤 실제 progression 회귀도 별도 검증해야 한다.
+- 다음 작업: fail-closed 전체 gate를 통과한 candidate implementation commit을 만든다. 그 exact SHA에서 3,650일 감사를 2회 재실행해 report SHA 일치를 기록하는 evidence commit으로 DOD-10과 M03을 닫는다.
 
 ## 9. 품질 분류
 

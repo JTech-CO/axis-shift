@@ -1,0 +1,240 @@
+{
+  "schemaVersion": 1,
+  "chapter": "echo",
+  "levels": [
+    {
+      "schemaVersion": 1,
+      "id": "lab-02-echo-01",
+      "mode": "lab",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|curation|v1|axis-shift-curation-v1|lab-02-echo-01|37",
+      "size": 4,
+      "initialRows": [0, 0, 0, 0],
+      "targetRows": [0, 5, 3, 0],
+      "optimalPulseCount": 2,
+      "canonicalSolution": [
+        { "colMask": 5, "rowMask": 6 },
+        { "colMask": 6, "rowMask": 4 }
+      ],
+      "difficulty": "easy",
+      "complexityScore": 36,
+      "tags": ["sparse", "asymmetric", "overlap"],
+      "titleKey": "level.lab.echo.01.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "lab-02-echo-02",
+      "mode": "lab",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|curation|v1|axis-shift-curation-v1|lab-02-echo-02|8",
+      "size": 4,
+      "initialRows": [0, 0, 0, 0],
+      "targetRows": [9, 14, 7, 9],
+      "optimalPulseCount": 2,
+      "canonicalSolution": [
+        { "colMask": 9, "rowMask": 13 },
+        { "colMask": 14, "rowMask": 6 }
+      ],
+      "difficulty": "easy",
+      "complexityScore": 36,
+      "tags": ["dense", "symmetric", "overlap"],
+      "titleKey": "level.lab.echo.02.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "lab-02-echo-03",
+      "mode": "lab",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|curation|v1|axis-shift-curation-v1|lab-02-echo-03|1",
+      "size": 4,
+      "initialRows": [0, 0, 0, 0],
+      "targetRows": [3, 5, 3, 3],
+      "optimalPulseCount": 2,
+      "canonicalSolution": [
+        { "colMask": 5, "rowMask": 15 },
+        { "colMask": 6, "rowMask": 13 }
+      ],
+      "difficulty": "normal",
+      "complexityScore": 40,
+      "tags": ["asymmetric", "overlap"],
+      "titleKey": "level.lab.echo.03.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "lab-02-echo-04",
+      "mode": "lab",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|curation|v1|axis-shift-curation-v1|lab-02-echo-04|19",
+      "size": 4,
+      "initialRows": [0, 0, 0, 0],
+      "targetRows": [14, 3, 3, 13],
+      "optimalPulseCount": 2,
+      "canonicalSolution": [
+        { "colMask": 13, "rowMask": 14 },
+        { "colMask": 14, "rowMask": 7 }
+      ],
+      "difficulty": "normal",
+      "complexityScore": 41,
+      "tags": ["dense", "asymmetric", "overlap"],
+      "titleKey": "level.lab.echo.04.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "lab-02-echo-05",
+      "mode": "lab",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|curation|v1|axis-shift-curation-v1|lab-02-echo-05|0",
+      "size": 5,
+      "initialRows": [0, 0, 0, 0, 0],
+      "targetRows": [22, 28, 0, 0, 10],
+      "optimalPulseCount": 2,
+      "canonicalSolution": [
+        { "colMask": 10, "rowMask": 17 },
+        { "colMask": 28, "rowMask": 3 }
+      ],
+      "difficulty": "normal",
+      "complexityScore": 41,
+      "tags": ["sparse", "asymmetric", "overlap"],
+      "titleKey": "level.lab.echo.05.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "lab-02-echo-06",
+      "mode": "lab",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|curation|v1|axis-shift-curation-v1|lab-02-echo-06|50",
+      "size": 5,
+      "initialRows": [0, 0, 0, 0, 0],
+      "targetRows": [11, 11, 17, 26, 26],
+      "optimalPulseCount": 2,
+      "canonicalSolution": [
+        { "colMask": 17, "rowMask": 7 },
+        { "colMask": 26, "rowMask": 27 }
+      ],
+      "difficulty": "normal",
+      "complexityScore": 41,
+      "tags": ["dense", "symmetric", "overlap"],
+      "titleKey": "level.lab.echo.06.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "lab-02-echo-07",
+      "mode": "lab",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|curation|v1|axis-shift-curation-v1|lab-02-echo-07|0",
+      "size": 5,
+      "initialRows": [0, 0, 0, 0, 0],
+      "targetRows": [23, 23, 29, 24, 10],
+      "optimalPulseCount": 3,
+      "canonicalSolution": [
+        { "colMask": 5, "rowMask": 7 },
+        { "colMask": 18, "rowMask": 19 },
+        { "colMask": 24, "rowMask": 28 }
+      ],
+      "difficulty": "normal",
+      "complexityScore": 61,
+      "tags": ["dense", "asymmetric", "overlap"],
+      "titleKey": "level.lab.echo.07.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "lab-02-echo-08",
+      "mode": "lab",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|curation|v1|axis-shift-curation-v1|lab-02-echo-08|8",
+      "size": 5,
+      "initialRows": [0, 0, 0, 0, 0],
+      "targetRows": [9, 9, 23, 5, 30],
+      "optimalPulseCount": 3,
+      "canonicalSolution": [
+        { "colMask": 9, "rowMask": 15 },
+        { "colMask": 18, "rowMask": 20 },
+        { "colMask": 12, "rowMask": 28 }
+      ],
+      "difficulty": "normal",
+      "complexityScore": 63,
+      "tags": ["dense", "asymmetric", "overlap"],
+      "titleKey": "level.lab.echo.08.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "lab-02-echo-09",
+      "mode": "lab",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|curation|v1|axis-shift-curation-v1|lab-02-echo-09|3",
+      "size": 5,
+      "initialRows": [0, 0, 0, 0, 0],
+      "targetRows": [27, 7, 21, 28, 27],
+      "optimalPulseCount": 3,
+      "canonicalSolution": [
+        { "colMask": 9, "rowMask": 23 },
+        { "colMask": 18, "rowMask": 19 },
+        { "colMask": 28, "rowMask": 14 }
+      ],
+      "difficulty": "hard",
+      "complexityScore": 61,
+      "tags": ["dense", "symmetric", "overlap"],
+      "titleKey": "level.lab.echo.09.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "lab-02-echo-10",
+      "mode": "lab",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|curation|v1|axis-shift-curation-v1|lab-02-echo-10|4",
+      "size": 5,
+      "initialRows": [0, 0, 0, 0, 0],
+      "targetRows": [25, 26, 3, 26, 12],
+      "optimalPulseCount": 3,
+      "canonicalSolution": [
+        { "colMask": 25, "rowMask": 5 },
+        { "colMask": 26, "rowMask": 14 },
+        { "colMask": 12, "rowMask": 16 }
+      ],
+      "difficulty": "hard",
+      "complexityScore": 61,
+      "tags": ["asymmetric", "overlap"],
+      "titleKey": "level.lab.echo.10.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "lab-02-echo-11",
+      "mode": "lab",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|curation|v1|axis-shift-curation-v1|lab-02-echo-11|47",
+      "size": 6,
+      "initialRows": [0, 0, 0, 0, 0, 0],
+      "targetRows": [25, 30, 38, 25, 30, 38],
+      "optimalPulseCount": 3,
+      "canonicalSolution": [
+        { "colMask": 33, "rowMask": 9 },
+        { "colMask": 38, "rowMask": 54 },
+        { "colMask": 56, "rowMask": 27 }
+      ],
+      "difficulty": "hard",
+      "complexityScore": 65,
+      "tags": ["dense", "symmetric", "overlap"],
+      "titleKey": "level.lab.echo.11.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "lab-02-echo-12",
+      "mode": "lab",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|curation|v1|axis-shift-curation-v1|lab-02-echo-12|14",
+      "size": 6,
+      "initialRows": [0, 0, 0, 0, 0, 0],
+      "targetRows": [45, 27, 31, 27, 4, 27],
+      "optimalPulseCount": 3,
+      "canonicalSolution": [
+        { "colMask": 41, "rowMask": 47 },
+        { "colMask": 50, "rowMask": 46 },
+        { "colMask": 4, "rowMask": 21 }
+      ],
+      "difficulty": "hard",
+      "complexityScore": 68,
+      "tags": ["dense", "asymmetric", "overlap"],
+      "titleKey": "level.lab.echo.12.title"
+    }
+  ]
+}

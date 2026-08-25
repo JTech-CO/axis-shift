@@ -1,8 +1,8 @@
 # AXIS//SHIFT 파일 트리·모듈 경계 계약
 
-**버전**: 1.1.0
-**상태**: M01·M02 구현 + 후속 phase 목표 계약
-**최종 갱신**: 2026-08-21
+**버전**: 1.2.0
+**상태**: M01·M02 완료 + M03 자동 pipeline·사람 큐레이션 승인 완료, DOD-10 대기 + 후속 phase 목표 계약
+**최종 갱신**: 2026-08-26
 **관련 불변식**: INV-002, INV-003, INV-017, INV-019
 
 ## 1. 목표
@@ -14,7 +14,7 @@
 
 ## 2. 목표 저장소 트리
 
-> **물리 배치 주의 (2026-08-21)**: 아래 트리는 M11까지의 목표 구조이며 모든 항목이 현재 존재한다는 뜻이 아니다. 구현 항목(`prototypes/`, `src/`, `public/`, `tests/`, `scripts/`, 설정 파일)은 부모 `PROJECT_ROOT` 기준이고, phase·ADR·불변식·증거 문서는 개발 중 `PROJECT_ROOT/AXIS_SHIFT_Harness_KR/`에 유지한다. 바로 아래 §2.1~2.2에 M01·M02 실제 범위를 별도로 적는다.
+> **물리 배치 주의 (2026-08-21)**: 아래 트리는 M11까지의 목표 구조이며 모든 항목이 현재 존재한다는 뜻이 아니다. 구현 항목(`prototypes/`, `src/`, `public/`, `tests/`, `scripts/`, 설정 파일)은 부모 `PROJECT_ROOT` 기준이고, phase·ADR·불변식·증거 문서는 개발 중 `PROJECT_ROOT/AXIS_SHIFT_Harness_KR/`에 유지한다. 바로 아래 §2.1~2.3에 M01~M03 실제 범위를 별도로 적는다.
 
 ```text
 axis-shift/
@@ -178,6 +178,58 @@ axis-shift/
 - `vitest.domain.config.ts`: 전역 coverage 보고 범위와 분리한 M02 5파일 per-file 100% threshold
 
 `generator`·`session`·`scoring`·`sprint` 구현과 실제 level JSON은 이 범위에 포함하지 않는다. M00/H00의 `prototypes/rule-proof/core.mjs`는 제출 슬라이스의 재현성을 위한 동결된 역사 구현이며 M02 production API로 간주하지 않는다.
+### 2.3 M03 생성기·콘텐츠 pipeline의 실제 구현 범위
+
+2026-08-26 현재 M03에서 실제 생성·활성화한 production/build-time 트리는 다음 범위다.
+
+```text
+src/domain/generator/
+├── daily-generator.ts
+├── date.ts
+├── difficulty.ts
+├── generator-config.ts
+├── generator.test.ts
+├── index.ts
+├── prng-v1.golden.ts
+├── prng.ts
+├── serialization.ts
+├── sha256.ts
+└── version-registry.ts
+src/content/
+├── catalog.ts
+├── daily-v1.golden.ts
+├── generator-map.json
+├── generator-registry.ts
+├── level-manifest.v1.json
+├── fallbacks/{index.ts,v1.json}
+├── levels/{index.ts,tutorial.json,pulse.json,echo.json,rank.json,noise.json}
+└── index.ts
+scripts/
+├── audit-daily-generator.ts
+├── generate-level-candidates.ts
+├── generator-parity-worker.ts
+├── lib/{curation-evidence.ts,curation-evidence.test.ts}
+└── validate-levels.ts
+tests/e2e/
+├── generator-parity.html
+├── generator-parity-bridge.ts
+└── generator-parity.spec.ts
+```
+
+- `domain/generator`는 React·DOM·storage·network·`Date`·Web Crypto·`Math.random()` 없는 순수 구현이다.
+- `content/catalog.ts`만 JSON envelope를 runtime guard·deep-freeze하고 domain generator에 version별 resource를 주입한다. content는 domain을 소비하며 역방향 import는 없다.
+- `generator-map.json`은 default/date schedule과 version별 policy를 보존한다. `fallbacks/v1.json`과 `daily-v1.golden.ts`는 `v1` resource에 묶인다.
+- `level-manifest.v1.json`과 5개 level JSON은 Tutorial 6·Lab 48의 안정 ID/순서를 정의한다.
+- `generate-level-candidates.ts`와 `validate-levels.ts`는 production domain API를 재사용하는 build-time I/O 계층이다. 공통 `lib/curation-evidence.ts`가 full manifest·순서 있는 catalog·human 필드를 `PENDING`으로 정규화한 machine scaffold를 approval fingerprint로 묶는다. exact match만 승인을 byte-preserve하며 catalog·manifest·scaffold 변경은 `PENDING` 재생성, 같은 fingerprint의 machine 편집은 fail-closed한다.
+- validator의 사람 큐레이션 확인은 기본 fail-closed다. manifest의 54 ID exact set/order·canonical physical profile order, section별 board·판정, progression/completion 각 5행 exact order, metadata/catalog hash/approval fingerprint binding과 normalized machine scaffold exact comparison을 self-check 22개와 함께 검증한다.
+- `generator-parity.html`·bridge·spec은 test-only Vite entry다. production router나 Pages 공개 route에 포함하지 않는다.
+- `.github/workflows/ci.yml`은 Node quality gate 뒤 Chromium·Firefox·WebKit M03 parity를 실행한다.
+- `AXIS_SHIFT_Harness_KR/evidence/M03/content-curation-v1.md`는 작은 텍스트 E1 체크리스트라 추적한다. 프로젝트 오너가 2026-08-26 54개 패턴·progression 5행을 전체 `APPROVED`했으며 evidence SHA-256은 `B81406D8…0214F`다.
+- `outputs/m03/daily-audit-v1-2026-01-01-3650.{json,md,sha256}`는 재생성 가능한 로컬 감사 산출물이므로 `.gitignore` 대상이고 커밋하지 않는다. 현재 hash는 변경 없는 미커밋 working tree의 pre-close rehearsal이다. DOD-10은 candidate implementation commit의 exact SHA에서 2회 재생성하고 phase·PROGRESS에 SHA와 요약 수치를 기록하는 evidence commit으로 닫는다.
+- M03 자동 경계 기준선은 `files=55 edges=81 violations=0 cycles=0 coreFiles=30`이며 candidate implementation commit 전 전체 closure gate에서 다시 실행한다.
+
+아직 구현하지 않은 범위는 Tutorial/Lab/Daily 화면과 session·storage·scoring 연결(M04~M07)이다. 정적 JSON과 생성 API의 존재를 플레이 가능한 프로덕션 모드 완료로 해석하지 않는다.
+
 
 ## 3. 계층별 책임
 
@@ -284,7 +336,8 @@ Date.now, performance.now, setTimeout, crypto.getRandomValues
 - `dist/`, `.vite/`, `coverage/`
 - `playwright-report/`, `test-results/`, trace·video 대량 파일
 - local `.env`와 token
-- generated candidate 전체 dump
+- manifest에 포함되지 않은 generated candidate 전체 dump
+- `outputs/m03/` Daily 감사 JSON·Markdown·checksum(phase 문서에는 hash 요약만 보존)
 - OS metadata·editor cache
 - 제출용 대형 영상 원본
 
@@ -292,7 +345,7 @@ CI artifact나 외부 보관 경로를 `PROGRESS.md`에 기록한다.
 
 ## 10. 경계 집행
 
-M01~M02에서 다음을 자동화한다.
+M01~M03에서 다음을 자동화한다.
 
 ```bash
 npm run lint

@@ -1,0 +1,224 @@
+{
+  "schemaVersion": 1,
+  "chapter": "pulse",
+  "levels": [
+    {
+      "schemaVersion": 1,
+      "id": "lab-01-pulse-01",
+      "mode": "lab",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|curation|v1|axis-shift-curation-v1|lab-01-pulse-01|0",
+      "size": 4,
+      "initialRows": [0, 0, 0, 0],
+      "targetRows": [2, 2, 2, 2],
+      "optimalPulseCount": 1,
+      "canonicalSolution": [{ "colMask": 2, "rowMask": 15 }],
+      "difficulty": "easy",
+      "complexityScore": 13,
+      "tags": ["sparse", "symmetric"],
+      "titleKey": "level.lab.pulse.01.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "lab-01-pulse-02",
+      "mode": "lab",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|curation|v1|axis-shift-curation-v1|lab-01-pulse-02|145",
+      "size": 4,
+      "initialRows": [0, 0, 0, 0],
+      "targetRows": [0, 15, 15, 0],
+      "optimalPulseCount": 1,
+      "canonicalSolution": [{ "colMask": 15, "rowMask": 6 }],
+      "difficulty": "easy",
+      "complexityScore": 15,
+      "tags": ["symmetric"],
+      "titleKey": "level.lab.pulse.02.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "lab-01-pulse-03",
+      "mode": "lab",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|curation|v1|axis-shift-curation-v1|lab-01-pulse-03|2",
+      "size": 4,
+      "initialRows": [0, 0, 0, 0],
+      "targetRows": [12, 12, 0, 12],
+      "optimalPulseCount": 1,
+      "canonicalSolution": [{ "colMask": 12, "rowMask": 11 }],
+      "difficulty": "easy",
+      "complexityScore": 16,
+      "tags": ["asymmetric"],
+      "titleKey": "level.lab.pulse.03.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "lab-01-pulse-04",
+      "mode": "lab",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|curation|v1|axis-shift-curation-v1|lab-01-pulse-04|2",
+      "size": 4,
+      "initialRows": [0, 0, 0, 0],
+      "targetRows": [11, 11, 11, 0],
+      "optimalPulseCount": 1,
+      "canonicalSolution": [{ "colMask": 11, "rowMask": 7 }],
+      "difficulty": "easy",
+      "complexityScore": 18,
+      "tags": ["dense", "asymmetric"],
+      "titleKey": "level.lab.pulse.04.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "lab-01-pulse-05",
+      "mode": "lab",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|curation|v1|axis-shift-curation-v1|lab-01-pulse-05|0",
+      "size": 4,
+      "initialRows": [0, 0, 0, 0],
+      "targetRows": [2, 0, 5, 5],
+      "optimalPulseCount": 2,
+      "canonicalSolution": [
+        { "colMask": 5, "rowMask": 12 },
+        { "colMask": 2, "rowMask": 1 }
+      ],
+      "difficulty": "easy",
+      "complexityScore": 34,
+      "tags": ["sparse", "asymmetric"],
+      "titleKey": "level.lab.pulse.05.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "lab-01-pulse-06",
+      "mode": "lab",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|curation|v1|axis-shift-curation-v1|lab-01-pulse-06|11",
+      "size": 4,
+      "initialRows": [0, 0, 0, 0],
+      "targetRows": [12, 3, 12, 3],
+      "optimalPulseCount": 2,
+      "canonicalSolution": [
+        { "colMask": 3, "rowMask": 10 },
+        { "colMask": 12, "rowMask": 5 }
+      ],
+      "difficulty": "easy",
+      "complexityScore": 34,
+      "tags": ["symmetric"],
+      "titleKey": "level.lab.pulse.06.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "lab-01-pulse-07",
+      "mode": "lab",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|curation|v1|axis-shift-curation-v1|lab-01-pulse-07|0",
+      "size": 4,
+      "initialRows": [0, 0, 0, 0],
+      "targetRows": [2, 7, 2, 7],
+      "optimalPulseCount": 2,
+      "canonicalSolution": [
+        { "colMask": 5, "rowMask": 10 },
+        { "colMask": 2, "rowMask": 15 }
+      ],
+      "difficulty": "normal",
+      "complexityScore": 37,
+      "tags": ["asymmetric"],
+      "titleKey": "level.lab.pulse.07.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "lab-01-pulse-08",
+      "mode": "lab",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|curation|v1|axis-shift-curation-v1|lab-01-pulse-08|0",
+      "size": 4,
+      "initialRows": [0, 0, 0, 0],
+      "targetRows": [9, 9, 9, 15],
+      "optimalPulseCount": 2,
+      "canonicalSolution": [
+        { "colMask": 9, "rowMask": 15 },
+        { "colMask": 6, "rowMask": 8 }
+      ],
+      "difficulty": "normal",
+      "complexityScore": 35,
+      "tags": ["dense", "symmetric"],
+      "titleKey": "level.lab.pulse.08.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "lab-01-pulse-09",
+      "mode": "lab",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|curation|v1|axis-shift-curation-v1|lab-01-pulse-09|1",
+      "size": 5,
+      "initialRows": [0, 0, 0, 0, 0],
+      "targetRows": [8, 24, 8, 24, 8],
+      "optimalPulseCount": 2,
+      "canonicalSolution": [
+        { "colMask": 8, "rowMask": 31 },
+        { "colMask": 16, "rowMask": 10 }
+      ],
+      "difficulty": "normal",
+      "complexityScore": 37,
+      "tags": ["sparse", "symmetric"],
+      "titleKey": "level.lab.pulse.09.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "lab-01-pulse-10",
+      "mode": "lab",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|curation|v1|axis-shift-curation-v1|lab-01-pulse-10|24",
+      "size": 5,
+      "initialRows": [0, 0, 0, 0, 0],
+      "targetRows": [10, 8, 0, 2, 10],
+      "optimalPulseCount": 2,
+      "canonicalSolution": [
+        { "colMask": 2, "rowMask": 25 },
+        { "colMask": 8, "rowMask": 19 }
+      ],
+      "difficulty": "normal",
+      "complexityScore": 37,
+      "tags": ["sparse", "symmetric"],
+      "titleKey": "level.lab.pulse.10.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "lab-01-pulse-11",
+      "mode": "lab",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|curation|v1|axis-shift-curation-v1|lab-01-pulse-11|1",
+      "size": 5,
+      "initialRows": [0, 0, 0, 0, 0],
+      "targetRows": [13, 15, 0, 5, 13],
+      "optimalPulseCount": 3,
+      "canonicalSolution": [
+        { "colMask": 5, "rowMask": 27 },
+        { "colMask": 2, "rowMask": 2 },
+        { "colMask": 8, "rowMask": 19 }
+      ],
+      "difficulty": "normal",
+      "complexityScore": 58,
+      "tags": ["asymmetric"],
+      "titleKey": "level.lab.pulse.11.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "lab-01-pulse-12",
+      "mode": "lab",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|curation|v1|axis-shift-curation-v1|lab-01-pulse-12|12",
+      "size": 5,
+      "initialRows": [0, 0, 0, 0, 0],
+      "targetRows": [15, 6, 7, 7, 7],
+      "optimalPulseCount": 3,
+      "canonicalSolution": [
+        { "colMask": 1, "rowMask": 29 },
+        { "colMask": 6, "rowMask": 31 },
+        { "colMask": 8, "rowMask": 1 }
+      ],
+      "difficulty": "normal",
+      "complexityScore": 58,
+      "tags": ["dense", "asymmetric"],
+      "titleKey": "level.lab.pulse.12.title"
+    }
+  ]
+}

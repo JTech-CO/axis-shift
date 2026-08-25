@@ -308,9 +308,9 @@ export interface EncodedPulse {
 }
 ```
 
-- Campaign 퍼즐은 `canonicalSolution`을 빌드 타임에 포함할 수 있다.
-- Daily 퍼즐은 생성 후 런타임에서 최적 분해를 산출하고 메모리 캐시에 보관한다.
-- `optimalPulseCount`는 저장값을 신뢰하지 않고 개발 빌드에서 실제 랭크와 교차 검증한다.
+- Tutorial·Lab 퍼즐은 빌드 타임에 검증한 `canonicalSolution`을 포함한다.
+- Daily `v1`도 생성 시 canonical factorization을 계산해 불변 `PuzzleDefinition`에 포함한다.
+- `optimalPulseCount`와 `canonicalSolution`은 저장값을 신뢰하지 않고 validator·3,650일 감사에서 실제 랭크와 round-trip으로 재검증한다.
 
 #### 2.3.3. 세션과 이동
 
@@ -782,16 +782,19 @@ export function isSolved(
 
 수학적 랭크만으로 체감 난도를 완전히 설명할 수 없으므로 다음 정규화 지표를 결합한다.
 
-- `rankFactor`: 최소 펄스 수
-- `sizeFactor`: 보드 크기
-- `overlapIndex`: 정규 해답 펄스 간 교차 셀 중첩률
-- `dispersionIndex`: 켜진 셀의 공간적 분산도
-- `noiseRatio`: 초기 상태가 빈 보드가 아닌 경우의 혼잡도
-- `symmetryScore`: 수평·수직·회전 대칭성. 대칭이 높으면 대체로 인지 부담이 낮다.
-- `gestureCost`: 최적해의 총 행·열 선택 수
+- `rankFactor`: `rank_GF2(initial XOR target)`, 즉 최소 펄스 수
+- `sizeFactor`: 보드 한 변 `N`
+- `overlapIndex`: canonical 해가 건드린 셀 중 두 번 이상 건드린 셀의 비율 `touches>=2 / touched`
+- `dispersionIndex`: 차이 보드 ON 셀 쌍의 평균 Manhattan 거리 `/ (2 × (N - 1))`
+- `noiseRatio`: initial 보드 ON 밀도와 같은 값
+- `symmetryScore`: 차이 보드의 수평·수직·180° 회전 일치율 중 최댓값
+- `gestureCost`: canonical 해의 모든 `rowMask`·`colMask` popcount 합
+- `normalizedGestureCost`: rank가 0이면 0, 아니면 `10 × gestureCost / (2 × N × rankFactor)`
+- `sweepBound`: 비영 행 수와 비영 열 수 중 작은 값
+- `compressionGap`: `sweepBound - rankFactor`, 즉 축 순회 대비 최적해 압축량
 
 ```text
-complexityScore =
+complexityScore = max(0, round(
   20 × (rankFactor - 1)
   + 5 × (sizeFactor - 3)
   + 12 × overlapIndex
@@ -799,7 +802,12 @@ complexityScore =
   + 8 × noiseRatio
   + 6 × (1 - symmetryScore)
   + normalizedGestureCost
+))
 ```
+
+태그 임계치는 `generator-map.json` 한 곳에서 관리한다: `sparse <= 0.35`, `dense >= 0.55`, `symmetric >= 0.90`, `overlap >= 0.05`. initial 밀도가 0보다 크면 `noise`다.
+
+`rankFactor`는 최소 행동 수이지 체감 난도의 단조 대리값이 아니다. Hard 자동 후보는 모든 행·열이 비영이고 `compressionGap >= 2`인 anti-sweep 구조를 요구하지만, 최종 Lab 난도와 학습 순서는 사람이 승인한다.
 
 이 점수는 자동 필터와 초기 배치용이며 최종 Lab 난도는 사람 플레이테스트로 재분류한다.
 
@@ -808,15 +816,22 @@ complexityScore =
 #### 4.4.1. 시드
 
 ```text
-seedInput = "axis-shift|daily|{generatorVersion}|{UTC yyyy-mm-dd}"
-seedHash  = SHA-256(seedInput)
-prngSeed  = hash 앞 32비트
+seedDomain = "axis-shift|daily"
+seedInput  = "axis-shift|daily|{generatorVersion}|{UTC YYYY-MM-DD}"
+normalized = NFKC(seedInput)
+seedHash   = SHA-256(UTF-8(normalized))
+prngSeed   = seedHash[0..3]을 big-endian uint32로 해석
+PRNG       = Mulberry32(prngSeed)
 ```
 
-- Daily 기준 시각은 UTC 00:00이다.
-- 화면에는 사용자의 현지 날짜와 다음 퍼즐까지 남은 시간을 표시한다.
-- `generatorVersion`을 포함하여 알고리즘 수정 후 과거 퍼즐이 바뀌는 것을 방지한다.
-- 생성기 버전 적용 기간을 `generator-map`에 저장한다.
+- `nextInt(maxExclusive)`는 modulo bias가 없도록 `2^32` 수용 한계 밖의 값을 rejection sampling한다.
+- 날짜는 `0001-01-01..9999-12-31`의 엄격한 Gregorian `YYYY-MM-DD`로 파싱한다. domain 생성기는 `Date`, `crypto`, `Math.random()`에 의존하지 않는다.
+- Daily 기준 시각은 UTC 00:00이며 화면의 현지 날짜 표시는 M07 adapter 책임이다.
+- `generator-map.json`은 `defaultVersion`, 정렬된 `effectiveFrom` schedule, version별 policy resource를 분리한다.
+- version별 policy·fallback·golden snapshot을 함께 보존한다. default가 향후 바뀌어도 명시적 `v1` 요청은 `v1` resource와 알고리즘을 사용한다.
+- object key를 정렬하고 `undefined`를 제외하는 stable JSON 직렬화를 puzzle output hash와 감사 리포트에 사용한다.
+- `generatorVersion`을 seed와 puzzle ID에 포함해 알고리즘 수정 후 과거 퍼즐이 바뀌는 것을 방지한다.
+- `v1` seed 입력에는 별도 런타임 salt나 로컬 타임존을 추가하지 않는다.
 
 #### 4.4.2. 난도 스케줄
 
@@ -824,15 +839,15 @@ prngSeed  = hash 앞 32비트
 
 | 요일(UTC) | 보드 | 목표 랭크 | 성격 |
 |---|---:|---:|---|
-| 월 | 4×4 | 2 | 짧고 대칭적인 시작 |
-| 화 | 5×5 | 3 | 희소 패턴 |
-| 수 | 5×5 | 3 | 중첩 중심 |
-| 목 | 5×5 | 4 | 일반 도전 |
-| 금 | 6×6 | 4 | 넓은 패턴 |
-| 토 | 6×6 | 5 | 주간 최고 난도 |
-| 일 | 5×5 | 4 | 시각적 특수 패턴 |
+| 월 | 4×4 | 2 | Easy, 짧은 시작 |
+| 화 | 5×5 | 3 | Normal, 희소 차이 패턴 |
+| 수 | 5×5 | 3 | Normal, canonical overlap 포함 |
+| 목 | 5×5 | 3 | Normal, 모든 축 비영·gap 2 |
+| 금 | 6×6 | 3 | Hard, 모든 축 비영·gap 3 |
+| 토 | 6×6 | 4 | Hard, overlap·gap 2 |
+| 일 | 5×5 | 2~3 | Normal, symmetric noise initial |
 
-난도는 날짜 해시로 일부 변형하되 목표 랭크 범위를 벗어나지 않는다.
+난도는 요일 profile의 범위를 벗어나지 않는다. 이 표의 랭크는 단독 난도 순서가 아니며 Hard profile은 모든 축 비영과 `compressionGap >= 2`를 만족한다.
 
 #### 4.4.3. 생성 절차
 
@@ -842,7 +857,7 @@ prngSeed  = hash 앞 32비트
 3. 서로 독립인 row vector와 column vector 쌍 생성
 4. rank-1 외적을 XOR 합성해 차이 행렬 생성
 5. 실제 GF(2) 랭크가 목표와 같은지 검증
-6. 밀도·빈 행/열·대칭·gestureCost 조건 검사
+6. 밀도·비영 행/열·`sweepBound`·`compressionGap`·overlap·대칭·gestureCost 조건 검사
 7. 초기 보드 생성 후 target = initial XOR diff 계산
 8. 정규 최적 분해 재구성 검증
 9. 통과 시 PuzzleDefinition 반환
@@ -855,33 +870,46 @@ prngSeed  = hash 앞 32비트
 - 모든 셀이 OFF 또는 ON인 목표 제외
 - 튜토리얼 외에는 차이 행렬이 한 행 또는 한 열에만 몰린 문제 제한
 - 목표 랭크와 실제 랭크 일치
-- 정규 해답의 각 `rowMask`, `colMask`가 0이 아님
-- 최적 분해 재합성 결과가 차이 행렬과 일치
-- 연속 Daily 간 동일 목표 패턴 해시 중복 방지
-- 시각적으로 해석 불가능한 과도한 노이즈는 난도별 임계값으로 제외
+- 난도 후보마다 `sweepBound`와 `compressionGap` 재계산
+- Hard profile은 모든 행·열 비영, `compressionGap >= 2`
+- 정규 해답의 각 `rowMask`, `colMask`가 0이 아니며 재합성 결과가 차이 행렬과 일치
+- 같은 크기가 이어지는 Daily는 직전 목표 해시와 같지 않아야 한다.
+- 목표 해시는 `SHA-256("${size}:${targetRows.join(',')}")`로 계산한다.
+- 시각적으로 해석 불가능한 과도한 노이즈는 profile 범위로 제외한다.
+- 정적 임계치와 분포 허용 구간은 코드 상수가 아니라 version별 `generator-map.json` resource에 둔다.
+- 생성된 puzzle은 stable serialization 후 SHA-256 output hash를 갖는다.
+- 모든 조건 통과 후 canonical solution·Par·난도 feature를 불변 객체로 반환한다.
 
 #### 4.4.5. 생성 실패 대응
 
-- 단일 퍼즐 생성 최대 시도: 512회
-- 실패 시 난도별 정적 fallback 풀에서 날짜 해시로 선택
-- fallback 사용 여부는 개발 로그에만 남기며 사용자에게 오류로 표시하지 않는다.
-- CI에서 향후 3,650일 분량을 샘플 생성하여 실패율과 중복률을 검사한다.
+- 단일 퍼즐 생성 최대 시도는 512회다.
+- 실패 시 `"${seedInput}|fallback"`에서 만든 PRNG로 해당 weekday profile의 정적 fallback 2개 중 하나를 고르고, 직전 목표와 같으면 다음 항목을 순회한다.
+- `v1`은 7개 profile×2개, 총 14개 fallback을 version resource로 보존한다.
+- 강제 max-attempt fixture가 결정적 fallback 선택과 validator 통과를 검증한다.
+- 2026-01-01부터 3,650일 감사의 정상 생성은 fallback 0회, 최대 시도 107회였다.
+- 변경 없는 미커밋 working tree의 pre-close rehearsal 2회는 동일 output hash `997df1b0…10b0`와 report SHA-256 `b1102aee…6d49`를 냈다. 이는 DOD-10 fixed-SHA 증거가 아니다.
+- DOD-10은 아직 없는 candidate implementation commit을 만들고, 그 exact SHA에서 감사를 2회 재실행해 동일 report SHA를 확인한 다음 evidence commit으로 닫는다.
+- 감사의 예외·invalid·wrong Par·인접 목표 중복·분포 실패는 모두 0이다.
 
 ### 4.5. 콘텐츠 파이프라인
 
-- Lab 레벨은 `src/content/levels/*.json`에 체크인한다.
-- 개발용 `scripts/generate-level-candidates.ts`가 후보를 생성한다.
-- `scripts/validate-levels.ts`가 스키마·랭크·최적해·중복을 검사한다.
-- 사람이 후보를 플레이하고 난도·패턴·튜토리얼 적합성을 승인한다.
-- 승인된 콘텐츠만 프로덕션 번들에 포함한다.
-- 레벨 ID는 한번 배포하면 변경하지 않는다.
+- `level-manifest.v1.json`이 Tutorial 6개와 Lab 48개를 고정한다. Lab은 `pulse`, `echo`, `rank`, `noise` 각 12개다.
+- `scripts/generate-level-candidates.ts --seed axis-shift-curation-v1`가 같은 seed에서 같은 JSON과 ASCII 큐레이션 atlas를 만든다. JSON 6파일의 재실행 hash change는 0이다.
+- 큐레이션 evidence는 단일 `content-curation-v1.md`다. 기본 생성은 full manifest·순서 있는 catalog·human 필드를 `PENDING`으로 정규화한 machine scaffold의 approval fingerprint exact match에서 파일을 byte-preserve하고 `curation=preserved`를 출력한다. catalog·manifest·scaffold 변경은 stale 승인을 `PENDING`으로 재생성하고, 같은 fingerprint의 machine 편집은 fail-closed하며, 명시적 `--reset-curation`도 승인을 초기화한다.
+- `scripts/validate-levels.ts`가 schema·범위·비자명성·rank/Par·canonical round-trip·난도 feature·tag·ID/title key·14 fallback을 재검증한다.
+- 현재 54개 카탈로그 SHA-256은 `c625d54327e5a6c3c6305a373d5199abd01c6fb69415161f9d4aee27c1738484`다.
+- validator는 manifest 54 ID exact set/order·canonical physical profile order와 section별 board·판정, progression/completion 각 5행 exact order, metadata/catalog hash/approval fingerprint binding, normalized machine scaffold exact comparison을 22개 self-check와 함께 검증한다. 객관 조건과 사람 E1 gate는 분리해 기록한다.
+- 프로젝트 오너는 2026-08-26 `AXIS_SHIFT_Harness_KR/evidence/M03/content-curation-v1.md`의 54개 패턴과 progression 5행을 전체 승인했다. metadata는 `프로젝트 오너` / `2026-08-26T00:20:42+09:00` / `APPROVED`, evidence SHA-256은 `B81406D8…0214F`다.
+- 일반 validator는 승인 metadata·approval fingerprint·machine scaffold가 어긋나면 실패한다. 후보 작업 중 객관 검증만 명시적 `--allow-pending-curation`으로 허용한다.
+- DOD-04 사람 승인은 완료됐지만 candidate exact-SHA 감사 2회 전에는 M03 완료나 프로덕션 플레이 가능 콘텐츠라고 주장하지 않는다. 화면 연결은 M06·M07 범위다.
+- 레벨 ID는 한번 배포하면 변경·재사용하지 않는다.
 
 ```text
-lab-01-pulse-01
-lab-01-pulse-02
-lab-02-echo-01
-lab-03-rank-01
-lab-04-noise-01
+tutorial: tutorial-01-row ... tutorial-06-echo
+pulse:    lab-01-pulse-01 ... lab-01-pulse-12
+echo:     lab-02-echo-01 ... lab-02-echo-12
+rank:     lab-03-rank-01 ... lab-03-rank-12
+noise:    lab-04-noise-01 ... lab-04-noise-12
 ```
 
 ### 4.6. 저장 및 복구 (Persistence & Recovery)
@@ -1352,11 +1380,15 @@ axis-shift/
 
 #### 생성기
 
-- 동일 시드와 버전은 동일 JSON을 생성한다.
-- 목표 랭크·밀도·범위 조건을 만족한다.
-- 10년치 날짜 샘플에서 생성 실패가 허용 기준 이하이다.
-- fallback 선택도 결정적이다.
-- 생성기 버전 변경 전 과거 버전 스냅샷이 유지된다.
+- SHA-256 표준 vector, NFKC seed, Mulberry32 seed 20개×첫 100출력이 일치한다.
+- 동일 date/version은 Node·Chromium·Firefox·WebKit과 UTC·서울·LA 시간대별 프로세스 3개에서 동일 stable JSON hash를 만든다. 각 시간대 프로세스는 10회 반복한다.
+- 20개 `v1` Daily golden date snapshot과 명시적 과거 version lookup을 고정한다.
+- 강제 max-attempt에서 14개 fallback 중 profile에 맞는 결과를 결정적으로 고른다.
+- 3,650일 감사는 예외·invalid·wrong Par·fallback·인접 중복·분포 실패 0을 요구한다.
+- 실제 M03 기준은 PRNG/Daily 3브라우저 parity 9/9, generator unit 14/14이다.
+- DOD-10 closure는 candidate implementation commit의 exact SHA에서 감사를 두 번 실행해 report SHA를 비교하고, exact SHA와 결과를 evidence commit에 기록한다.
+- 정적 콘텐츠 객관 검증과 사람 큐레이션 승인 상태를 서로 다른 gate로 기록한다.
+- 생성기 버전 변경 전 과거 algorithm·policy·fallback·golden snapshot을 유지한다.
 
 #### 점수·저장
 

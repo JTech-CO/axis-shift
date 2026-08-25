@@ -4,7 +4,7 @@
 **작성일**: 2026-08-09  
 **프로젝트**: AXIS//SHIFT — A Daily Tensor Puzzle  
 **대상 에이전트**: OpenAI Codex 우선, Claude Code 호환  
-**상태**: M00·M01·M02 및 H00 완료 / M03 진입 전
+**상태**: M00·M01·M02 및 H00 완료 / M03 DOD-04 승인 완료 + DOD-10 candidate exact-SHA 재실행 대기
 
 AXIS//SHIFT를 여러 세션에 걸쳐 구현하더라도 게임 규칙, 수학적 정확성, 디자인 품질, 검증 기준이 표류하지 않도록 만든 다중 파일 작업 하네스다. 이 팩은 단순 작업 목록이 아니라 다음을 분리해 관리한다.
 
@@ -153,4 +153,4 @@ AXIS//SHIFT에서 완료는 다음 세 조건을 동시에 만족하는 상태�
 
 ## 7. 첫 실행
 
-현재 시작점은 `PROGRESS.md`와 다음 정규 phase인 `phases/M03_generator_content.md`다. M00·M01·M02와 한시적 H00 v0.1 제출 lane은 완료됐으며, M03은 자신의 원래 DoR를 충족한 뒤 별도 오너 지시로 착수한다. H00 완료는 정규 M03~M11 완료를 뜻하지 않는다.
+현재 시작점은 `PROGRESS.md`, `phases/M03_generator_content.md`, `evidence/M03/content-curation-v1.md`다. M00·M01·M02와 한시적 H00 v0.1 제출 lane은 완료됐고 M03의 생성기·54레벨·14 fallback·3,650일 감사 pre-close rehearsal·3브라우저 객관 검증도 통과했다. 프로젝트 오너는 2026-08-26 54개 패턴과 progression 5행을 전체 승인해 DOD-04를 통과시켰다. 아직 candidate commit이 없어 DOD-10 fixed-SHA 감사만 미실행이며, fail-closed 전체 gate를 통과한 candidate implementation commit을 만들고 그 exact SHA에서 3,650일 감사를 2회 재실행한 뒤 evidence commit으로 M03을 닫는다.

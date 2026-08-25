@@ -1,3 +1,4 @@
+import path from 'node:path';
 import { fileURLToPath, URL } from 'node:url';
 
 import react from '@vitejs/plugin-react';
@@ -26,9 +27,21 @@ export function normalizeBasePath(rawBasePath: string | undefined): string {
 export default defineConfig(({ mode }) => {
   const fileEnvironment = loadEnv(mode, process.cwd(), 'VITE_');
   const basePath = process.env.VITE_BASE_PATH ?? fileEnvironment.VITE_BASE_PATH;
+  const generatorParityEntry = process.env.AXIS_SHIFT_E2E_GENERATOR_PARITY === '1';
+  const projectRoot = fileURLToPath(new URL('.', import.meta.url));
 
   return {
     base: normalizeBasePath(basePath),
+    build: generatorParityEntry
+      ? {
+          rollupOptions: {
+            input: {
+              app: path.join(projectRoot, 'index.html'),
+              generatorParity: path.join(projectRoot, 'tests', 'e2e', 'generator-parity.html'),
+            },
+          },
+        }
+      : undefined,
     plugins: [react()],
     resolve: {
       alias: {

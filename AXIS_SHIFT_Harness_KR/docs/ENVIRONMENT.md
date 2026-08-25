@@ -1,8 +1,8 @@
 # AXIS//SHIFT 개발·검증·배포 환경 계약
 
-**버전**: 1.0.0  
-**상태**: M01 제한 체크포인트·Pages artifact 전환 기준
-**최종 갱신**: 2026-08-14
+**버전**: 1.1.0
+**상태**: M01 Pages artifact 기준 + M02 domain + M03 generator/content 자동 gate
+**최종 갱신**: 2026-08-26
 
 ## 1. 기준 환경
 
@@ -35,6 +35,20 @@ Node 24 메이저 안의 정확한 patch는 CI와 개발환경에서 같은 lock
 | Pages base | `/axis-shift/` |
 
 2026-08-14 Windows 호스트의 시스템 기본 Node는 v25.2.0이어서 공식 M01 증거 명령은 Node 24 실행기로 분리해 수행했다. 제품 계약은 시스템 Node 25가 아니라 `.nvmrc`와 `package.json#engines`의 Node 24다.
+
+### M03 결정성 검증 기준선
+
+| 항목 | 실제 기준 |
+|---|---|
+| Daily generator | `v1`, seed domain `axis-shift|daily`, max attempts 512 |
+| PRNG | NFKC + SHA-256 first 4 bytes big-endian + Mulberry32/rejection sampling |
+| PRNG golden | 20 seeds × first 100 `uint32` |
+| Browser parity | Chromium·Firefox·WebKit, tests 9/9 |
+| Process/timezone parity | UTC·Asia/Seoul·America/Los_Angeles 시간대 프로세스 3개 × 프로세스별 10회 반복, mismatch 0 |
+| Daily audit rehearsal | unchanged working tree, 3,650 dates from `2026-01-01`, 2 runs, failures 0, max attempt 107 |
+| Static content | Tutorial 6 + Lab 48, fallback 14, DOD-04 owner APPROVED |
+
+M03 객관 pre-close 검증은 Node 24 도구 체인에서 통과했고 프로젝트 오너는 2026-08-26 54개 패턴과 progression 5행을 전체 승인했다. 일반 level validator는 승인 metadata·approval fingerprint·machine scaffold가 어긋나면 fail-closed한다. DOD-10은 아직 없는 candidate implementation commit의 exact SHA에서 3,650일 감사를 2회 재실행해야 하며 현재 working-tree rehearsal로 대체하지 않는다.
 
 ## 2. 지원 개발 OS
 
@@ -79,6 +93,7 @@ npm run format:check
 npm run typecheck
 npm run test
 npm run test:coverage
+npm run generate:level-candidates
 npm run validate:levels
 npm run audit:daily
 npm run audit:secrets
@@ -87,6 +102,8 @@ npm run build
 npm run build:pages
 npm run preview
 npm run test:e2e
+
+M03 closure 재검증에서는 기본 `npm run generate:level-candidates -- --seed axis-shift-curation-v1`가 full manifest·순서 있는 catalog·human 필드를 정규화한 machine scaffold의 approval fingerprint exact match에서 승인 evidence를 byte-preserve하고 `curation=preserved`를 출력해야 한다. catalog·manifest·scaffold 변경은 `PENDING` 재생성, 같은 fingerprint의 machine 편집은 fail-closed한다. `--reset-curation`은 사람 승인을 명시적으로 폐기하므로 closure 명령에 포함하지 않는다.
 npm run test:pages
 npm run test:a11y
 npm run verify
@@ -170,15 +187,16 @@ M01 필수 확인:
 ### 시간
 
 - 단위 테스트는 fake clock을 주입한다.
-- Daily는 명시적 UTC instant와 timezone을 사용한다.
+- Daily domain은 명시적 UTC `YYYY-MM-DD` 문자열을 사용하고 `Date`를 직접 읽지 않는다.
 - Sprint는 `sessionEndAt` 경계를 ms 단위로 검사한다.
-- 실제 현재 날짜에 의존하는 snapshot을 만들지 않는다.
+- 실제 현재 날짜·로컬 timezone에 의존하는 snapshot을 만들지 않는다.
 
 ### 랜덤
 
-- Daily·generator test는 고정 seed와 version을 사용한다.
+- Daily·generator test는 고정 seed와 version을 사용하며 NFKC→SHA-256→Mulberry32 순서를 고정한다.
+- `nextInt`는 rejection sampling을 사용한다. 단순 modulo로 바꾸면 golden vector와 browser parity를 다시 고정해야 한다.
 - Sprint production seed는 Web Crypto를 사용할 수 있으나 test는 주입한다.
-- `Math.random()`을 도메인·테스트 오라클에서 사용하지 않는다.
+- `Math.random()`·Web Crypto를 Daily domain과 테스트 오라클에서 사용하지 않는다.
 
 ### Locale·timezone
 
@@ -188,6 +206,8 @@ Playwright matrix 최소값:
 locale: ko-KR, en-US
 timezone: UTC, Asia/Seoul, America/Los_Angeles, Pacific/Kiritimati
 ```
+
+M03 generator parity는 `UTC`, `Asia/Seoul`, `America/Los_Angeles`의 3개 환경에서 puzzle/diagnostics stable hash를 비교한다. `Pacific/Kiritimati`를 포함한 전체 제품 locale·timezone matrix는 M07·M10에서 유지한다.
 
 ### Viewport
 
@@ -215,11 +235,13 @@ checkout
 → 정적 접근성 이름 검사
 → 모듈 경계·순환 검사
 → level validation
-→ Daily 구현 탐지·대표 날짜 audit
+→ 54-level fail-closed validation
+→ 3,650-day Daily audit
 → secret scan
 → build
-→ Chromium 설치
+→ Chromium·Firefox·WebKit 설치
 → non-root route core E2E
+→ M03 PRNG·Daily browser parity 3엔진
 ```
 
 main Pages pipeline:
@@ -236,7 +258,7 @@ checkout
 → Pages artifact upload/deploy
 ```
 
-M01 workflow는 `node-version-file: .nvmrc`, npm cache와 `package-lock.json`, `npm ci`를 사용한다. `.nvmrc=24`와 `package.json#engines`도 Node 24로 일치한다. PR/main 품질 CI는 Chromium core E2E까지, Pages workflow는 호환 artifact Chromium smoke와 공식 upload/deploy까지 실행한다.
+workflow는 `node-version-file: .nvmrc`, npm cache와 `package-lock.json`, `npm ci`를 사용한다. `.nvmrc=24`와 `package.json#engines`도 Node 24로 일치한다. 품질 CI는 Chromium core E2E 뒤 M03 parity를 Chromium·Firefox·WebKit에서 실행하고, Pages workflow는 호환 artifact Chromium smoke와 공식 upload/deploy를 유지한다.
 
 ## 9. GitHub Pages 배포
 

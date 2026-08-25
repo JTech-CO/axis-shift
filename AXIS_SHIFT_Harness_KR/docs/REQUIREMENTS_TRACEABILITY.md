@@ -1,8 +1,8 @@
 # AXIS//SHIFT 요구사항 추적표
 
 **버전**: 1.0.0  
-**상태**: M00·M01·M02 verified / H00 v0.1 submission slice verified / v1 roadmap baseline
-**최종 갱신**: 2026-08-21
+**상태**: M00·M01·M02 verified / M03 자동 pipeline·사람 큐레이션 verified, DOD-10 pending / H00 v0.1 submission slice verified / v1 roadmap baseline
+**최종 갱신**: 2026-08-26
 
 > 기능 요구사항 ID는 기술 백서 §2.2.2를 따른다. `NFR-*`는 백서의 성능·접근성·배포·개인정보 기준을 하네스에서 추적 가능하게 부여한 ID다. 이 표가 새로운 제품 요구를 만드는 것은 아니며, 원문 기준의 검증 경로를 연결한다.
 
@@ -28,8 +28,8 @@
 | FR-CORE-006 | 확인 후 initial state Reset, 확정 기록 보존 | M04·M06 | reducer, Dialog | reducer + component/E2E | 010,011 | Planned |
 | FR-CORE-007 | 새로고침 후 유효 미완료 세션 복구 | M04·M06·M07 | storage repository | migration + reload E2E | 011 | Planned |
 | FR-HINT-001 | 남은 Par → 한 축 → 전체 PULSE 단계형 Hint | M02·M04·M06 | factorization, selectors | rank/factorization + UI | 006 | In Progress |
-| FR-LAB-001 | Tutorial 이후 Lab 진입·48레벨 진행 | M03·M06 | content, lab feature | level validator + E2E | 007,011 | Planned |
-| FR-DAILY-001 | 동일 UTC date/version에서 동일 퍼즐 | M03·M07 | generator, UTC adapter | 3,650-day audit + timezone E2E | 008,009 | Planned |
+| FR-LAB-001 | Tutorial 이후 Lab 진입·48레벨 진행 | M03·M06 | content, lab feature | level validator + E2E | 007,011 | In Progress |
+| FR-DAILY-001 | 동일 UTC date/version에서 동일 퍼즐 | M03·M07 | generator, UTC adapter | 3,650-day audit + timezone E2E | 008,009 | In Progress |
 | FR-DAILY-002 | 날짜별 완료와 local streak | M04·M07 | record repository, streak | truth table + E2E | 011,012 | Planned |
 | FR-SPRINT-001 | `sessionEndAt` 기준 180초 연속 세션 | M08 | sprint reducer, score | fake clock + browser E2E | 010,012 | Planned |
 | FR-SHARE-001 | 정답 없는 UTF-8 결과 텍스트·폴백 | M09 | share-safe DTO, adapter | payload snapshot + capability matrix | 013,016 | Planned |
@@ -42,7 +42,7 @@
 | ID | 백서 기준 | Phase | 자동·수동 검증 | INV | 상태 |
 |---|---|---|---|---|---|
 | NFR-MATH-001 | Par=`rank_GF2(current XOR target)` | M02 | 3×3 512 전수 BFS 패리티 | 006 | Verified |
-| NFR-CONTENT-001 | Tutorial 6 + Lab 48 전부 유효 | M03·M06 | validator + canonical solve | 007 | Planned |
+| NFR-CONTENT-001 | Tutorial 6 + Lab 48 전부 유효 | M03·M06 | validator + canonical solve | 007 | In Progress |
 | NFR-DET-001 | seed·factorization·signature 결정성 | M02·M03·M09 | golden vectors·browser parity | 006,008 | In Progress |
 | NFR-STORAGE-001 | schema guard·migration·손상 복구 | M04 | fixture matrix + reload E2E | 011 | Planned |
 | NFR-RESP-001 | 360px부터 가로 스크롤·가림 없음 | M05·M10 | viewport E2E + 실기기 | 015 | Planned |
@@ -58,7 +58,9 @@
 | NFR-RELEASE-001 | P0/P1·INV 위반 0 | M10·M11 | QA_REPORT + issue audit | 020 | Planned |
 | NFR-CODEX-001 | Codex 기여·사람 판단·검증 증거 구분 | 전 phase·M11 | collaboration log + commit links | 018 | Planned |
 
-> **M02 완료 증거 (2026-08-21)**: `matrixCount=512 oracleUnvisited=0 rankMismatch=0 factorizationMismatch=0 pulseInvariantFailures=0`, 고정 시드 `randomMatrices=50000 determinismFailures=0`; `board`·`pulse`·`guards`·`gf2-rank`·`factorization` 5개 파일은 파일별 statements/branches/functions/lines 100%, `src/domain` test 27/27이다. 경계 검사는 `files=43 edges=40 violations=0 cycles=0 coreFiles=27 coreFixtureImplementations=5 coreFixtureAssertions=2`로 production 중복 구현과 의도적 self-check를 함께 검증했다. 이 증거는 M02 수학 계층만 닫으며 FR-CORE-003의 M04/M06 session·UI, FR-HINT-001의 M04/M06 selector·UI, NFR-DET-001의 M03 seed와 M09 signature는 아직 완료하지 않는다.
+> **M02 완료 증거 (2026-08-21)**: `matrixCount=512 oracleUnvisited=0 rankMismatch=0 factorizationMismatch=0 pulseInvariantFailures=0`, 고정 시드 `randomMatrices=50000 determinismFailures=0`; `board`·`pulse`·`guards`·`gf2-rank`·`factorization` 5개 파일은 파일별 statements/branches/functions/lines 100%, `src/domain` test 27/27이다. 경계 검사는 `files=43 edges=40 violations=0 cycles=0 coreFiles=27 coreFixtureImplementations=5 coreFixtureAssertions=2`로 production 중복 구현과 의도적 self-check를 함께 검증했다. 이 증거는 M02 수학 계층만 닫으며 FR-CORE-003의 M04/M06 session·UI와 FR-HINT-001의 M04/M06 selector·UI는 아직 완료하지 않는다.
+
+> **M03 진행 증거 (2026-08-26)**: Tutorial 6 + Lab 48(4 chapter×12), fallback 14, catalog hash `c625d54327e5a6c3c6305a373d5199abd01c6fb69415161f9d4aee27c1738484`; level schema·Par·canonical·tag·ID 객관 검증 실패 0이다. 프로젝트 오너는 54개 패턴과 progression 5행을 전체 승인해 DOD-04를 통과시켰다. approval fingerprint `5a60604a…b7e6a`는 full manifest·순서 있는 catalog·human 필드를 정규화한 machine scaffold를 묶고, validator는 exact binding·scaffold comparison을 self-check 22개로 방어한다. PRNG 20 seed×100 출력과 Daily golden 20개는 Chromium·Firefox·WebKit 9/9이며, 변경 없는 미커밋 working tree의 3,650일 audit pre-close rehearsal 2회는 output hash `997df1b0…10b0`, report SHA `b1102aee…6d49`, 예외·invalid·wrong Par·fallback·인접 중복·분포 실패 0, 최대 시도 107을 냈다. 이는 DOD-10 fixed-SHA 증거가 아니다. 아직 없는 candidate implementation commit의 exact SHA에서 감사 2회를 재실행하고 evidence commit을 만들기 전까지, 그리고 M06 화면/진행 E2E·M07 UTC adapter/Archive 회귀·M09 signature가 남아 있으므로 FR-LAB-001·FR-DAILY-001·NFR-CONTENT-001·NFR-DET-001은 `Verified`가 아니라 `In Progress`로 유지한다.
 
 ## 4. H00 해커톤 제출 슬라이스 추적
 

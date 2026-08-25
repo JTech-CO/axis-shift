@@ -1,0 +1,300 @@
+{
+  "schemaVersion": 1,
+  "generatorVersion": "v1",
+  "fallbacks": [
+    {
+      "schemaVersion": 1,
+      "id": "daily-v1-mon-fallback-01",
+      "profileId": "daily-v1-mon",
+      "mode": "daily",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|fallback|v1|axis-shift-curation-v1|daily-v1-mon|0|0",
+      "size": 4,
+      "initialRows": [0, 0, 0, 0],
+      "targetRows": [13, 13, 6, 0],
+      "optimalPulseCount": 2,
+      "canonicalSolution": [
+        { "colMask": 13, "rowMask": 3 },
+        { "colMask": 6, "rowMask": 4 }
+      ],
+      "difficulty": "easy",
+      "complexityScore": 35,
+      "tags": ["asymmetric"],
+      "titleKey": "level.daily.fallback.1.01.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "daily-v1-mon-fallback-02",
+      "profileId": "daily-v1-mon",
+      "mode": "daily",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|fallback|v1|axis-shift-curation-v1|daily-v1-mon|1|1",
+      "size": 4,
+      "initialRows": [0, 0, 0, 0],
+      "targetRows": [12, 15, 3, 3],
+      "optimalPulseCount": 2,
+      "canonicalSolution": [
+        { "colMask": 3, "rowMask": 14 },
+        { "colMask": 12, "rowMask": 3 }
+      ],
+      "difficulty": "easy",
+      "complexityScore": 36,
+      "tags": ["dense", "asymmetric"],
+      "titleKey": "level.daily.fallback.1.02.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "daily-v1-tue-fallback-01",
+      "profileId": "daily-v1-tue",
+      "mode": "daily",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|fallback|v1|axis-shift-curation-v1|daily-v1-tue|0|12",
+      "size": 5,
+      "initialRows": [0, 0, 0, 0, 0],
+      "targetRows": [4, 4, 18, 14, 0],
+      "optimalPulseCount": 3,
+      "canonicalSolution": [
+        { "colMask": 18, "rowMask": 12 },
+        { "colMask": 4, "rowMask": 11 },
+        { "colMask": 24, "rowMask": 8 }
+      ],
+      "difficulty": "normal",
+      "complexityScore": 59,
+      "tags": ["sparse", "asymmetric", "overlap"],
+      "titleKey": "level.daily.fallback.2.01.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "daily-v1-tue-fallback-02",
+      "profileId": "daily-v1-tue",
+      "mode": "daily",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|fallback|v1|axis-shift-curation-v1|daily-v1-tue|1|0",
+      "size": 5,
+      "initialRows": [0, 0, 0, 0, 0],
+      "targetRows": [12, 26, 12, 4, 0],
+      "optimalPulseCount": 3,
+      "canonicalSolution": [
+        { "colMask": 18, "rowMask": 2 },
+        { "colMask": 4, "rowMask": 13 },
+        { "colMask": 8, "rowMask": 7 }
+      ],
+      "difficulty": "normal",
+      "complexityScore": 57,
+      "tags": ["sparse", "asymmetric"],
+      "titleKey": "level.daily.fallback.2.02.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "daily-v1-wed-fallback-01",
+      "profileId": "daily-v1-wed",
+      "mode": "daily",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|fallback|v1|axis-shift-curation-v1|daily-v1-wed|0|3",
+      "size": 5,
+      "initialRows": [0, 0, 0, 0, 0],
+      "targetRows": [7, 3, 17, 0, 7],
+      "optimalPulseCount": 3,
+      "canonicalSolution": [
+        { "colMask": 17, "rowMask": 23 },
+        { "colMask": 18, "rowMask": 19 },
+        { "colMask": 4, "rowMask": 17 }
+      ],
+      "difficulty": "normal",
+      "complexityScore": 62,
+      "tags": ["asymmetric", "overlap"],
+      "titleKey": "level.daily.fallback.3.01.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "daily-v1-wed-fallback-02",
+      "profileId": "daily-v1-wed",
+      "mode": "daily",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|fallback|v1|axis-shift-curation-v1|daily-v1-wed|1|0",
+      "size": 5,
+      "initialRows": [0, 0, 0, 0, 0],
+      "targetRows": [11, 15, 19, 19, 28],
+      "optimalPulseCount": 3,
+      "canonicalSolution": [
+        { "colMask": 19, "rowMask": 15 },
+        { "colMask": 4, "rowMask": 18 },
+        { "colMask": 24, "rowMask": 19 }
+      ],
+      "difficulty": "normal",
+      "complexityScore": 63,
+      "tags": ["dense", "asymmetric", "overlap"],
+      "titleKey": "level.daily.fallback.3.02.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "daily-v1-thu-fallback-01",
+      "profileId": "daily-v1-thu",
+      "mode": "daily",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|fallback|v1|axis-shift-curation-v1|daily-v1-thu|0|2",
+      "size": 5,
+      "initialRows": [0, 0, 0, 0, 0],
+      "targetRows": [31, 7, 4, 7, 28],
+      "optimalPulseCount": 3,
+      "canonicalSolution": [
+        { "colMask": 3, "rowMask": 11 },
+        { "colMask": 4, "rowMask": 31 },
+        { "colMask": 24, "rowMask": 17 }
+      ],
+      "difficulty": "normal",
+      "complexityScore": 59,
+      "tags": ["dense", "asymmetric"],
+      "titleKey": "level.daily.fallback.4.01.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "daily-v1-thu-fallback-02",
+      "profileId": "daily-v1-thu",
+      "mode": "daily",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|fallback|v1|axis-shift-curation-v1|daily-v1-thu|1|0",
+      "size": 5,
+      "initialRows": [0, 0, 0, 0, 0],
+      "targetRows": [11, 6, 27, 6, 13],
+      "optimalPulseCount": 3,
+      "canonicalSolution": [
+        { "colMask": 13, "rowMask": 21 },
+        { "colMask": 6, "rowMask": 15 },
+        { "colMask": 16, "rowMask": 4 }
+      ],
+      "difficulty": "normal",
+      "complexityScore": 60,
+      "tags": ["dense", "asymmetric", "overlap"],
+      "titleKey": "level.daily.fallback.4.02.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "daily-v1-fri-fallback-01",
+      "profileId": "daily-v1-fri",
+      "mode": "daily",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|fallback|v1|axis-shift-curation-v1|daily-v1-fri|0|1",
+      "size": 6,
+      "initialRows": [0, 0, 0, 0, 0, 0],
+      "targetRows": [51, 30, 50, 30, 51, 31],
+      "optimalPulseCount": 3,
+      "canonicalSolution": [
+        { "colMask": 1, "rowMask": 49 },
+        { "colMask": 50, "rowMask": 63 },
+        { "colMask": 44, "rowMask": 42 }
+      ],
+      "difficulty": "hard",
+      "complexityScore": 66,
+      "tags": ["dense", "asymmetric", "overlap"],
+      "titleKey": "level.daily.fallback.5.01.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "daily-v1-fri-fallback-02",
+      "profileId": "daily-v1-fri",
+      "mode": "daily",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|fallback|v1|axis-shift-curation-v1|daily-v1-fri|1|0",
+      "size": 6,
+      "initialRows": [0, 0, 0, 0, 0, 0],
+      "targetRows": [45, 51, 28, 30, 49, 30],
+      "optimalPulseCount": 3,
+      "canonicalSolution": [
+        { "colMask": 49, "rowMask": 19 },
+        { "colMask": 2, "rowMask": 42 },
+        { "colMask": 28, "rowMask": 45 }
+      ],
+      "difficulty": "hard",
+      "complexityScore": 64,
+      "tags": ["dense", "asymmetric"],
+      "titleKey": "level.daily.fallback.5.02.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "daily-v1-sat-fallback-01",
+      "profileId": "daily-v1-sat",
+      "mode": "daily",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|fallback|v1|axis-shift-curation-v1|daily-v1-sat|0|0",
+      "size": 6,
+      "initialRows": [0, 0, 0, 0, 0, 0],
+      "targetRows": [17, 43, 31, 22, 17, 7],
+      "optimalPulseCount": 4,
+      "canonicalSolution": [
+        { "colMask": 17, "rowMask": 55 },
+        { "colMask": 34, "rowMask": 46 },
+        { "colMask": 52, "rowMask": 44 },
+        { "colMask": 24, "rowMask": 6 }
+      ],
+      "difficulty": "hard",
+      "complexityScore": 88,
+      "tags": ["asymmetric", "overlap"],
+      "titleKey": "level.daily.fallback.6.01.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "daily-v1-sat-fallback-02",
+      "profileId": "daily-v1-sat",
+      "mode": "daily",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|fallback|v1|axis-shift-curation-v1|daily-v1-sat|1|3",
+      "size": 6,
+      "initialRows": [0, 0, 0, 0, 0, 0],
+      "targetRows": [33, 5, 22, 22, 24, 57],
+      "optimalPulseCount": 4,
+      "canonicalSolution": [
+        { "colMask": 33, "rowMask": 35 },
+        { "colMask": 50, "rowMask": 12 },
+        { "colMask": 36, "rowMask": 14 },
+        { "colMask": 24, "rowMask": 48 }
+      ],
+      "difficulty": "hard",
+      "complexityScore": 86,
+      "tags": ["asymmetric", "overlap"],
+      "titleKey": "level.daily.fallback.6.02.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "daily-v1-sun-fallback-01",
+      "profileId": "daily-v1-sun",
+      "mode": "daily",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|fallback|v1|axis-shift-curation-v1|daily-v1-sun|0|3",
+      "size": 5,
+      "initialRows": [0, 2, 2, 8, 6],
+      "targetRows": [30, 24, 2, 3, 9],
+      "optimalPulseCount": 3,
+      "canonicalSolution": [
+        { "colMask": 17, "rowMask": 24 },
+        { "colMask": 26, "rowMask": 27 },
+        { "colMask": 4, "rowMask": 17 }
+      ],
+      "difficulty": "normal",
+      "complexityScore": 61,
+      "tags": ["dense", "symmetric", "overlap", "noise"],
+      "titleKey": "level.daily.fallback.7.01.title"
+    },
+    {
+      "schemaVersion": 1,
+      "id": "daily-v1-sun-fallback-02",
+      "profileId": "daily-v1-sun",
+      "mode": "daily",
+      "generatorVersion": "v1",
+      "seed": "axis-shift|fallback|v1|axis-shift-curation-v1|daily-v1-sun|1|18",
+      "size": 5,
+      "initialRows": [19, 18, 0, 2, 8],
+      "targetRows": [3, 12, 0, 13, 9],
+      "optimalPulseCount": 3,
+      "canonicalSolution": [
+        { "colMask": 1, "rowMask": 24 },
+        { "colMask": 14, "rowMask": 10 },
+        { "colMask": 16, "rowMask": 3 }
+      ],
+      "difficulty": "normal",
+      "complexityScore": 59,
+      "tags": ["symmetric", "noise"],
+      "titleKey": "level.daily.fallback.7.02.title"
+    }
+  ]
+}
