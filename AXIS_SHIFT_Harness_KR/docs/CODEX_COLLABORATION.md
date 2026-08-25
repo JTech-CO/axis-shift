@@ -103,7 +103,7 @@ Codex가 제안·생성·수정한 항목
 | CX-H00-002 | 2026-08-21 | H00 | 18신호·AXIS 연출 vertical slice | prototype·Pages test·H00 증거 | campaign 217, browser 891, Pages 27/27, 오류 0 | 3D 대신 콘텐츠·축 인과·모바일 완성도 채택 | 완료 |
 | CX-H00-003 | 2026-08-21~26 | H00 | 공개 배포 회귀·submission-ready 패키지·오너 제출 | PR #1·#2·#3, tag·Pages·private package | clean E3, public E4, 14-entry manifest, backup delta 0 | 오너가 개인정보·동의·Submit을 직접 수행하고 완료 확인 | 완료 / 접수 metadata 미제공 |
 | CX-M02-001 | 2026-08-21 | M02 | 순수 보드·PULSE·rank·factorization 코어 | `55b0b55273aff6803191bb9812927c622721bd2f` / PR `#5` | 512 전수·50,000 property 오류 0, 5파일 coverage 100% | 공개 규칙·bit·pivot 계약과 milestone commit/push 승인 | 완료 / PR·main CI·Pages PASS |
-| CX-M03-001 | 2026-08-21~26 | M03 | 결정적 Daily·54레벨 공급망 | candidate `1c313bd29e1d24c483749af90a8734542988be5d` | 20×100 PRNG, 3브라우저 9/9, 3,650일 exact-SHA 감사 2회 동일, DOD-04 승인 | 오너 전체 승인·M04 전환 | Accepted / DOD-01~11 PASS |
+| CX-M03-001 | 2026-08-21~26 | M03 | 결정적 Daily·54레벨 공급망 | candidate `1c313bd29e1d24c483749af90a8734542988be5d`; closure `5050551796fde4c9255349775e685c932060c58e`; PR #7 | 20×100 PRNG, 3브라우저 9/9, 3,650일 exact-SHA 감사 2회 동일, DOD-04 승인, remote CI PASS | 오너 전체 승인·M04 전환 | Accepted / DOD-01~11 PASS |
 
 ## 8. 상세 로그 템플릿
 
@@ -337,7 +337,7 @@ Codex가 제안·생성·수정한 항목
 - 사람 결정: **APPROVED**. 프로젝트 오너는 2026-08-26 54개 패턴의 가독성·난도/학습 순서·불쾌 패턴과 progression 5행을 전체 승인했고 교체·재분류 없음으로 기록했다.
 - 사람이 수정·거절한 것과 이유: 자동 score·rank·validator를 최종 학습 순서 승인으로 대신하지 않았고 오너가 atlas와 progression을 직접 검토했다. 일반 `validate:levels`는 승인 metadata·fingerprint·machine scaffold 변조를 fail-closed한다.
 - 변경 파일: `src/domain/generator/`, `src/content/`, `scripts/{generate-level-candidates,validate-levels,audit-daily-generator,generator-parity-worker}.ts`, `scripts/lib/curation-evidence*`, `tests/e2e/generator-parity*`, CI·package scripts, M03 phase·수학·백서·파일 트리·추적성 문서
-- Commit / PR: candidate implementation `1c313bd29e1d24c483749af90a8734542988be5d`; closure evidence는 이 기록을 담는 후속 문서 commit이며 push·PR 결과는 별도 원격 증거로 갱신한다.
+- Commit / PR: candidate implementation `1c313bd29e1d24c483749af90a8734542988be5d`; closure evidence `5050551796fde4c9255349775e685c932060c58e`; PR #7 / CI run `32870894868` quality PASS. PR은 병합하지 않았다.
 - 종료 검증:
   - focused generator+curation+catalog unit `23/23`; 전체 unit `55/55`
   - boundary `files=55 edges=81 violations=0 cycles=0 coreFiles=30`
@@ -354,9 +354,9 @@ Codex가 제안·생성·수정한 항목
   - exceptions/invalid/wrongPar/fallback/adjacentDuplicates/distributionFailures `0/0/0/0/0/0`, max attempt `107`
   - timezone processes `3`(UTC/Asia-Seoul/America-Los_Angeles), repeats per process `10`, puzzle/diagnostics hash mismatch `0/0`
 - Codex 기여 경계: Codex는 후보·generator·validator·감사·문서 초안을 만들고 자동 정확성을 검증했다. 사람은 학습 순서·체감 난도·시각 패턴·최종 채택과 릴리스 승인을 유지한다.
-- 현재 분류: `Accepted` — 사람 큐레이션 DOD-04와 candidate exact-SHA DOD-10을 포함한 M03 DOD-01~11이 모두 통과했다.
+- 현재 분류: `Accepted` — 사람 큐레이션 DOD-04와 candidate exact-SHA DOD-10을 포함한 M03 DOD-01~11이 모두 통과했고, closure commit 대상 PR #7의 원격 CI도 PASS했다.
 - 남은 위험: 이번 승인은 현재 atlas·progression에 한정된다. catalog·manifest·scaffold 변경 시 재승인이 필요하며 M06/M07 UI 연결 뒤 실제 progression 회귀도 별도 검증해야 한다.
-- 다음 작업: closure evidence commit을 push하고 원격 CI 결과를 기록한 뒤, `phases/M04_session_persistence_scoring.md`의 DoR를 확인한다. M06/M07 UI progression 검증은 여전히 후속 범위다.
+- 다음 작업: `phases/M04_session_persistence_scoring.md`의 DoR를 확인한다. PR #7의 main 병합은 프로젝트 오너 결정에 따르며, M06/M07 UI progression 검증은 여전히 후속 범위다.
 
 ## 9. 품질 분류
 

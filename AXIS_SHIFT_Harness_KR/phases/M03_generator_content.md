@@ -166,9 +166,13 @@ exceptions=0 invalid=0 wrongPar=0 fallbackCount=0 adjacentDuplicates=0
 maxAttemptCount=107 distributionFailures=0 goldenVectors=20 goldenMismatches=0
 timezoneProcesses=3 timezones=UTC/Asia-Seoul/America-Los_Angeles repeatsPerProcess=10 hashMismatches=0
 fixedShaAuditReruns=2 hashesMatch=true
+remoteClosureSha=5050551796fde4c9255349775e685c932060c58e
+remoteBranch=codex/m03-generator-content
+pullRequest=7
+ciRun=32870894868 quality=PASS duration=1m57s
 ```
 - 변경 없는 미커밋 working tree의 pre-close rehearsal 2회는 역사 기준선으로 보존한다. DOD-10의 권위 있는 증거는 candidate exact SHA `1c313bd…be5d`의 clean detached worktree에서 서로 다른 출력 디렉터리로 수행한 위 2회 감사다.
-- exact-SHA 두 실행은 output hash·정규화 JSON/report·Markdown·checksum-file SHA가 각각 일치했고, 실행 전후 tracked worktree status는 0이었다. 이 문서 evidence commit은 candidate 이후의 종료 기록이며 아직 push·PR을 주장하지 않는다.
+- exact-SHA 두 실행은 output hash·정규화 JSON/report·Markdown·checksum-file SHA가 각각 일치했고, 실행 전후 tracked worktree status는 0이었다. 후속 closure evidence commit `5050551796fde4c9255349775e685c932060c58e`은 원격 브랜치로 push되었고 PR #7의 CI run `32870894868`에서 quality PASS했다. PR은 아직 병합하지 않았다.
 
 - 감사 산출물: `outputs/m03/daily-audit-v1-2026-01-01-3650.{json,md,sha256}`. 이 경로는 재생성 가능한 로컬 출력이므로 Git에 커밋하지 않는다.
 - 후보·카탈로그는 동일 seed 재생성에서 JSON 6파일 hash change 0이며 Prettier 검사를 통과했다. approval fingerprint exact match에서는 승인 evidence hash `B81406D8…0214F`가 그대로 보존되어 `curationEvidenceHashChanges=0`, `curation=preserved`였다.
@@ -181,7 +185,7 @@ fixedShaAuditReruns=2 hashesMatch=true
 - 승인 evidence metadata는 `프로젝트 오너` / `2026-08-26T00:20:42+09:00` / `APPROVED`이며 54개 패턴과 progression 5행 모두 PASS다.
 - DOD-10은 candidate `1c313bd29e1d24c483749af90a8734542988be5d`의 clean detached worktree에서 감사 2회와 동일 hash를 확인해 통과했다.
 - 일반 `npm run validate:levels`는 승인 metadata·fingerprint·machine scaffold가 어긋나면 실패하도록 닫혀 있다.
-- DOD-01~11이 모두 통과해 M03을 완료한다. 이 종료 기록 시점에는 push·PR이 아직 없으며 별도 Git 작업으로 남긴다.
+- DOD-01~11이 모두 통과해 M03을 완료한다. closure evidence `5050551796fde4c9255349775e685c932060c58e`의 원격 push와 PR #7 CI PASS까지 확인했으며 main 병합은 수행하지 않았다.
 
 ## 11. 롤백 계획
 

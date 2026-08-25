@@ -6,7 +6,7 @@
 
 - **현재 phase**: M03 — Generator & Content Pipeline 완료; 다음 M04 진입 전
 - **상태**: M03 DOD-01~11 완료; candidate exact-SHA 감사 2회와 사람 큐레이션 승인까지 고정, M00·M01·M02·H00 완료 상태 유지
-- **마지막 갱신**: 2026-08-26 / candidate `1c313bd29e1d24c483749af90a8734542988be5d`의 clean Node 24 감사 2회 동일, M03 완료
+- **마지막 갱신**: 2026-08-26 / closure commit `5050551796fde4c9255349775e685c932060c58e` 원격 push, PR [#7](https://github.com/JTech-CO/axis-shift/pull/7) CI run [`32870894868`](https://github.com/JTech-CO/axis-shift/actions/runs/32870894868) quality PASS, M03 원격 폐쇄 완료
 - **목표 릴리스**: `v0.1.0-hackathon` — OpenAI Game Builders Seoul Track 1 제출 슬라이스 완료
 - **제출 접수 종료**: 2026-08-26
 
@@ -66,7 +66,7 @@
 ## 다음 할 일
 
 1. 다음 구현은 `phases/M04_session_persistence_scoring.md`의 DoR를 확인하고 프로젝트 오너 착수 지시에 따라 시작한다. M03 완료는 M04 reducer·저장·시간·등급 gate를 면제하지 않는다.
-2. M03 closure evidence commit을 만든 뒤 `codex/m03-generator-content`를 push하고 원격 CI를 확인한다.
+2. PR #7은 closure commit `5050551796fde4c9255349775e685c932060c58e`에서 CI run `32870894868` quality PASS다. PR은 열려 있으며 main 병합은 프로젝트 오너 결정 전에는 수행하지 않는다.
 3. H00 비공개 playtest·submission 자료와 두 backup은 Git에 넣지 않는다. 제출 완료 조건은 충족됐지만 이번 작업에서는 삭제하지 않았으며, 프로젝트 오너의 명시적 정리 결정 전까지 보존한다.
 4. H00의 권리 상태는 `UNLICENSED` / All Rights Reserved로 고정했다. 공개 OSS 라이선스 채택 여부는 M11 오너 결정으로 남긴다.
 
@@ -98,7 +98,7 @@
 | M01 | Production Scaffolding | 완료 — ADR-0008 제한 체크포인트, DOD-01~09·CI·Pages smoke 통과 | 완료 |
 | H00 | Hackathon Submission Slice | 완료 — DOD-01~12, tag/pre-release `v0.1.0-hackathon`, 오너 공식 제출 확인 | clean checkout·public E4·릴리스 정직성·제출 패키지·2중 backup; 접수 시각/ID 미제공 경계 보존 |
 | M02 | Board & GF(2) Core | 완료 — DOD-01~10 | 3×3 전수 512 mismatch 0, 4~8 총 50,000 round-trip·결정성 실패 0, core coverage 각 100% |
-| M03 | Generator & Content Pipeline | 완료 — DOD-01~11 | 오너 전체 승인 + candidate `1c313bd…98be5d` exact-SHA 감사 2회 동일 |
+| M03 | Generator & Content Pipeline | 완료 — DOD-01~11 | 오너 전체 승인 + candidate `1c313bd…98be5d` exact-SHA 감사 2회 동일 + PR #7 CI PASS |
 | M04 | Session, Persistence & Scoring | 미시작 | reducer·저장·시간·등급 정합 |
 | M05 | Design System & Shared UI | 미시작 | 360px·테마·키보드·상태 fixture |
 | M06 | Tutorial & Lab | 미시작 | 튜토리얼 6 + Lab 48 전체 플레이 가능 |
@@ -119,6 +119,7 @@
 | 2026-08-26 | M03 | DOD-04 사람 큐레이션 E1 | manifest 순서 54개 ASCII atlas + progression/completion 각 5행 체크리스트 검토 | **PASS / APPROVED** — 프로젝트 오너 전체 승인, progression 교체·재분류 없음; evidence SHA=`B81406D8…0214F` | `evidence/M03/content-curation-v1.md` |
 | 2026-08-26 | M03 | DOD-03·11 단위·경계 회귀 E3 | focused unit + `npm run test` + `npm run check:boundaries` + `npm run verify` | focused generator+curation+catalog 3 files/23 tests; full unit 11 files/55 tests; boundary files=55, edges=81, violations=0, cycles=0, coreFiles=30; verify 10/10 | `src/domain/generator/`, `scripts/lib/curation-evidence.test.ts`, `scripts/check-boundaries.mjs` |
 | 2026-08-26 | M03 | DOD-10 fixed-SHA 재현성 E3 | candidate `1c313bd29e1d24c483749af90a8734542988be5d` clean detached worktree, Node 24 `npm ci` → verify·3브라우저 parity → 서로 다른 경로의 3,650일 감사 2회 | **PASS** — verify 10/10, parity 9/9, report/json SHA `b1102aee…6d49`·MD SHA `3149a492…a036`·checksum-file SHA `8a827506…a893` 각각 2회 동일, worktree status 0 | `phases/M03_generator_content.md` §10 |
+| 2026-08-26 | M03 | DOD-11 원격 폐쇄 E3 | closure commit `5050551796fde4c9255349775e685c932060c58e` push → PR #7 CI | **PASS** — Actions run `32870894868`, head SHA 일치, quality 1분 57초, 전체 step success | PR `#7`, Actions `32870894868` |
 | 2026-08-09 | M00 | DoR fixture readiness | Node 4×4 전체 상태 BFS 준비 계산 | main rank/BFS=2/2, backup=3/3 | `AXIS_SHIFT_Harness_KR/phases/M00_rule_proof.md` §3.2 |
 | 2026-08-09 | M00 | Workspace root contract | GitHub metadata + `git init -b main` + origin 연결 | root=`AXIS SHIFT (Tensor)`, remote public/main/empty, push 없음 | 루트 `AGENTS.md` |
 | 2026-08-09 | M00 | DOD-01 초기 4×4 다단계 E2 | `node prototypes/rule-proof/verify-fixture.mjs` | stageSequence=easy:2>normal:3>hard:4, assertions=196708, failures=0 | `phases/M00_rule_proof.md` §10 역사 로그 |
@@ -177,7 +178,8 @@ checksumFileSha256=8a827506ea0cb296fc0f125f65c08a03230bb67aa9454eaa6f3b5c646b98a
 exceptions=0 invalid=0 wrongPar=0 fallbackCount=0 adjacentDuplicates=0 distributionFailures=0
 maxAttemptCount=107 goldenVectors=20 goldenMismatches=0
 timezoneProcesses=3 repeatsPerProcess=10 processHashMismatches=0 diagnosticsHashMismatches=0
-remaining: closure evidence commit + branch push; M04 not started
+remoteClosure: sha=5050551796fde4c9255349775e685c932060c58e pr=7 ciRun=32870894868 quality=PASS duration=1m57s
+remaining: M04 not started; PR #7 not merged
 ```
 
 ### M02 최신 검증 출력
@@ -360,3 +362,4 @@ STOP 발동 시 아래 형식으로 추가한다.
 - 2026-08-21: 오너 지시로 M03을 착수해 `v1` PRNG/Daily/version resource registry, Tutorial 6·Lab 48·fallback 14, candidate/validator/audit/3-browser parity를 구현했다. 변경 없는 미커밋 working tree에서 3,650일 감사 rehearsal 2회는 동일 hash와 실패 0을 냈지만 DOD-10 fixed-SHA 증거는 아니다.
 - 2026-08-26: 프로젝트 오너가 공식 해커톤 양식 제출 완료를 확인했다. 정확한 접수 시각·접수 ID·확인 화면은 미제공이며 누락값을 생성하지 않는다. Codex는 인증·개인정보·동의·최종 Submit을 수행하지 않았다.
 - 2026-08-26: 프로젝트 오너가 54개 패턴과 progression 5행을 전체 승인해 DOD-04를 통과했다. approval fingerprint가 full manifest·순서 있는 catalog·machine scaffold를 묶으며 변경 시 재승인하도록 fail-closed한다. candidate `1c313bd29e1d24c483749af90a8734542988be5d`의 clean Node 24 worktree에서 verify 10/10·3브라우저 9/9와 3,650일 감사 2회 동일 report SHA `b1102aee…6d49`를 확인해 DOD-10과 M03을 완료했다.
+- 2026-08-26: closure evidence `5050551796fde4c9255349775e685c932060c58e`를 `codex/m03-generator-content`에 push하고 PR #7을 열었다. Actions run `32870894868`은 해당 head SHA에서 quality 전체 단계를 1분 57초에 통과했다. main 병합은 수행하지 않았다.
