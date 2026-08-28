@@ -46,10 +46,18 @@ describe('storage schema guards', () => {
       session: 'axis-shift:session:v1',
       generatorMap: 'axis-shift:generator-map:v1',
     });
+    expect(DEFAULT_USER_SETTINGS.theme).toBe('dark');
     expect(normalizeSettings(DEFAULT_USER_SETTINGS).valid).toBe(true);
     expect(normalizeSettings({ ...DEFAULT_USER_SETTINGS, soundVolume: 2 }).value).toEqual(
       DEFAULT_USER_SETTINGS,
     );
+    const legacyTheme = normalizeSettings({
+      ...DEFAULT_USER_SETTINGS,
+      theme: 'high-contrast',
+    });
+    expect(legacyTheme.valid).toBe(true);
+    expect(legacyTheme.issues).toEqual(['settings-theme-high-contrast']);
+    expect(legacyTheme.value.theme).toBe('dark');
     expect(normalizeSettings({ ...DEFAULT_USER_SETTINGS, extra: true }).valid).toBe(false);
   });
 

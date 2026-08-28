@@ -124,6 +124,9 @@
 - [ ] Hint 2·3 grade 제한 통과
 - [ ] 나쁜 재플레이가 best를 덮어쓰지 않음
 - [ ] valid v1 storage round-trip
+- [ ] Theme 기본 `dark`, 쓰기 allowlist `dark|light|system`
+- [ ] legacy v1 `theme: high-contrast` 읽기 시 `dark` 정규화·legacy 값 재기록 없음
+- [ ] Motion UI `reduced` → 저장값 `on`
 - [ ] invalid JSON 안전 복구
 - [ ] invalid field 안전 복구
 - [ ] future schema backup/no overwrite
@@ -179,7 +182,10 @@
 
 - [ ] dark theme
 - [ ] light theme
-- [ ] high-contrast theme
+- [ ] system theme이 운영체제 dark/light 선호를 따름
+- [ ] 커스텀 high-contrast theme 노출 0
+- [ ] 운영체제 forced-colors parity
+- [ ] High Contrast Cells가 Theme·Forced Colors와 독립적으로 동작
 - [ ] reduced-motion parity
 - [ ] 360×640 overflow=0
 - [ ] 390×844 overflow=0
@@ -208,6 +214,7 @@
 - [ ] axe critical=0
 - [ ] screen reader 수동 점검
 - [ ] 색각 시뮬레이션
+- [ ] 운영체제 Forced Colors에서 색 이외 상태 표식 유지
 - [ ] sound/haptics 없이 정보 동일
 - [ ] reduce motion에서 멀미 유발 이동 제거
 
@@ -247,11 +254,12 @@
 
 ## 14. Settings·피드백
 
-- [ ] theme system/dark/light/high-contrast
+- [ ] Theme 단일 버튼 기본 `dark`, `dark → light → system → dark`
 - [ ] sound enabled/volume
 - [ ] haptics enabled
-- [ ] reduced motion system/on/off
-- [ ] high contrast cells
+- [ ] Motion 단일 버튼 기본 `system`, `system ↔ reduced`
+- [ ] Motion UI `reduced`가 저장값 `on`으로 매핑
+- [ ] high contrast cells는 Theme·Forced Colors와 별도 설정
 - [ ] keyboard hints
 - [ ] 설정 즉시 적용·reload 저장
 - [ ] AudioContext 첫 gesture 이후

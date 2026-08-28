@@ -4,9 +4,9 @@
 
 ## 현재 상태
 
-- **현재 phase**: M04 — Session, Persistence, Clock & Scoring 완료; 다음 M05 진입 전
-- **상태**: M04 DoR 5/5·DOD-01~13 통과; session·clock·scoring·storage v1 순수 계약 완료, 실제 화면 연결은 M05·M06
-- **마지막 갱신**: 2026-08-26 / focused 12파일 92테스트·migration 3테스트, M04 S98.90/B98.79/F100/L98.95·per-file branch 11/11, global 23파일 147테스트 통과
+- **현재 phase**: M05 — Design System & Shared Game UI 종료 후보; public Pages 검증 중
+- **상태**: 자동 E2/E3 PASS·프로젝트 오너 visual baseline 9/9 승인; 수동 E1 0/4는 ADR-0012로 M10 이관; fixed commit·public submitted-URL smoke 대기
+- **마지막 갱신**: 2026-08-29 / global 30파일 180테스트, axe 18/18, visual 18/18·diff 0, Pages 3브라우저 30/30, prototype browser 908단언 PASS
 - **목표 릴리스**: `v0.1.0-hackathon` — OpenAI Game Builders Seoul Track 1 제출 슬라이스 완료
 - **제출 접수 종료**: 2026-08-26
 
@@ -68,12 +68,15 @@
 - [x] M04 persistence v1 — 네 root, pre-start canonical ready·started-unsolved paused snapshot, exact ledger/clock guard·null-prototype Lab map, quarantine backup-before-delete·collision retry·progress salvage 재저장·경고 dedupe
 - [x] M04 품질 게이트 — focused 12파일 92테스트, migration 3테스트, aggregate S98.90/B98.79/F100/L98.95, per-file branch 11/11·최저 95.45%, global 23파일 147테스트, lint·format·typecheck·boundaries 통과
 - [x] M04 build hardening — 기존 `dist`에서 발생한 Vite 8 Windows native cleanup crash 회피용 검증된 preclean + `emptyOutDir=false` canonical build
+- [x] M04 원격 체크포인트 — commit `95fbff2b4bff261ff16784099dc2a02df7473069`를 `origin/codex/m04-session-persistence-scoring`에 push; PR 없음
+- [x] M05 shared UI 자동 체크포인트 — dark/light/system token, Theme 기본 dark 순환 버튼, Motion 기본 system 토글, common/layout/game presentational component, 8개 상태+long-copy fixture, keyboard·axe·visual harness 구현
+- [x] M05 ADR-0011 자동 품질 — focused 7파일 33테스트, global 30파일 180테스트, token 16파일·하드코드 0·예외 13, axe 18/18, visual update/no-update 18/18·full-fixture baseline 9·strict diff 0, keyboard 3브라우저 9/9, boundary·static a11y·build·Pages·verify PASS
 
 ## 다음 할 일
 
-1. 다음 구현은 `phases/M05_design_system.md`의 DoR를 확인하고 M04 action·selector·6개 session 상태 fixture를 shared game UI에 연결한다.
-2. M06는 M04 `IdGenerator`를 앱 singleton·crypto-backed source로 연결하고 hydrated ID를 seed/reserve한다. 또한 `TIMER_TICK`·Page Visibility dispatch, paused snapshot resume, completion projection·Lab best 저장과 실제 reload E2E를 담당한다. M07은 UTC Daily·streak·Archive를 추가한다.
-3. Sprint 180초 절대 종료·총점·동점 규칙은 계속 M08까지 결정하지 않는다.
+1. M05 후보를 commit·push하고 Pages workflow를 실행해 기존 제출 URL의 Theme/Motion·18-signal 플레이·stage/signal/seed/hash를 공개 smoke한다.
+2. public smoke 뒤 M05를 닫고 M06 DoR를 확인한다. M06는 M04 `IdGenerator` singleton·crypto source, Page Visibility·tick, paused resume, Result/Lab best 저장과 reload E2E를 실제 feature controller에 연결한다.
+3. M07은 UTC Daily·streak·Archive를 추가하고, Sprint 180초 절대 종료·총점·동점 규칙은 계속 M08까지 결정하지 않는다.
 4. H00 비공개 playtest·submission 자료와 두 backup은 Git에 넣지 않는다. 제출 완료 조건은 충족됐지만 이번 작업에서는 삭제하지 않았으며, 프로젝트 오너의 명시적 정리 결정 전까지 보존한다.
 5. H00의 권리 상태는 `UNLICENSED` / All Rights Reserved로 고정했다. 공개 OSS 라이선스 채택 여부는 M11 오너 결정으로 남긴다.
 
@@ -107,7 +110,7 @@
 | M02 | Board & GF(2) Core | 완료 — DOD-01~10 | 3×3 전수 512 mismatch 0, 4~8 총 50,000 round-trip·결정성 실패 0, core coverage 각 100% |
 | M03 | Generator & Content Pipeline | 완료 — DOD-01~11 | 오너 전체 승인 + candidate `1c313bd…98be5d` exact-SHA 감사 2회 동일 + PR #7 CI PASS |
 | M04 | Session, Persistence & Scoring | 완료 — DOD-01~13 | 12파일 92테스트, B98.79%, 11/11 per-file branch·네 v1 root·격리·재개 정규화 |
-| M05 | Design System & Shared UI | 미시작 | 360px·테마·키보드·상태 fixture |
+| M05 | Design System & Shared UI | 종료 후보 — 자동 PASS·오너 baseline 9/9 승인·수동 E1 0/4 M10 이관; public Pages 대기 | 30파일/180 unit·18 axe·18 visual diff 0·Pages 30/30·prototype 908단언 |
 | M06 | Tutorial & Lab | 미시작 | 튜토리얼 6 + Lab 48 전체 플레이 가능 |
 | M07 | Daily & Archive | 미시작 | 날짜 결정성·streak·archive 회귀 |
 | M08 | Sprint | 미시작 | 180초 절대 종료·점수 재현 |
@@ -119,6 +122,11 @@
 
 | 일시 | Phase | Gate | 명령/절차 | 결과 | 증거 위치 |
 |---|---|---|---|---|---|
+| 2026-08-26 | M05 | ADR-0011 DOD-01~02·05·08~09·13 focused/token/axe E2/E3 | focused unit + `audit:design-tokens` + `npm run test:a11y -- --project=ui-fixtures` | **자동 PASS** — focused 6 files/30 tests; token files=16 hardcode=0 annotations=13; axe 18/18 serious/critical=0 externalRequests=0, matrix=8 states+long copy+system 3+light 3+reduced-motion 3 | `phases/M05_design_system.md` §10 |
+| 2026-08-26 | M05 | ADR-0011 DOD-06~09·12 responsive/theme/motion/visual E3 | visual update → strict no-update rerun | **PASS** — visual 18/18, 5 viewport, dark/light/system, AA contrast, full-fixture baseline 9, `maxDiffPixels=0`, threshold 0, diff 0; Codex 새 mobile/tablet/desktop 3/3 육안 PASS | `tests/visual` |
+| 2026-08-26 | M05 | ADR-0011 DOD-03~04 keyboard·입력 원자성 E3 | `npm run test:e2e -- tests/e2e/keyboard-core.spec.ts` | **PASS** — Chromium·Firefox·WebKit 9/9; Theme→Motion 버튼 focus 순서, pointer/shortcut/repeat coalescing, reset focus 복귀, result heading focus | `tests/e2e/keyboard-core.spec.ts` |
+| 2026-08-29 | M05 | 제출 URL adapter 포함 최종 로컬 자동 회귀 | global unit + boundary/static a11y + lint/format/typecheck + build/Pages artifact + Pages 3브라우저 + prototype smoke + `npm run verify` | **PASS** — unit 30 files/180; boundary 83/150/0/0; static 36/8/0; build 46 modules CSS 10.49kB gzip 3.03, JS 234.56kB gzip 75.20; Pages 14 files/353631 bytes/prototype 10·30/30; prototype browser 908; verify required 22 missing 0 steps 12 | `phases/M05_design_system.md` §10 |
+| 2026-08-29 | M05 | 수동 E1·오너 visual 승인 | Android 실기기·실제 SR·200% zoom·색각 시뮬레이션 + baseline 9종 검토 | **CHECKPOINT ACCEPTED** — 프로젝트 오너 9/9 승인; manual 0/4는 `NOT RUN`·`DEFERRED_TO_M10`이며 PASS/면제 아님 | `phases/M05_design_system.md` §9~10, ADR-0012 |
 | 2026-08-09 | 문서 준비 | Harness completeness | 파일 구조·내부 참조 검증 | 생성 완료 | 이 패키지 `MANIFEST.sha256` |
 | 2026-08-21 | M03 | DOD-01·07 PRNG/브라우저 parity E3 | generator unit + `npm run test:e2e -- tests/e2e/generator-parity.spec.ts` | generator 14/14; seed 20×100 + Daily golden 20, Chromium·Firefox·WebKit 9/9; UTC·서울·LA 시간대 프로세스 3개 × 프로세스별 반복 10, hash mismatch 0 | `src/domain/generator/*.test.ts`, `tests/e2e/generator-parity.spec.ts` |
 | 2026-08-26 | M03 | DOD-02·03 정적 콘텐츠 E3 | 후보 생성 + fail-closed level validator | levels=54, tutorial=6, Lab=48, chapter별=12; rank/solution/tag checks=68/68/68; validatorSelfChecks=22; idChanges=0, failures=0; catalogHash=`c625d543…1738484`; approvalFingerprint=`5a60604a…b7e6a`; `curation=preserved` | `src/content/`, `scripts/lib/curation-evidence.ts`, `evidence/M03/content-curation-v1.md` |
@@ -162,6 +170,30 @@
 | 2026-08-21 | M02 | DOD-07~08·통합 검증 | `npm run check:boundaries` + `npm run verify` | boundary files=43, violations=0, cycles=0, named-duplicate self-check=5/5; occurrence review 병행; scriptContract=16/16, unit=32/32, secret findings=0, verify steps=10 | `phases/M02_core_math.md` §10 |
 | 2026-08-21 | M02 | commit·PR·main CI·Pages E4 | implementation `55b0b55` + evidence `3fc095a` → PR `#5` merge | merge=`b38084e`; PR CI `32461938140` success; main CI `32462073073` success; Pages `32462073080` success | `phases/M02_core_math.md` §10, `https://github.com/JTech-CO/axis-shift/pull/5` |
 
+### M05 최신 검증 출력
+
+```text
+status=READY_FOR_PUBLIC_CLOSE; automated E2/E3=PASS; manual E1=0/4 DEFERRED_TO_M10; projectOwnerFull9=APPROVED
+candidate=codex/m05-design-system working tree; implementation commit/push/Pages run=pending this turn
+focused component+fixture unit: files=7 tests=33 failures=0
+global unit: files=30 tests=180 failures=0
+design tokens: files=16 color=0 spacing=0 radius=0 duration=0 exceptionAnnotations=13
+token annotations: calculation=2 transparency=2 mediaQueryBreakpoints=9
+axe: tests=18/18 serious=0 critical=0 externalRequests=0 matrix=8states+longCopy+system3+light3+reducedMotion3
+visual update+no-update: tests=18/18 baselines=9 fullFixture=true viewports=5 themes=dark/light/system contrastPairs=AA maxDiffPixels=0 threshold=0 actualDiff=0
+visual review: Codex representative=3/3 PASS projectOwnerFull9=APPROVED on 2026-08-29
+keyboard: chromium+firefox+webkit tests=9/9
+boundaries: files=83 edges=150 violations=0 cycles=0
+static a11y: files=36 interactiveTargets=8 failures=0
+build: modules=46 CSS=10.49kB gzip=3.03kB JS=234.56kB gzip=75.20kB
+lint=pass formatCheck=pass typecheck=pass diffCheck=pass
+verify: scriptContract required=22 missing=0 passedSteps=12
+Pages local: artifact files=14 bytes=353631 prototypeFiles=10; chromium+firefox+webkit=30/30; submitted URL adapter local browserAssertions=908 externalRequests=0 consoleErrors=0; remote pending
+manual: Android Chrome=NOT RUN screenReader=NOT RUN zoom200=NOT RUN colorVision=NOT RUN; all DEFERRED_TO_M10
+```
+
+ADR-0011 변경분과 제출 URL appearance adapter의 local 자동 E2/E3는 PASS했다. M05 React UI는 아직 실제 feature controller가 아니므로 제출 URL은 기존 playable H00 game과 18개 신호를 보존한다. fixed-SHA·원격 Pages·공개 URL smoke 뒤 checkpoint를 닫는다. Playwright·axe·OS forced-colors는 이관된 수동 E1 4종을 대체하지 않는다.
+
 ### M04 최신 검증 출력
 
 ```text
@@ -175,10 +207,11 @@ global coverage: files=23 tests=147 statements=93.06% branches=91.81% functions=
 storage roots=4 fixtures=10 quarantine=backup-before-delete+collision-retry salvage=persist-after-quarantine warningDedupe=keyKind+code
 idGenerator=issued-ledger+seed+reserve+retry; M06=singleton+crypto-source
 canonicalBuild=validated-dist-preclean+emptyOutDir-false
+remoteCheckpoint=95fbff2b4bff261ff16784099dc2a02df7473069 branch=origin/codex/m04-session-persistence-scoring pr=none
 handoff: M05 shared UI; M06 ID singleton/crypto+visibility/resume/result persistence; M07 UTC Daily/streak/archive; M08 Sprint scoring
 ```
 
-실제 화면의 reload·visibility·Result 저장을 M04에서 통과했다고 주장하지 않는다. M04는 순수 reducer·clock·scoring·repository E3를 닫았고 사용자 흐름 E2E는 M05·M06에 남겼다.
+실제 화면의 reload·visibility·Result 저장을 M04에서 통과했다고 주장하지 않는다. M05가 presentational keyboard fixture를 추가했지만 실제 route·session·storage 사용자 흐름과 reload·visibility·Result 저장 E2E는 M06에 남아 있다.
 
 ### M03 최종 검증 출력
 
@@ -334,7 +367,7 @@ public browserAssertions=140 viewport=360x640 easyMoves=2 normalMoves=3 hardMove
 | R-02 | generator/par 오답이 전체 신뢰를 훼손 | 낮음 | 매우 높음 | 전수·property test, 단일 도메인 코어 | M02·M03 |
 | R-03 | 48개 Lab 콘텐츠 큐레이션 일정 부족 | 중 | 높음 | 자동 후보 생성 + 사람이 패턴·난도 검수 | M03·M06 |
 | R-04 | PWA 캐시가 제출 직전 구버전을 제공 | 중 | 높음 | prompt update, 실제 URL cache reset·smoke | M09·M10 |
-| R-05 | 모바일 6×6에서 축 타깃과 PULSE가 겹침 | 중 | 높음 | 360×640 fixture와 실기기 테스트 | M05·M10 |
+| R-05 | 모바일 6×6에서 축 타깃과 PULSE가 겹침 | 중 | 높음 | 5 viewport 자동 fixture는 PASS; Android Chrome 실기기는 `NOT RUN / DEFERRED_TO_M10` | M05·M10 |
 | R-06 | 공유 서명이 정답/이동을 간접 노출 | 낮음 | 높음 | 금지 필드 invariant, payload snapshot, 수동 검토 | M09 |
 | R-07 | 정규 v1 범위가 8/26 제출 일정 안에 과도함 | 낮음 | 매우 높음 | H00 v0.1 구현·tag·제출 준비 패키지는 동결 완료; 오너는 정규 범위를 추가하지 않고 공식 양식만 최종 제출 | H00·전역 |
 | R-08 | rank/Par만으로 난도를 정하면 단일 축 순회가 최적 또는 준최적이 됨 | 높음 | 매우 높음 | `sweepBound`·`compressionGap` 검증, full-rank를 난도 stage가 아닌 대조군으로 분리, 사람 비교 | M00·M03·M06 |
@@ -369,6 +402,8 @@ STOP 발동 시 아래 형식으로 추가한다.
 - ADR-0006: Signal Signature 기반 스포일러 없는 공유를 채택한다.
 - ADR-0007: 로컬 전용 데이터와 런타임 AI API 없음 원칙을 채택한다.
 - ADR-0010: 정규 M02~M11과 분리한 H00 `v0.1.0-hackathon` 제출 lane을 채택한다.
+- [ADR-0011](decisions/0011-appearance-cycle-controls.md): Theme·Motion 단일 순환 버튼, dark 기본, custom high-contrast 제거와 legacy 설정 정규화를 채택한다.
+- [ADR-0012](decisions/0012-m05-checkpoint-manual-evidence-deferral.md): M05 자동 E2/E3와 오너 baseline 9/9로 checkpoint 종료를 허용하되, 수동 E1 0/4를 PASS·면제 없이 M10의 release-blocking gate로 이관한다.
 - ADR-0008: M00 formal E1을 통과 처리하지 않은 채 M01의 도구·경계·라우팅·CI 체크포인트만 선행 착수한다.
 - Workspace-2026-08-09: 부모 `AXIS SHIFT (Tensor)`를 Git·구현 루트로, `AXIS_SHIFT_Harness_KR`를 가이드·증거 폴더로 유지한다.
 - 2026-08-09: 내부 파일럿 run 2회에서 Easy stage의 관측 최저는 3 PULSE였고, 초기 계산이 어긋난 흐름은 4~5 PULSE까지 이어질 수 있었다. 이는 수학적 Par 2를 바꾸지 않으며 참가자 수·시간·개입은 미보고로 둔다.
@@ -391,4 +426,6 @@ STOP 발동 시 아래 형식으로 추가한다.
 - 2026-08-26: 프로젝트 오너가 공식 해커톤 양식 제출 완료를 확인했다. 정확한 접수 시각·접수 ID·확인 화면은 미제공이며 누락값을 생성하지 않는다. Codex는 인증·개인정보·동의·최종 Submit을 수행하지 않았다.
 - 2026-08-26: 프로젝트 오너가 54개 패턴과 progression 5행을 전체 승인해 DOD-04를 통과했다. approval fingerprint가 full manifest·순서 있는 catalog·machine scaffold를 묶으며 변경 시 재승인하도록 fail-closed한다. candidate `1c313bd29e1d24c483749af90a8734542988be5d`의 clean Node 24 worktree에서 verify 10/10·3브라우저 9/9와 3,650일 감사 2회 동일 report SHA `b1102aee…6d49`를 확인해 DOD-10과 M03을 완료했다.
 - 2026-08-26: closure evidence `5050551796fde4c9255349775e685c932060c58e`를 `codex/m03-generator-content`에 push하고 PR #7을 열었다. Actions run `32870894868`은 해당 head SHA에서 quality 전체 단계를 1분 57초에 통과했다. main 병합은 수행하지 않았다.
-- 2026-08-26: M04에서 append-only action ledger, `TIMER_TICK` high-water, `WeakSet` completion provenance, Hint cap·best tuple, issued-ledger ID service, 네 v1 storage root와 canonical ready/paused normalization·격리·부분 복구를 고정했다. focused 12파일 92테스트와 migration 3테스트, aggregate B98.79%·per-file branch 11/11, global 23파일 147테스트, 정적 gate와 `npm run verify`(scriptContract 19/19, steps 10/10)를 통과해 DOD-01~13을 닫았다. M06은 ID singleton·crypto source와 실제 UI·visibility·reload, M07은 UTC Daily·streak·Archive, M08은 Sprint 산식을 맡는다.
+- 2026-08-26: M04에서 append-only action ledger, `TIMER_TICK` high-water, `WeakSet` completion provenance, Hint cap·best tuple, issued-ledger ID service, 네 v1 storage root와 canonical ready/paused normalization·격리·부분 복구를 고정했다. focused 12파일 92테스트와 migration 3테스트, aggregate B98.79%·per-file branch 11/11, global 23파일 147테스트, 정적 gate와 `npm run verify`(scriptContract 19/19, steps 10/10)를 통과해 DOD-01~13을 닫았다. commit `95fbff2b4bff261ff16784099dc2a02df7473069`는 `origin/codex/m04-session-persistence-scoring`에 push됐고 PR은 없다. M06은 ID singleton·crypto source와 실제 UI·visibility·reload, M07은 UTC Daily·streak·Archive, M08은 Sprint 산식을 맡는다.
+- 2026-08-29: M05 자동 E2/E3와 오너 visual baseline 9/9를 checkpoint exit evidence로 승인했다. Android 실기기·실제 스크린리더·200% zoom·색각 시뮬레이션은 0/4 `NOT RUN`이며 ADR-0012에 따라 M10의 blocking gate로 이관한다. 제출 URL은 M05 React fixture로 대체하지 않고 playable H00에 Theme/Motion adapter를 이식한다.
+- 2026-08-29: 프로젝트 오너는 [ADR-0011](decisions/0011-appearance-cycle-controls.md)의 Theme·Motion 계약과 full-fixture baseline 9/9를 승인했다. [ADR-0012](decisions/0012-m05-checkpoint-manual-evidence-deferral.md)는 수동 E1 0/4를 M10으로 이관하되 PASS나 면제로 재분류하지 않는다.

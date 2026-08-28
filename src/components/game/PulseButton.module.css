@@ -1,0 +1,39 @@
+.button {
+  position: relative;
+  min-height: var(--pulse-min);
+  justify-content: space-between;
+  border: var(--border-width-strong) solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  letter-spacing: var(--letter-spacing-label);
+}
+
+.copy {
+  display: grid;
+  gap: var(--space-1);
+  justify-items: center;
+}
+
+.copy strong {
+  font-size: var(--font-size-lg);
+  letter-spacing: var(--letter-spacing-pulse);
+}
+
+.copy small {
+  font-size: var(--font-size-xs);
+  letter-spacing: var(--letter-spacing-status);
+}
+
+.bracket {
+  font-size: var(--font-size-lg);
+}
+
+.affected {
+  position: absolute;
+  right: var(--space-2);
+  bottom: var(--space-1);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xs);
+  font-weight: 650;
+  letter-spacing: 0;
+}

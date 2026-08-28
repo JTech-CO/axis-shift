@@ -1,8 +1,8 @@
 # AXIS//SHIFT Asset & License Registry
 
-**문서 버전**: 1.0.0  
-**상태**: H00 제출·릴리스 자산 및 무결성 기록 완료 / M11 production inventory·공개 라이선스 결정 대기
-**최종 갱신**: 2026-08-21
+**문서 버전**: 1.1.0
+**상태**: H00 제출 자산 기록 완료 + M05 자동 자산 감사 PASS·baseline 9/9 승인 / M11 production inventory·공개 라이선스 결정 대기
+**최종 갱신**: 2026-08-29
 **관련 불변식**: INV-001, INV-002, INV-017, INV-019
 
 ## 1. 정책
@@ -86,6 +86,14 @@ H00 제출 전용 자산 AST-007~AST-009는 등록·검증을 마쳤다. AST-001
 - 백업: primary `.private/submission/H00`, secondary `<USER_DOCUMENTS>/AXIS_SHIFT_H00_Backup/v0.1.0-hackathon`; 각 15 files, hash delta=0
 - 검토: 2026-08-21 15:41:32·15:42:06 KST final release-SHA 독립 검사와 1920×1080 육안 검토 PASS
 
+### 3.1 M05 디자인 시스템 자산·라이선스 delta
+
+- M05 production UI의 글꼴은 AST-006 system font stack만 사용한다. 저장소에 font file을 포함하거나 재배포하지 않는다.
+- 셀·축·상태 glyph·focus indicator는 CSS와 텍스트로 구성했다. 새 runtime image·audio·font asset과 외부 URL hotlink는 0이며, axe fixture 18/18의 network 감사에서도 external request 0을 확인했다.
+- `tests/visual/__snapshots__/*-ui-fixtures-win32.png` 9개는 dark/light/system × mobile/tablet/desktop full-fixture 회귀용 test-only baseline이다. [ADR-0011](../decisions/0011-appearance-cycle-controls.md)에 따라 custom high-contrast baseline은 제거했으며 OS forced-colors와 별도 `highContrastCells` 지원은 유지한다. 이 파일들은 production bundle·Pages runtime asset inventory에 포함하지 않는다. strict 0-pixel 무갱신 18/18(diff 0), Codex 대표 3/3 검토와 프로젝트 오너 9/9 승인을 통과했다.
+- M05 후보 Pages artifact 감사 결과는 files 14, bytes 353631, prototypeFiles 10이며 새 외부·미등록 production asset은 없다.
+- 개발 전용 접근성 검사 의존성 `@axe-core/playwright@4.13.0`과 그 의존성 `axe-core@4.13.0`은 모두 MPL-2.0이다. `devDependencies`와 test runner에서만 사용하며 production runtime bundle에는 포함하지 않는다.
+- 따라서 M05에서 새 production asset ID를 등록하지 않는다. M11의 전체 lockfile license report와 production asset inventory 승인은 별도 gate로 유지한다.
 ## 4. 자산 등록 필수 필드
 
 ```text

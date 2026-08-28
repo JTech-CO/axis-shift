@@ -1,8 +1,8 @@
 # AXIS//SHIFT 개발·검증·배포 환경 계약
 
-**버전**: 1.1.0
-**상태**: M01 Pages artifact 기준 + M02 domain + M03 generator/content 자동 gate
-**최종 갱신**: 2026-08-26
+**버전**: 1.2.0
+**상태**: M01~M04 완료 + M05 자동 E2/E3 PASS·오너 baseline 9/9 승인·수동 E1 0/4 M10 이관; public Pages close 대기
+**최종 갱신**: 2026-08-29
 
 ## 1. 기준 환경
 
@@ -50,6 +50,30 @@ Node 24 메이저 안의 정확한 patch는 CI와 개발환경에서 같은 lock
 
 M03은 candidate `1c313bd29e1d24c483749af90a8734542988be5d`의 clean detached worktree와 Node v24.19.0/npm 11.6.2에서 `npm ci` 취약점 0, browser parity 9/9, verify 10/10을 통과했다. 서로 다른 출력 디렉터리의 3,650일 감사 2회는 output hash `997df1b0…10b0`와 report/JSON SHA `b1102aee…6d49`가 일치했고 실행 전후 worktree status는 0이었다. 일반 level validator는 승인 metadata·approval fingerprint·machine scaffold가 어긋나면 계속 fail-closed한다.
 
+### M05 shared UI 검증 기준선
+
+| 항목 | 실제 기준 |
+|---|---|
+| Phase/evidence | `READY_FOR_PUBLIC_CLOSE`; 자동 E2/E3 PASS, 오너 baseline 9/9 승인, 수동 E1 0/4 `DEFERRED_TO_M10` |
+| Focused component/fixture | 7파일 / 33테스트 PASS |
+| Global unit/component | 30파일 / 180테스트 PASS |
+| Design token audit | files 16, color/spacing/radius/duration hardcode 0/0/0/0 |
+| Token 예외 주석 | 13개: 계산식 2, 투명도 2, breakpoint 9 |
+| Static accessibility | files 36, interactiveTargets 8, failures 0 |
+| axe UI fixtures | 18/18 PASS: 8 states + long copy + system 3 + light 3 + reduced-motion 3; serious 0, critical 0, external requests 0 |
+| Visual regression | update/no-update 18/18 PASS, full-fixture baseline 9, viewport 5, dark/light/system, `maxDiffPixels=0`, threshold 0, diff 0; Codex 대표 3/3 PASS |
+| Keyboard core | Chromium·Firefox·WebKit 9/9 PASS |
+| Module boundaries | files 83, edges 150, violations 0, cycles 0 |
+| Full verify | script contract required 22, missing 0; 12단계 PASS |
+| Production build | 46 modules; CSS 10.49 kB (gzip 3.03), JS 234.56 kB (gzip 75.20) |
+| Pages artifact | files 14, bytes 353631, prototypeFiles 10; 3엔진 30/30; prototype browser 908단언 |
+| 정적 품질 | lint·format·typecheck PASS |
+
+token 예외 13개는 CSS custom property를 사용할 수 없는 media query 문법 경계와 명시적 주석으로만 허용한다. 세부 분류는 계산식 2개, 투명도 2개, breakpoint 9개다. [ADR-0011](../decisions/0011-appearance-cycle-controls.md)은 Theme 기본 dark·dark→light→system 순환, Motion 기본 system·system↔reduced를 고정하고 custom high-contrast option/token/baseline을 제거한다. OS forced-colors와 `highContrastCells`, legacy v1 `high-contrast` 읽기의 dark 정규화는 유지한다.
+
+자동 증거와 수동 E1을 분리한다. ADR-0011 변경분을 포함한 자동 E2/E3와 오너 baseline 9/9 승인은 확보했다. 실제 Android Chrome, NVDA/VoiceOver 동등 스크린리더, 200% zoom, 색각 검토는 0/4 `NOT RUN`이며 ADR-0012로 M10에 이관했다. 이는 PASS나 면제가 아니다. M05 후보의 fixed commit·push·공개 Pages smoke는 이번 종료 작업에서 기록한다.
+
+strict 0-pixel visual 재실행에서는 transparent backdrop blur가 rounded button corner 한 color channel을 비결정적으로 바꿔 mobile 2/18, 이어 tablet 3/18 실패했다. toolbar를 opaque canvas token background로 고정하고 baseline을 재생성한 뒤 동일 no-update가 18/18, `maxDiffPixels=0`, threshold 0, diff 0으로 통과했다.
 ## 2. 지원 개발 OS
 
 - Windows 10/11 + PowerShell 7 또는 Git Bash
@@ -93,28 +117,41 @@ npm run format:check
 npm run typecheck
 npm run test
 npm run test:coverage
+npm run test:coverage:domain
+npm run test:coverage:m04
+npm run test:math:exhaustive
+npm run test:storage:migrations
 npm run generate:level-candidates
 npm run validate:levels
 npm run audit:daily
 npm run audit:secrets
+npm run audit:a11y-static
+npm run audit:design-tokens
 npm run check:boundaries
 npm run build
 npm run build:pages
 npm run preview
 npm run test:e2e
-
-M03 종료 재검증에서 기본 `npm run generate:level-candidates -- --seed axis-shift-curation-v1`는 full manifest·순서 있는 catalog·human 필드를 정규화한 machine scaffold의 approval fingerprint exact match에서 승인 evidence를 byte-preserve하고 `curation=preserved`를 출력했다. catalog·manifest·scaffold 변경은 `PENDING` 재생성, 같은 fingerprint의 machine 편집은 fail-closed한다. `--reset-curation`은 사람 승인을 명시적으로 폐기하므로 closure 명령에 포함하지 않는다.
 npm run test:pages
 npm run test:a11y
+npm run test:visual
 npm run verify
 ```
+
+M05 fixture 전용 canonical 명령은 다음과 같다.
+
+```bash
+npm run test -- src/components src/test/ui-fixture-app.tsx
+npm run test:a11y -- --project=ui-fixtures
+npm run test:visual -- --project=ui-fixtures
+npm run test:e2e -- tests/e2e/keyboard-core.spec.ts
+```
+
+M03 종료 재검증에서 기본 `npm run generate:level-candidates -- --seed axis-shift-curation-v1`는 full manifest·순서 있는 catalog·human 필드를 정규화한 machine scaffold의 approval fingerprint exact match에서 승인 evidence를 byte-preserve하고 `curation=preserved`를 출력했다. catalog·manifest·scaffold 변경은 `PENDING` 재생성, 같은 fingerprint의 machine 편집은 fail-closed한다. `--reset-curation`은 사람 승인을 명시적으로 폐기하므로 closure 명령에 포함하지 않는다.
 
 후속 phase에서 추가할 권장 script:
 
 ```bash
-npm run test:math:exhaustive
-npm run test:storage:migrations
-npm run test:visual
 npm run test:i18n
 npm run test:share:fixtures
 npm run audit:network
@@ -124,7 +161,6 @@ npm run docs:links
 npm run check:traceability
 npm run smoke:production -- --url <URL>
 ```
-
 ## 5. 환경변수 정책
 
 v1.0 runtime에 secret 환경변수는 없다. build-time 값도 공개 정보만 사용한다.
@@ -221,28 +257,39 @@ M03 generator parity는 `UTC`, `Asia/Seoul`, `America/Los_Angeles`의 3개 환�
 
 ## 8. CI 계약
 
-PR pipeline:
+PR quality job:
 
 ```text
 checkout
 → setup-node 24 + npm cache
 → Node·npm 버전 출력
 → npm ci
-→ lint
-→ format:check
-→ typecheck
-→ unit/component
+→ lint·format:check·typecheck
+→ unit/component·global/domain/M04 coverage·storage/math
 → 정적 접근성 이름 검사
-→ 모듈 경계·순환 검사
-→ level validation
-→ 54-level fail-closed validation
-→ 3,650-day Daily audit
-→ secret scan
+→ 디자인 token 검사
+→ 모듈 경계·레벨·Daily·secret 검사
 → build
 → Chromium·Firefox·WebKit 설치
+→ M05 axe fixture
+→ M05 keyboard core 3엔진
 → non-root route core E2E
 → M03 PRNG·Daily browser parity 3엔진
 ```
+
+정적 접근성·token 검사는 browser 설치 전에 실행한다. browser 기반 axe·keyboard·route·parity는 세 엔진 설치 뒤 실행한다.
+
+canonical visual은 Linux quality job과 분리한 `windows-latest` job에서 수행한다.
+
+```text
+checkout
+→ setup-node 24 + npm cache
+→ npm ci
+→ Chromium 설치
+→ M05 visual regression
+```
+
+Windows dark/light/system full-fixture baseline 9개를 canonical로 사용한다. 생성 후 무갱신 재실행은 `maxDiffPixels=0`, threshold 0, diff 0으로 통과했으며, OS별 font rasterization 차이를 Linux quality job의 visual failure로 혼합하지 않는다.
 
 main Pages pipeline:
 
@@ -251,15 +298,17 @@ checkout
 → setup-node .nvmrc + npm cache
 → npm ci
 → npm run verify
-→ npm run test:a11y
+→ npm run audit:a11y-static
 → Chromium 설치
+→ npm run test:a11y -- --project=ui-fixtures
 → npm run test:e2e -- --project=chromium
 → npm run test:pages -- --project=chromium
 → Pages artifact upload/deploy
 ```
 
-workflow는 `node-version-file: .nvmrc`, npm cache와 `package-lock.json`, `npm ci`를 사용한다. `.nvmrc=24`와 `package.json#engines`도 Node 24로 일치한다. 품질 CI는 Chromium core E2E 뒤 M03 parity를 Chromium·Firefox·WebKit에서 실행하고, Pages workflow는 호환 artifact Chromium smoke와 공식 upload/deploy를 유지한다.
+Pages도 정적 접근성 검사를 browser 설치 전에 수행하고, axe는 Chromium 설치 뒤 수행한다. 자동 E2/E3가 통과해도 실제 Android Chrome·스크린리더·200% zoom·색각 검토의 수동 E1 4개를 CI 성공으로 대체하지 않는다.
 
+workflow는 `node-version-file: .nvmrc`, npm cache와 `package-lock.json`, `npm ci`를 사용한다. `.nvmrc=24`와 `package.json#engines`도 Node 24로 일치한다. 품질 CI는 Chromium core E2E 뒤 M03 parity를 Chromium·Firefox·WebKit에서 실행하고, Pages workflow는 호환 artifact Chromium smoke와 공식 upload/deploy를 유지한다.
 ## 9. GitHub Pages 배포
 
 2026-08-14 원격 Pages를 legacy branch source에서 공식 artifact workflow로 전환했다. 배포 SHA는 `93a4359b5cbe1b45f8ed1fe0ee4a984003e8191c`이며 `build_type=workflow`·`status=built`다. 전환 전 SHA `576e6dbac1938652ba892539c91a1fa07f4d2cf7`는 `backup/pages-legacy-20260814`에 보존했다.

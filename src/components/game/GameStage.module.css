@@ -1,0 +1,213 @@
+.stage {
+  --grid-extent: min(
+    calc(100vw - var(--game-mobile-inline-reserve)),
+    var(--board-max)
+  ); /* token-audit: calculation */
+
+  display: grid;
+  width: min(100%, var(--game-width));
+  gap: var(--space-4);
+  padding-block-end: var(--sticky-action-height);
+  margin-inline: auto;
+  scroll-padding-block-end: var(--sticky-action-height);
+}
+
+.stageHeader {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-block-end: var(--space-3);
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.stageHeader h1 {
+  font-size: var(--font-size-xl);
+}
+
+.eyebrow,
+.puzzleId {
+  color: var(--color-primary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  font-weight: 750;
+  letter-spacing: var(--letter-spacing-label);
+  text-transform: uppercase;
+}
+
+.puzzleId {
+  color: var(--color-text-muted);
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns:
+    minmax(var(--game-side-min), 0.72fr) minmax(
+      0,
+      calc(var(--board-max) + var(--control-min) + var(--space-2))
+    )
+    minmax(var(--game-rail-min), 0.9fr);
+  grid-template-areas:
+    'target board side'
+    '. action side';
+  align-items: start;
+  justify-content: center;
+  gap: var(--space-4);
+}
+
+.workspace > :first-child {
+  grid-area: target;
+}
+
+.boardPanel {
+  grid-area: board;
+  width: calc(var(--grid-extent) + var(--control-min) + var(--space-2));
+  max-width: 100%;
+  scroll-margin-block-end: var(--sticky-action-height);
+}
+
+.columnRail {
+  display: grid;
+  width: var(--grid-extent);
+  height: var(--control-min);
+  grid-template-columns: repeat(var(--grid-size), minmax(0, 1fr));
+  margin-inline-start: calc(var(--control-min) + var(--space-2));
+}
+
+.matrix {
+  display: grid;
+  grid-template-columns: var(--control-min) var(--grid-extent);
+  gap: var(--space-2);
+}
+
+.rowRail {
+  display: grid;
+  width: var(--control-min);
+  height: var(--grid-extent);
+  grid-template-rows: repeat(var(--grid-size), minmax(0, 1fr));
+}
+
+.axisSlot {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  place-items: center;
+}
+
+.board {
+  width: var(--grid-extent);
+  aspect-ratio: 1;
+}
+
+.side {
+  display: grid;
+  grid-area: side;
+  align-content: start;
+  gap: var(--space-3);
+}
+
+.errorPanel {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: var(--border-width-strong) solid var(--color-danger);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.bottomAction {
+  position: sticky;
+  z-index: var(--z-sticky);
+  grid-area: action;
+  align-self: start;
+  bottom: 0;
+  width: min(100%, var(--game-action-max));
+  padding: var(--space-2) var(--space-2) calc(var(--space-2) + env(safe-area-inset-bottom));
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  margin-inline: auto;
+  background: color-mix(
+    in srgb,
+    var(--color-canvas) 92%,
+    transparent
+  ); /* token-audit: transparency */
+  backdrop-filter: blur(var(--blur-surface));
+}
+
+.stage[data-phase='pulsing'] .stageHeader {
+  border-bottom-color: var(--color-primary);
+}
+
+.stage[data-phase='solved'] .stageHeader {
+  border-bottom-color: var(--color-warning);
+}
+
+@media (min-width: 48rem) and (max-width: 69.99rem) {
+  /* token-audit: breakpoint */
+  .stage {
+    --grid-extent: min(
+      calc(100vw - var(--game-tablet-inline-reserve)),
+      var(--board-max)
+    ); /* token-audit: calculation */
+  }
+
+  .workspace {
+    grid-template-columns: minmax(0, 1fr) minmax(var(--game-tablet-side-min), 0.62fr);
+    grid-template-areas:
+      'board target'
+      'action side';
+  }
+
+  .boardPanel {
+    justify-self: end;
+  }
+}
+
+@media (min-width: 48rem) {
+  /* token-audit: breakpoint */
+  .stage {
+    padding-block-end: 0;
+  }
+
+  .bottomAction {
+    position: static;
+    width: min(100%, var(--board-max));
+    padding: 0;
+    border: 0;
+    background: transparent;
+    backdrop-filter: none;
+  }
+}
+
+@media (max-width: 47.99rem) {
+  /* token-audit: breakpoint */
+  .stageHeader {
+    align-items: start;
+  }
+
+  .workspace {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'board'
+      'action'
+      'target'
+      'side';
+  }
+
+  .boardPanel {
+    justify-self: center;
+  }
+}
+
+@media (max-width: 25rem) {
+  /* token-audit: breakpoint */
+  .puzzleId {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bottomAction {
+    backdrop-filter: none;
+  }
+}

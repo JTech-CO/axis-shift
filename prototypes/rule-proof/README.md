@@ -43,6 +43,9 @@ node prototypes/rule-proof/browser-smoke.cjs
 - PULSE 입력 스냅샷과 중복 입력 잠금
 - Undo, 확인형 Reset, 완료 잠금
 - 320px·360px 무가로스크롤 레이아웃과 6×6에서도 44px 이상인 축 조작 타깃
+- 제출 URL 호환 Theme 버튼: 기본 dark, `dark → light → system → dark` 순환과 OS system palette
+- 제출 URL 호환 Motion 버튼: 기본 system, `system ↔ reduced` 전환; reduced 또는 OS 설정에서 PULSE 대기 0ms
+- OS forced-colors 보존, appearance 전환 중 stage·signal·seed·hash와 현재 보드 불변
 - 키보드 Tab·Enter·Space 경로와 `aria-pressed`
 - 색 외 기호를 사용하는 Preview ON·OFF와 완료 상태
 - 첫 축 선택에서 시작하고 숨김 탭 시간을 제외하는 스톱워치, 완료 시 고정된 PULSE·0.1초 결과

@@ -38,6 +38,7 @@ export default defineConfig(({ mode }) => {
             input: {
               app: path.join(projectRoot, 'index.html'),
               generatorParity: path.join(projectRoot, 'tests', 'e2e', 'generator-parity.html'),
+              uiFixtures: path.join(projectRoot, 'tests', 'ui-fixtures', 'index.html'),
             },
           },
         }

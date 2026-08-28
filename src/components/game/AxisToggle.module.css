@@ -1,0 +1,90 @@
+.toggle {
+  position: relative;
+  display: grid;
+  width: min(var(--control-min), calc(100% - var(--cell-inset)));
+  height: min(var(--control-min), calc(100% - var(--cell-inset)));
+  min-width: var(--control-min);
+  min-height: var(--control-min);
+  place-items: center;
+  padding: 0;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast) var(--ease-standard),
+    background-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+}
+
+.toggle::after {
+  position: absolute;
+  width: var(--axis-node-size);
+  height: var(--axis-node-size);
+  border: var(--border-width) solid currentColor;
+  border-radius: var(--radius-circle);
+  content: '';
+}
+
+.toggle[data-axis='column']::before {
+  position: absolute;
+  bottom: calc(var(--cell-inset) * -1);
+  width: var(--axis-indicator-long);
+  height: var(--axis-indicator-short);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  content: '';
+}
+
+.toggle[data-axis='row']::before {
+  position: absolute;
+  right: calc(var(--cell-inset) * -1);
+  width: var(--axis-indicator-short);
+  height: var(--axis-indicator-long);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  content: '';
+}
+
+.toggle[data-selected='true'] {
+  border-color: var(--color-primary);
+  background: var(--color-surface-raised);
+  color: var(--color-axis-selected-text);
+}
+
+.toggle[data-selected='true']::before {
+  background: currentColor;
+}
+
+.toggle[data-selected='true']::after {
+  border-radius: 0;
+  background: currentColor;
+  transform: rotate(45deg);
+}
+
+.toggle[data-hinted='true'] {
+  outline: var(--border-width-strong) dashed var(--color-warning);
+  outline-offset: calc(var(--space-1) * -1);
+}
+
+.toggle:disabled {
+  opacity: 0.42;
+}
+
+.label {
+  position: absolute;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  font-weight: 750;
+}
+
+.node + .label {
+  transform: translateY(var(--axis-label-shift));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toggle {
+    transition: none;
+  }
+}

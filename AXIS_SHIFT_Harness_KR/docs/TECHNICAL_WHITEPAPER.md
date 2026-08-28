@@ -81,7 +81,7 @@ AXIS//SHIFT는 텐서와 이진 행렬의 연산 원리를 일반 사용자가 �
 | Sprint | 180초 연속 퍼즐 | 일일 시드 Sprint·리더보드 |
 | Archive | 지난 Daily 재생, 로컬 완료 표시 | 시즌별 컬렉션 |
 | 공유 | 텍스트, 1080×1080, 1200×630 | 동영상 리플레이 카드 |
-| 접근성 | 키보드, 고대비 상태, 모션 감소, 한·영 | 추가 언어·스크린리더 최적화 |
+| 접근성 | 키보드, 비색상 상태 표식, Forced Colors, 모션 감소, 한·영 | 추가 언어·스크린리더 최적화 |
 | 저장 | LocalStorage 기반 진행도·설정 | 계정 연동 클라우드 세이브 |
 | 배포 | GitHub Pages PWA | 앱 스토어용 TWA/Capacitor 래핑 |
 
@@ -104,7 +104,8 @@ AXIS//SHIFT는 텐서와 이진 행렬의 연산 원리를 일반 사용자가 �
 - **지원 언어**: 한국어, 영어. URL 또는 저장 설정을 통해 전환하며 텍스트를 이미지에 포함하지 않는다.
 - **뷰 모드**: Mobile First + Fluid Layout
 - **최소 기준 뷰포트**: 360×640 CSS px
-- **테마 정책**: `prefers-color-scheme`을 기본값으로 사용하고 사용자의 수동 선택을 우선한다. `system`, `dark`, `light`, `high-contrast` 값을 지원한다.
+- **테마 정책**: ADR-0011에 따라 기본값은 `dark`이고 단일 버튼이 `dark → light → system → dark`로 순환한다. `system`에서만 `prefers-color-scheme`을 따르며 커스텀 `high-contrast` 테마는 지원하지 않는다. 운영체제 Forced Colors와 별도 `highContrastCells`는 유지한다.
+- **모션 정책**: 단일 버튼의 기본값은 `system`이고 `system ↔ reduced`로 순환한다. UI의 `reduced`는 저장값 `on`으로 기록한다.
 
 #### 2.1.2. 라우팅
 
@@ -405,7 +406,7 @@ export interface DailyRecord extends PuzzleBestRecord {
 export interface UserSettings {
   schemaVersion: 1;
   locale: 'ko' | 'en';
-  theme: 'system' | 'dark' | 'light' | 'high-contrast';
+  theme: 'dark' | 'light' | 'system';
   soundEnabled: boolean;
   soundVolume: number;
   hapticsEnabled: boolean;
@@ -455,6 +456,9 @@ axis-shift:generator-map:v1
 
 - settings·progress·session·generator-map은 서로 독립된 네 v1 root다. `PersistedAppState`를 다섯 번째 key로 저장하지 않는다.
 - v1은 최초 공개 schema다. 존재하지 않는 v0을 만들지 않고 실제 이전 버전이 생길 때만 순차 migration registry에 단계를 추가한다.
+- `UserSettings.theme`의 쓰기 허용값은 `dark | light | system`, 기본값은 `dark`다. legacy v1 raw의 `theme: 'high-contrast'`는 읽기 단계에서 `dark`로 정규화하고 다시 쓰지 않는다.
+- Motion UI는 `system`을 `reducedMotion: 'system'`, `reduced`를 `reducedMotion: 'on'`으로 쓴다. 저장 타입의 기존 `off` 호환성과 별개로 새 2상태 버튼은 `off`를 생성하지 않는다.
+- `highContrastCells`는 셀의 경계·pattern을 강화하는 독립 boolean이며 `theme`이나 운영체제 Forced Colors를 대체하지 않는다.
 - generator-map root는 `schemaVersion`, `defaultVersion`, 정렬된 UTC `schedule`만 저장하며 전체 생성 정책은 정적 M03 content가 기준이다.
 - 손상·빈 값·미지원·미래 버전 raw는 `axis-shift:quarantine:v1:<key-kind>:<reason>:<id>`에 원문 백업이 성공한 뒤에만 primary key에서 제거한다. 백업 실패 시 원키를 보존한다.
 - 읽기·쓰기 실패는 메모리 기본값으로 계속하고 경고는 repository 인스턴스에서 `keyKind+code`당 한 번만 방출한다.
@@ -645,7 +649,7 @@ type GameSessionAction =
 
 1. `import.meta.env.BASE_URL`을 기반으로 정적 자산 경로를 설정한다.
 2. 설정과 진행도 JSON을 읽고 스키마 마이그레이션 및 검증을 수행한다.
-3. 시스템 언어·테마·모션 설정을 해석하되 저장된 사용자의 명시적 선택을 우선한다.
+3. 시스템 언어·테마·모션 설정을 해석하되 검증된 사용자 선택을 우선한다. 테마 저장값이 없으면 `dark`, `system`일 때만 시스템 색 선호를 따르며 legacy `high-contrast`는 `dark`로 정규화한다.
 4. 현재 라우트와 재개 가능한 세션을 비교한다.
 5. 캠페인 퍼즐을 정적 JSON에서 읽거나 Daily 퍼즐을 생성한다.
 6. 퍼즐의 보드 형식·랭크·최적해를 검증한다.
@@ -996,7 +1000,8 @@ noise:    lab-04-noise-01 ... lab-04-noise-12
 8. Private Browsing·quota·read/write 예외에서는 메모리 모드로 계속하며 경고는 repository 인스턴스의 `keyKind+code`당 한 번이다.
 9. 설정 변경은 즉시 저장하고 진행도 쓰기는 완료·PULSE 후에 수행한다. Reset은 session root만 교체하며 별도 progress root의 Daily best를 보존한다. 세션 복구 안내는 진행 중 퍼즐이 있을 때만 홈에 표시한다.
 10. M04 `IdGenerator`는 issued ledger·seed·reserve·retry·exhaustion을 검증했다. 앱 singleton·crypto source와 hydrate seed/reserve 연결은 M06 범위다.
-11. M04는 reducer·clock·ID·storage 계약까지만 닫는다. 실제 Page Visibility 연결, Result·Lab 저장과 reload E2E는 M05·M06, UTC Daily·streak·Archive는 M07 범위다.
+11. M04는 reducer·clock·ID·storage 계약까지만 닫는다. M05는 selector 결과·표시 DTO·번역된 문자열·callback만 받는 presentational shared UI와 `paused`·Result를 포함한 상태 fixture를 제공하며 production controller나 저장 orchestration을 소유하지 않는다.
+12. 실제 Page Visibility dispatch, Result·Lab 기록 저장과 browser reload E2E는 M06 범위다. UTC Daily·streak·Archive는 M07 범위다.
 
 ### 4.7. 공유 파이프라인 (Sharing Pipeline)
 
@@ -1498,7 +1503,7 @@ axis-shift/
 ### 8.4. 시각·접근성 테스트
 
 - 주요 화면의 고정 뷰포트 스크린샷 회귀
-- dark/light/high-contrast 테마
+- dark/light/system 테마 순환, reduced-motion 설정, 운영체제 Forced Colors
 - 200% 브라우저 줌
 - 텍스트 확대와 긴 한국어·영어 문자열
 - 자동 axe 검사와 수동 스크린리더 확인
@@ -1619,7 +1624,7 @@ Codex가 제안하거나 생성한 변경
 
 - [ ] 360px 모바일에서 가로 스크롤과 잘린 컨트롤이 없다.
 - [ ] 키보드만으로 홈부터 공유 결과까지 완료할 수 있다.
-- [ ] Dark, Light, High Contrast, Reduced Motion이 동작한다.
+- [ ] Dark, Light, System, Reduced Motion, 운영체제 Forced Colors가 동작하고 커스텀 high-contrast 테마가 노출되지 않는다.
 - [ ] 한국어·영어의 누락 문자열이 없다.
 - [ ] 새로고침과 오프라인에서 세션이 복구된다.
 - [ ] 공유 텍스트와 두 이미지 비율이 정답을 노출하지 않는다.

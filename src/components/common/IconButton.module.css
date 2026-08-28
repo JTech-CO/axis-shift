@@ -1,0 +1,12 @@
+.iconButton {
+  width: var(--control-min);
+  padding: 0;
+  border-radius: var(--radius-circle);
+}
+
+.icon {
+  display: grid;
+  width: var(--icon-size);
+  height: var(--icon-size);
+  place-items: center;
+}

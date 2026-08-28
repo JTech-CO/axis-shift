@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.node.json",
+  "compilerOptions": {
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "tsBuildInfoFile": "./node_modules/.cache/tsconfig.playwright.tsbuildinfo"
+  },
+  "include": [
+    "src/content/**/*.json",
+    "src/content/**/*.ts",
+    "src/domain/**/*.ts",
+    "tests/**/*.ts"
+  ],
+  "exclude": ["src/domain/**/*.test.ts"]
+}

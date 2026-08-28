@@ -2,7 +2,7 @@
 
 **문서 버전**: 1.0.0  
 **상태**: 미실행 템플릿 — M10에서 실제 값 입력  
-**최종 갱신**: 2026-08-09
+**최종 갱신**: 2026-08-26
 
 > 빈 항목은 통과를 의미하지 않는다. 명령·환경·commit·artifact가 연결되지 않은 값은 릴리스 증거가 아니다.
 
@@ -105,14 +105,16 @@ INV violation=0
 
 ## 7. Viewport·테마 matrix
 
-| Viewport | Dark | Light | High Contrast | Reduced Motion | Overflow | 상태 |
-|---|---|---|---|---|---|---|
-| 360×640 | — | — | — | — | — | NOT RUN |
-| 390×844 | — | — | — | — | — | NOT RUN |
-| 768×1024 | — | — | — | — | — | NOT RUN |
-| 1024×768 | — | — | — | — | — | NOT RUN |
-| 1440×900 | — | — | — | — | — | NOT RUN |
-| 200% zoom | — | — | — | — | — | NOT RUN |
+> ADR-0011에 따라 커스텀 high-contrast 테마는 제외한다. Forced Colors는 운영체제 접근성 환경, High Contrast Cells는 별도 셀 표식 설정이다.
+
+| Viewport | Dark | Light | System | Reduced Motion | Forced Colors | Overflow | 상태 |
+|---|---|---|---|---|---|---|---|
+| 360×640 | — | — | — | — | — | — | NOT RUN |
+| 390×844 | — | — | — | — | — | — | NOT RUN |
+| 768×1024 | — | — | — | — | — | — | NOT RUN |
+| 1024×768 | — | — | — | — | — | — | NOT RUN |
+| 1440×900 | — | — | — | — | — | — | NOT RUN |
+| 200% zoom | — | — | — | — | — | — | NOT RUN |
 
 ## 8. 접근성 결과
 
@@ -124,6 +126,8 @@ INV violation=0
 | result focus | heading | — | NOT RUN |
 | dialog focus trap/return | pass | — | NOT RUN |
 | color-independent state | pass | — | NOT RUN |
+| Forced Colors state parity | pass | — | NOT RUN |
+| High Contrast Cells/theme independence | pass | — | NOT RUN |
 | reduced motion parity | pass | — | NOT RUN |
 | screen reader comprehension | pass | — | NOT RUN |
 | ko/en long text | no clipping | — | NOT RUN |
@@ -153,6 +157,8 @@ INV violation=0
 | Scenario | 기대 | 실제 | 상태 |
 |---|---|---|---|
 | valid v1 round-trip | deep equal | — | NOT RUN |
+| legacy v1 `theme: high-contrast` | normalize to `dark`, do not rewrite legacy value | — | NOT RUN |
+| Theme/Motion write contract | `dark|light|system`, UI `reduced` → stored `on` | — | NOT RUN |
 | invalid JSON | isolate/default | — | NOT RUN |
 | future schema | backup/no overwrite | — | NOT RUN |
 | write failure/quota | memory play continues | — | NOT RUN |

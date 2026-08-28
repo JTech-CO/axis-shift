@@ -31,8 +31,11 @@
     "preview": "vite preview",
     "test:e2e": "playwright test",
     "test:pages": "playwright test --config=playwright.pages.config.ts",
-    "test:a11y": "tsx scripts/check-a11y-targets.ts",
-    "verify": "tsx scripts/run-verify.ts"
+    "test:a11y": "playwright test --config=playwright.ui-fixtures.config.ts tests/a11y",
+    "verify": "tsx scripts/run-verify.ts",
+    "audit:a11y-static": "tsx scripts/check-a11y-targets.ts",
+    "audit:design-tokens": "tsx scripts/check-design-tokens.ts",
+    "test:visual": "playwright test --config=playwright.ui-fixtures.config.ts tests/visual"
   },
   "dependencies": {
     "react": "19.2.8",
@@ -40,6 +43,7 @@
     "react-router-dom": "7.18.2"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
     "@eslint/js": "10.0.1",
     "@playwright/test": "1.62.1",
     "@testing-library/jest-dom": "7.0.1",

@@ -4,18 +4,27 @@
   box-sizing: border-box;
 }
 
+html {
+  text-size-adjust: 100%;
+}
+
 html:focus-within {
   scroll-behavior: smooth;
 }
 
 body,
 h1,
+h2,
+h3,
 p,
-ul {
+ul,
+ol,
+figure {
   margin: 0;
 }
 
-ul {
+ul,
+ol {
   padding: 0;
   list-style: none;
 }
@@ -28,6 +37,39 @@ textarea {
 }
 
 button,
-a {
+a,
+summary {
   touch-action: manipulation;
+}
+
+button {
+  border: 0;
+}
+
+img,
+picture,
+svg,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+dialog {
+  padding: 0;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: var(--duration-instant) !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: var(--duration-instant) !important;
+  }
 }

@@ -48,7 +48,7 @@ AXIS//SHIFT의 디자인 목표는 수학적 배경이 있는 퍼즐을 “수�
    데스크톱에서는 목표·보드·상태를 나란히 두고, 모바일에서는 목표를 축소하고 PULSE를 하단에 고정한다. 기능을 삭제하지 않고 우선순위를 바꾼다.
 
 5. **Accessible State Language — 색상 이외의 상태 문법**  
-   셀의 채움, 중심 기호, 테두리, 패턴, 레이블을 함께 사용한다. 색각 이상, 고대비, 모션 감소, 키보드 환경에서도 동일한 규칙을 이해할 수 있다.
+   셀의 채움, 중심 기호, 테두리, 패턴, 레이블을 함께 사용한다. 색각 이상, 운영체제 Forced Colors·고대비 환경, 모션 감소, 키보드 환경에서도 동일한 규칙을 이해할 수 있다.
 
 ### 1.4. 대상 사용자 (Target Users)
 
@@ -71,7 +71,7 @@ AXIS//SHIFT의 디자인 목표는 수학적 배경이 있는 퍼즐을 “수�
 - 데스크톱 브라우저, 마우스·키보드
 - 소리 없이 플레이하는 공공장소
 - 오프라인 또는 불안정한 네트워크
-- 다크 모드·고대비·모션 감소를 사용하는 환경
+- 다크 모드·운영체제 Forced Colors·고대비·모션 감소를 사용하는 환경
 
 ### 1.5. UX 원칙 (Experience Principles)
 
@@ -117,12 +117,14 @@ AXIS//SHIFT의 디자인 목표는 수학적 배경이 있는 퍼즐을 “수�
 - **스크롤**: 게임 보드와 PULSE가 첫 뷰포트 안에 들어오도록 우선 배치
 - **가로 스크롤**: 모든 지원 뷰포트에서 금지
 
-#### 2.1.2. 테마 정책
+#### 2.1.2. 테마·모션 설정 정책
 
-- 기본값은 시스템 설정을 따른다.
-- 사용자는 `System`, `Dark`, `Light`, `High Contrast` 중 선택할 수 있다.
+- ADR-0011에 따라 기본 테마는 `Dark`다.
+- Theme은 목록이 아닌 단일 순환 버튼이며 `Dark → Light → System → Dark` 순서로 전환한다. `System`에서만 `prefers-color-scheme`을 따른다.
+- 커스텀 `High Contrast` 테마는 제공하지 않는다. 운영체제 Forced Colors·고대비 환경 지원과 별도 `High Contrast Cells` 설정은 이 결정과 무관하게 유지한다.
+- Motion은 기본 `System`인 단일 버튼이며 `System ↔ Reduced`로 전환한다. `System`은 운영체제 `prefers-reduced-motion`을 따르고 `Reduced`는 모션 감소를 강제한다.
 - 마케팅 썸네일과 공유 카드는 일관된 다크 브랜드 팔레트를 사용한다.
-- 테마 전환 시 페이지 전체가 번쩍이지 않도록 초기 HTML에서 저장값 또는 시스템 설정을 먼저 적용한다.
+- 테마 전환 시 페이지 전체가 번쩍이지 않도록 초기 HTML에서 검증된 저장값을 먼저 적용한다. 저장값이 없거나 유효하지 않으면 `Dark`, legacy v1 `high-contrast` 값도 읽기 단계에서 `Dark`로 정규화한다.
 
 ##### Dark Theme
 
@@ -644,7 +646,8 @@ Home
 | Preview ON | Primary soft fill + dotted ring |
 | Preview OFF | ON fill 위 minus/notch + double border |
 | Solved | Primary fill 또는 final target state + lock sweep |
-| High Contrast ON | 검정/흰색 강대비 + 사선 또는 X pattern |
+| High Contrast Cells ON | 현재 테마의 색을 유지하고 사선·X pattern·강한 경계 추가 |
+| Forced Colors active | 운영체제 시스템 색 + 중심 기호·pattern·텍스트 유지 |
 
 - 셀 자체는 입력 요소가 아니므로 hover 효과를 주지 않는다.
 - 각 셀의 radius는 보드 크기에 따라 8~14px 범위다.
@@ -989,7 +992,7 @@ Primary를 화면 전체 네온 glow로 확장하지 않는다. 강조가 희소
 - 기본: 1px solid `--border`
 - Focus: 2px solid `--signal-primary` + 2px offset
 - Preview: 1px dashed 또는 double motif
-- 고대비: 2px solid
+- High Contrast Cells 또는 Forced Colors: 형태 표식을 유지한 2px 이상 경계
 
 #### Shadow
 
@@ -1293,7 +1296,7 @@ src/
     └── visual-fixtures/
         ├── game-dark.ts
         ├── game-light.ts
-        ├── game-high-contrast.ts
+        ├── game-forced-colors.ts
         ├── result-square.ts
         └── result-wide.ts
 
@@ -1324,7 +1327,7 @@ docs/
 2. 기능 컴포넌트 스타일은 CSS Modules에 둔다.
 3. 상태는 임의의 문자열 클래스보다 `data-state`, `data-phase`, `aria-pressed`를 우선한다.
 4. 색상·spacing·radius·motion 값을 컴포넌트에 하드코딩하지 않는다.
-5. `!important`는 고대비·reduced motion 같은 전역 접근성 override 외에는 사용하지 않는다.
+5. `!important`는 Forced Colors·reduced motion 같은 전역 접근성 override 외에는 사용하지 않는다.
 6. CSS nesting·container query 등 최신 기능은 지원 범위와 폴백을 확인한다.
 7. 테마별 이미지 파일을 따로 만들기보다 토큰과 SVG `currentColor`를 사용한다.
 
@@ -1338,7 +1341,7 @@ docs/
 6. 모달·bottom sheet는 focus trap, Escape, 배경 inert를 지원한다.
 7. 모든 아이콘 단독 버튼에 accessible name을 제공한다.
 8. 색상 외에 shape·border·pattern·text를 함께 사용한다.
-9. `prefers-reduced-motion`, 200% zoom, high contrast를 지원한다.
+9. `prefers-reduced-motion`, 200% zoom, 운영체제 Forced Colors·고대비 환경을 지원한다. 이는 커스텀 high-contrast 테마 제공을 뜻하지 않는다.
 10. 키보드만으로 첫 실행부터 결과 공유까지 진행할 수 있어야 한다.
 11. 시간 제한이 있는 Sprint 외에는 완료 시간에 따른 강제 실패가 없다.
 12. 사운드·햅틱을 끄더라도 정보 손실이 없어야 한다.
@@ -1526,7 +1529,10 @@ AXIS//SHIFT
 5. Data: Export/Reset Progress
 6. About: Version, GitHub, Licenses
 
-- 토글마다 즉시 미리보기가 가능해야 한다.
+- Theme은 현재 값을 함께 표시하는 단일 버튼이며 기본 `Dark`, 순서는 `Dark → Light → System → Dark`다. 3상태 컨트롤에 이진 의미의 `aria-pressed`를 사용하지 않는다.
+- Reduced Motion은 현재 값을 함께 표시하는 단일 버튼이며 기본 `System`, 순서는 `System ↔ Reduced`다. 저장 시 UI `Reduced`는 `reducedMotion: 'on'`으로 매핑한다.
+- `High Contrast Cells`는 셀의 경계·pattern을 강화하는 별도 설정이며 Theme 값을 바꾸지 않는다. 운영체제 Forced Colors도 별도 환경 기능이다.
+- 설정마다 즉시 미리보기가 가능해야 한다.
 - `Reset Progress`는 Danger 영역으로 분리한다.
 - 설정 화면을 닫으면 이전 포커스 위치로 돌아간다.
 
@@ -1586,7 +1592,9 @@ AXIS//SHIFT
 - PULSE 후 “4개 셀이 반전되었습니다. 목표와 7개 셀이 다릅니다.” 같은 요약을 제공할 수 있다.
 - Target 패턴은 필요 시 행별 이진 텍스트 또는 좌표 목록으로 읽는 별도 기능을 제공한다.
 
-### 9.3. 색각·고대비
+### 9.3. 색각·Forced Colors·High Contrast Cells
+
+커스텀 high-contrast 테마는 제공하지 않는다. 아래 비색상 상태 문법은 Dark·Light·System, 운영체제 Forced Colors, 선택적 High Contrast Cells에서 동일하게 유지한다.
 
 - ON 셀: 색 + 중심 diamond
 - Target ON: 색 + ring
@@ -1599,6 +1607,7 @@ AXIS//SHIFT
 ### 9.4. 모션
 
 - 시스템 Reduced Motion을 기본 존중
+- 설정 버튼은 기본 `System`이며 한 번 누르면 `Reduced`, 다시 누르면 `System`으로 돌아간다.
 - 모션 감소 시 scale, sweep, slide 제거
 - 상태 변경은 즉시 또는 120ms opacity로 표현
 - 시간 경고에서 pulse animation 반복 금지
@@ -1630,7 +1639,9 @@ AXIS//SHIFT
 
 - [ ] Light
 - [ ] Dark
-- [ ] High Contrast
+- [ ] System이 운영체제 Dark/Light 선호를 따름
+- [ ] 운영체제 Forced Colors
+- [ ] High Contrast Cells가 테마와 독립적으로 동작
 - [ ] Reduced Motion
 - [ ] 200% Zoom
 - [ ] 키보드 전용
@@ -1682,7 +1693,7 @@ AXIS//SHIFT
 ### 디자인 시스템
 
 - [ ] 모든 색·공간·radius·motion이 token으로 정의된다.
-- [ ] Light/Dark/High Contrast 간 의미 token이 동일하다.
+- [ ] Light/Dark/System 해석과 Forced Colors에서 의미 token·비색상 상태 표식이 동일하다.
 - [ ] 버튼·카드·축·셀 상태가 Story 또는 fixture로 확인 가능하다.
 - [ ] 아이콘 stroke와 viewBox 규칙이 통일된다.
 
@@ -1827,8 +1838,11 @@ SIGNAL GRADE S
 
 | 결정 | 채택 | 이유 |
 |---|---|---|
-| Dark-only | 아니오 | 기기·접근성 선호 대응 |
-| System + Dark/Light/High Contrast | 예 | 선택권과 접근성 |
+| Dark-only | 아니오 | 기본값은 Dark지만 Light와 System 선택 제공 |
+| 단일 Theme 순환 버튼 | 예 | `Dark → Light → System → Dark`, ADR-0011 |
+| 커스텀 High Contrast 테마 | 아니오 | 가독성 저하로 제거; legacy v1 값은 Dark로 정규화 |
+| Forced Colors + High Contrast Cells | 예 | OS 보조기능과 셀 형태 강화는 커스텀 테마와 분리 |
+| 단일 Motion 버튼 | 예 | `System ↔ Reduced`, UI Reduced는 저장값 `on`에 매핑 |
 | 3-column Desktop | 예 | Target·Game·Status 동시 가시성 |
 | 모바일 PULSE sticky | 예 | 한 손 조작과 주요 액션 유지 |
 | 일반 confetti | 아니오 | 제품 고유성이 낮고 산만함 |

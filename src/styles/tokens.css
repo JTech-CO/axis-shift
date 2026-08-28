@@ -1,8 +1,7 @@
-:root {
+:root,
+:root[data-theme='dark'] {
   color-scheme: dark;
   font-family:
-    Inter,
-    Pretendard,
     system-ui,
     -apple-system,
     BlinkMacSystemFont,
@@ -11,18 +10,192 @@
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 
-  --color-background: #0d1110;
-  --color-surface: #151c1a;
-  --color-border: #52605d;
-  --color-text: #f3f7f5;
-  --color-muted: #aab6b2;
-  --color-accent: #6ee7c8;
-  --focus-ring: 0 0 0 0.2rem #0d1110, 0 0 0 0.4rem #6ee7c8;
+  --color-canvas: #070a0f;
+  --color-surface: #0f141c;
+  --color-surface-raised: #161d28;
+  --color-surface-strong: #202a38;
+  --color-text: #f4f7fa;
+  --color-text-muted: #9ba8b8;
+  --color-border: #334052;
+  --color-border-strong: #52637a;
+  --color-primary: #72f2c5;
+  --color-primary-strong: #25c99a;
+  --color-primary-contrast: #06130f;
+  --color-secondary: #8da2ff;
+  --color-secondary-soft: #293158;
+  --color-axis-selected-text: var(--color-primary-strong);
+  --color-selection-text: var(--color-primary-contrast);
+  --color-danger: #ff8f9f;
+  --color-warning: #ffd175;
+  --color-success: #72f2c5;
+  --color-focus: #b9c5ff;
+  --color-grid-line: #273242;
+  --color-cell-off: #101720;
+  --color-cell-on: #72f2c5;
+  --color-cell-on-contrast: #06130f;
+  --color-preview-on: #8da2ff;
+  --color-preview-off: #ffd175;
+  --color-overlay: rgb(2 5 9 / 78%);
+  --color-shadow: rgb(0 0 0 / 42%);
 
-  --space-1: 0.5rem;
-  --space-2: 0.75rem;
-  --space-3: 1rem;
-  --space-4: 1.5rem;
-  --space-5: 2rem;
-  --content-width: 64rem;
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Mono', 'SFMono-Regular', Consolas, monospace;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+  --font-size-xl: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem);
+  --line-height-tight: 1.2;
+  --line-height-body: 1.6;
+  --letter-spacing-label: 0.12em;
+  --letter-spacing-brand: 0.06em;
+  --letter-spacing-pulse: 0.18em;
+  --letter-spacing-status: 0.04em;
+  --text-decoration-thickness: 0.15em;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --control-min: 2.75rem;
+  --cell-inset: 0.125rem;
+  --cell-inset-compact: 0.08rem;
+  --visually-hidden-offset: -1px;
+  --pulse-min: 3.25rem;
+  --content-width: 72rem;
+  --game-width: 68rem;
+  --board-max: 31rem;
+  --sticky-action-height: 5.75rem;
+  --target-preview-mobile-max: 8rem;
+  --target-preview-max: 12rem;
+  --header-min-height: 3.5rem;
+  --footer-copy-max: 48rem;
+  --dialog-max: 30rem;
+  --game-mobile-inline-reserve: 5.25rem;
+  --game-side-min: 10rem;
+  --game-rail-min: 13rem;
+  --game-action-max: 36rem;
+  --game-tablet-inline-reserve: 23.5rem;
+  --game-tablet-side-min: 14rem;
+  --visually-hidden-size: 1px;
+  --icon-size: 1.25rem;
+  --status-icon-size: 1.75rem;
+  --axis-node-size: 0.42rem;
+  --axis-indicator-short: 0.25rem;
+  --axis-indicator-long: 0.65rem;
+  --axis-label-shift: 0.9rem;
+  --button-press-shift: 0.0625rem;
+  --cell-signal-size: clamp(0.45rem, 30%, 1.35rem);
+  --cell-label-size: clamp(0.7rem, 3vw, 1.2rem);
+  --cell-pulse-size: clamp(0.25rem, 34%, 0.8rem);
+  --cell-selected-ring: 0.2rem;
+  --cell-pulse-ring: 0.3rem;
+  --grid-focus-inset: -0.2rem;
+  --blur-subtle: 0.2rem;
+  --blur-surface: 0.6rem;
+  --clip-hidden-inset: 50%;
+  --skip-link-hidden-shift: -200%;
+  --cell-symbol-scale: 64%;
+  --viewport-dynamic-block: 100vh;
+  --viewport-small-block: 100vh;
+
+  --radius-sm: 0.25rem;
+  --radius-circle: 50%;
+  --radius-pill: 999px;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --border-width: 1px;
+  --border-width-strong: 2px;
+  --shadow-raised: 0 1rem 3rem var(--color-shadow);
+  --focus-ring: 0 0 0 0.125rem var(--color-canvas), 0 0 0 0.25rem var(--color-focus);
+
+  --duration-instant: 80ms;
+  --duration-fast: 160ms;
+  --duration-pulse: 420ms;
+  --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --z-skip: 100;
+  --z-sticky: 20;
+  --z-dialog: 80;
+}
+
+@supports (height: 100dvh) {
+  :root {
+    --viewport-dynamic-block: 100dvh;
+  }
+}
+
+@supports (height: 100svh) {
+  :root {
+    --viewport-small-block: 100svh;
+  }
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+  --color-canvas: #f5f7fb;
+  --color-surface: #ffffff;
+  --color-surface-raised: #eef2f8;
+  --color-surface-strong: #dde5f0;
+  --color-text: #111925;
+  --color-text-muted: #526174;
+  --color-border: #bac6d6;
+  --color-border-strong: #718198;
+  --color-primary: #087f61;
+  --color-primary-strong: #056149;
+  --color-primary-contrast: #ffffff;
+  --color-secondary: #4057c8;
+  --color-secondary-soft: #dfe4ff;
+  --color-danger: #b4233d;
+  --color-warning: #8a5b00;
+  --color-success: #087f61;
+  --color-focus: #1b43d4;
+  --color-grid-line: #cbd5e1;
+  --color-cell-off: #f7f9fc;
+  --color-cell-on: #087f61;
+  --color-cell-on-contrast: #ffffff;
+  --color-preview-on: #4057c8;
+  --color-preview-off: #8a5b00;
+  --color-overlay: rgb(13 20 31 / 64%);
+  --color-shadow: rgb(28 42 62 / 18%);
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]),
+  :root[data-theme='system'] {
+    color-scheme: light;
+    --color-canvas: #f5f7fb;
+    --color-surface: #ffffff;
+    --color-surface-raised: #eef2f8;
+    --color-surface-strong: #dde5f0;
+    --color-text: #111925;
+    --color-text-muted: #526174;
+    --color-border: #bac6d6;
+    --color-border-strong: #718198;
+    --color-primary: #087f61;
+    --color-primary-strong: #056149;
+    --color-primary-contrast: #ffffff;
+    --color-secondary: #4057c8;
+    --color-secondary-soft: #dfe4ff;
+    --color-danger: #b4233d;
+    --color-warning: #8a5b00;
+    --color-success: #087f61;
+    --color-focus: #1b43d4;
+    --color-grid-line: #cbd5e1;
+    --color-cell-off: #f7f9fc;
+    --color-cell-on: #087f61;
+    --color-cell-on-contrast: #ffffff;
+    --color-preview-on: #4057c8;
+    --color-preview-off: #8a5b00;
+    --color-overlay: rgb(13 20 31 / 64%);
+    --color-shadow: rgb(28 42 62 / 18%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: var(--duration-instant);
+    --duration-pulse: var(--duration-instant);
+  }
 }

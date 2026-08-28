@@ -104,7 +104,10 @@ Codex가 제안·생성·수정한 항목
 | CX-H00-003 | 2026-08-21~26 | H00 | 공개 배포 회귀·submission-ready 패키지·오너 제출 | PR #1·#2·#3, tag·Pages·private package | clean E3, public E4, 14-entry manifest, backup delta 0 | 오너가 개인정보·동의·Submit을 직접 수행하고 완료 확인 | 완료 / 접수 metadata 미제공 |
 | CX-M02-001 | 2026-08-21 | M02 | 순수 보드·PULSE·rank·factorization 코어 | `55b0b55273aff6803191bb9812927c622721bd2f` / PR `#5` | 512 전수·50,000 property 오류 0, 5파일 coverage 100% | 공개 규칙·bit·pivot 계약과 milestone commit/push 승인 | 완료 / PR·main CI·Pages PASS |
 | CX-M03-001 | 2026-08-21~26 | M03 | 결정적 Daily·54레벨 공급망 | candidate `1c313bd29e1d24c483749af90a8734542988be5d`; closure `5050551796fde4c9255349775e685c932060c58e`; PR #7 | 20×100 PRNG, 3브라우저 9/9, 3,650일 exact-SHA 감사 2회 동일, DOD-04 승인, remote CI PASS | 오너 전체 승인·M04 전환 | Accepted / DOD-01~11 PASS |
-| CX-M04-001 | 2026-08-26 | M04 | 세션·일반 타이머·점수·ID·storage v1 | `codex/m04-session-persistence-scoring`; commit/PR 없음 | focused 12파일/92테스트, migration 3/3, M04 B98.79%·per-file 11/11, global 23파일/147테스트, 정적 gate PASS | M04 착수; M06 singleton/crypto·Sprint M08·UI 경계 유지 | 자동 검증 완료 / DOD-01~13 PASS, 오너 리뷰·커밋 대기 |
+| CX-M04-001 | 2026-08-26 | M04 | 세션·일반 타이머·점수·ID·storage v1 | `95fbff2b4bff261ff16784099dc2a02df7473069`; 원격 branch push·PR 없음 | focused 12파일/92테스트, migration 3/3, M04 B98.79%·per-file 11/11, global 23파일/147테스트, 정적 gate PASS | M06 singleton/crypto·Sprint M08·UI 경계 유지 | 완료 / DOD-01~13 PASS |
+| CX-M05-001 | 2026-08-26 | M05 | shared Design System·게임 UI fixture 초기 checkpoint | working tree; commit/PR 없음 | focused 6/30, global 30/179, axe 18/18, visual 18/18·baseline 9, keyboard 3엔진 9/9 | 오너가 M05 착수; 초기 high-contrast 행렬은 후속 ADR-0011로 대체 | 역사적 자동 checkpoint / 현행 아님 |
+| CX-M05-002 | 2026-08-26 | M05 | Theme·Motion 단일 순환 버튼과 appearance 계약 정정 | [ADR-0011](../decisions/0011-appearance-cycle-controls.md); 당시 working tree·commit/PR 없음 | global 30/180, token 16/0/13, axe 18/18, visual no-update 18/18·diff 0·baseline 9, keyboard 3엔진 9/9, verify 12/12 | 오너가 dark 기본·custom high-contrast 제거를 확정; 당시 실제 수동·baseline 전체 승인은 미제공 | 역사적 pre-approval checkpoint / 후속 CX-M05-003으로 대체 |
+| CX-M05-003 | 2026-08-29 | M05 | checkpoint 종료 후보·제출 URL appearance adapter | [ADR-0012](../decisions/0012-m05-checkpoint-manual-evidence-deferral.md); candidate branch, fixed commit·Pages pending | focused 7/33, global 30/180, Pages 30/30·353631 bytes, prototype browser 908 | 오너 baseline 9/9 승인; manual 0/4는 NOT RUN·M10 이관 | READY_FOR_PUBLIC_CLOSE / 배포 증거 대기 |
 
 ## 8. 상세 로그 템플릿
 
@@ -379,7 +382,7 @@ Codex가 제안·생성·수정한 항목
   - 기존 `dist`의 Vite 8 Windows native cleanup crash를 피해 검증된 `dist` preclean 뒤 `emptyOutDir=false`로 빌드하는 workaround를 추가했다. 저장 JSON byte 상한은 미구현이므로 후속 storage-budget 정책으로 남겼다.
 - 사람이 채택·수정·거절한 결정과 이유: 오너는 M04 착수를 승인했다. PULSE 규칙·Par·Hint·등급 기본 계약은 기존 백서와 phase를 유지했고 Sprint 절대 타이머·총점·동점 규칙은 임의 결정하지 않고 M08에 남겼다. 실제 UI 연결과 사용자 흐름을 M04 PASS로 과장하지 않고 M05·M06·M07에 남겼다.
 - 변경 파일: `src/domain/{session,scoring}/`, `src/services/{clock,id,storage}/`, `src/test/fixtures/storage/partial-v1.json`, `scripts/clean-build-output.ts`, `vitest.m04.config.ts`, package·CI·verify·tsconfig, M04 phase·progress·백서·파일 트리·추적성·협업 문서
-- Commit / PR: 없음. `codex/m04-session-persistence-scoring` 작업트리에 있으며 프로젝트 오너의 별도 지시 없이 commit·push하지 않았다.
+- Commit / PR: milestone commit `95fbff2b4bff261ff16784099dc2a02df7473069`를 원격 `codex/m04-session-persistence-scoring`에 push했다. PR은 만들지 않았다.
 - 검증:
   - focused M04 unit `12 files / 92 tests`, failures `0`; storage migration `3/3`
   - M04 aggregate coverage `S=98.90% B=98.79% F=100% L=98.95%`; per-file branches `11/11`, minimum `best-record.ts=95.45%`, selectors `95.65%`, repository `97.67%`
@@ -389,6 +392,55 @@ Codex가 제안·생성·수정한 항목
 - 실패·수정 기록: Windows sandbox의 `apply_patch`가 deny-read ACL 오류로 문서를 읽지 못해 작업공간 경로 확인과 exact-match 단일 발생 검증을 건 제한적 대체를 사용했다. 구현 감사에서 replay ledger·open segment·pulsing/paused persistence·completion projection을 먼저 보강했다. 후속 감사에서는 symbol 복제, pre-start 폐기, phantom ledger, pause clock mismatch, year zero, prototype 오염, salvage 유실, quarantine overwrite를 재현해 `WeakSet`·canonical normalization·exact guard·null-prototype map·repair 재저장·collision 탐색 회귀로 닫았다. 첫 최종 verify는 Vitest 4 기본 15개 fork가 Windows에서 startup timeout을 일으켜 중단됐고, `pool=threads`·`maxWorkers=4`·`testTimeout=30_000`으로 제한한 뒤 동일 unit 23/147과 verify 10/10을 통과했다.
 - Codex 기여 경계: Codex는 reducer·clock·scoring·storage·테스트·문서 구현과 자동 검증을 수행했다. 제품 모드 UI, Sprint 산식, 사람 체감 평가와 릴리스 승인은 결정하지 않았다.
 - 남은 위험·인계: M05는 action/selector fixture를 UI에 연결한다. M06는 `IdGenerator` singleton·crypto-backed source와 hydrate seed/reserve, Page Visibility·tick dispatch, paused resume, Result·Lab best 저장, browser reload E2E를 검증한다. M07은 UTC Daily·streak·Archive와 puzzle/date/version 일치 복구를 추가하고 M08이 Sprint를 소유한다.
+
+---
+
+### CX-M05-001 — Shared Design System과 게임 UI fixture 초기 checkpoint
+
+- 날짜: 2026-08-26
+- Phase / DoD: M05 / 초기 구현·자동 E2/E3 PASS. theme 행렬과 baseline은 후속 ADR-0011로 대체돼 현행 최종 증거가 아니다.
+- 관련 INV / ADR: INV-003·010·015~019 / ADR-0004·0005·0007
+- 시작 상태·실패: M04 domain은 session·selector를 제공했지만 공통 토큰, 축·보드·PULSE·상태·Result UI와 360px~desktop 레이아웃, theme/reduced-motion, axe·visual fixture가 없었다. 초기 구현 감사에서 modal 뒤 단축키, reserved browser chord, DOM Tab 순서, callback 교체 시 pulse timer 재시작, label 기반 중복 ID, compact style 누출, stale Pages axe 순서와 과소 범위 token audit를 재현했다.
+- Codex 제안·변경:
+  - 초기 `src/styles`의 system/dark/light/high-contrast 토큰과 reset/global/utility, AppShell·Header·Footer·Button·IconButton·Toast·Dialog·VisuallyHidden을 구현했다. custom high-contrast 부분은 후속 CX-M05-002·ADR-0011에서 제거됐다.
+  - AxisToggle·TensorGrid·TargetPreview·PulseButton·StatusStrip·HintPanel·ResultPanel·GameStage를 규칙 재계산 없는 presentational API로 만들고 reducer·selector에서 8상태 fixture를 투영했다. 사용자 문자열은 번역 완료 prop/result로만 받는다.
+  - PULSE latch, 정확한 P·Ctrl/Cmd+Enter chord, callback ref 기반 시각 완료 timer, 열린 modal shortcut lock, `useId`, 열→행→PULSE→Undo→Hint DOM/Tab 순서, puzzle-keyed Reset을 회귀로 고정했다.
+  - 모바일 board 직후 sticky PULSE·128px Target, 5 viewport 무가림, `dvh`/`svh` fallback, hover-capable media, reduced-motion 80ms 이하, selection/selected-axis AA 대비를 구현했다.
+  - Playwright browser 타입을 Node/domain tsconfig와 분리하고 axe·visual 전용 server/config, 9개 Windows baseline과 CI job을 추가했다. Pages는 정적 접근성 검사 뒤 Chromium 설치, axe fixture 순서로 정정했다.
+- 사람 결정: 프로젝트 오너는 M05 착수를 승인했다. 실제 Android·스크린리더·200% zoom·색각 검증과 9 baseline 전체 제품 승인은 제공하지 않았으므로 자동 테스트로 대체하거나 phase 완료로 과장하지 않는다. 이후 appearance control은 CX-M05-002·ADR-0011의 오너 결정이 이 초기 계약보다 우선한다.
+- 변경 파일: `src/styles/`, `src/components/{common,layout,game}/`, `src/test/{fixtures/game-ui,ui-fixture-*}`, `tests/{a11y,visual,e2e/keyboard-core}`, `playwright.ui-fixtures.config.ts`, `tsconfig.playwright.json`, token/server scripts, package·Vite·Vitest·CI·Pages와 M05 하네스 문서
+- Commit / PR: 없음. `codex/m05-design-system` working tree이며 사용자의 별도 commit·push 지시가 없었다.
+- 초기 자동 검증(ADR-0011 이전 역사):
+  - focused component/fixture `6 files / 30 tests`, global unit `30 files / 179 tests`, failures 0
+  - design token `files=16`, color/spacing/radius/duration hardcodes `0/0/0/0`, annotated calculation/transparency/breakpoint exceptions `2/2/9`
+  - axe `18/18`, serious/critical/external requests `0/0/0`; visual `18/18`, 5 viewport·3 theme·9 baseline, update 후 무갱신 pixel diff 0. 이 theme/baseline 행렬은 ADR-0011 이후 현행 증거로 사용하지 않는다.
+  - keyboard Chromium·Firefox·WebKit `9/9`; boundaries `files=83 edges=150 violations=0 cycles=0`; static a11y `files=36 targets=10 failures=0`
+  - lint·format·typecheck·diff check exit 0; build 46 modules, CSS `11.34kB`/gzip `3.18kB`, JS `234.55kB`/gzip `75.19kB`
+  - full `npm run verify`: script contract required 22·missing 0, 12단계 PASS
+- 실패·수정 기록: Windows ACL 때문에 `apply_patch`와 브라우저 스킬 runtime이 deny-read로 실패해 exact-match/hash-guarded .NET 쓰기와 저장소 Playwright gate를 사용했다. 768/1440 board-panel overlap, stale snapshot, mobile CTA/focus 순서, touch hover, 대비 경계와 hidden custom modal false positive는 각각 layout assertion·canonical baseline 재생성·실제 Tab/visibility·semantic token 회귀로 닫았다.
+- Codex 기여 경계: Codex는 shared UI·fixture·자동 접근성/시각/키보드 gate와 문서 증거를 구현했다. 제품 feature/controller, 실제 저장·reload·mode route, 사람 스크린리더·실기기·시각 승인과 릴리스 결정은 수행하지 않았다.
+- 당시 남은 위험·인계: Android Chrome 실기기, NVDA/VoiceOver 상당, browser 200% zoom, 색각 시뮬레이션은 `0/4 PENDING`이었고 baseline 승인도 남아 있었다. 2026-08-29 오너 9/9 승인과 ADR-0012의 수동 0/4 M10 이관 이후 현재 결론은 CX-M05-003을 따른다.
+
+### CX-M05-002 — Appearance 순환 버튼 계약 정정
+
+- 날짜: 2026-08-26
+- Phase / DoD: M05 / ADR-0011 자동 E2/E3 전체 PASS의 역사적 pre-approval checkpoint; 후속 승인·이관은 CX-M05-003
+- 관련 INV / ADR: INV-003·011·015·018 / [ADR-0011](../decisions/0011-appearance-cycle-controls.md)
+- 사람 결정: 프로젝트 오너는 Theme을 단일 버튼·기본 `dark`·`dark → light → system → dark`, Motion을 단일 버튼·기본 `system`·`system ↔ reduced`로 확정했다. 가독성을 해치던 custom high-contrast option/token/baseline은 제거하되 OS forced-colors와 별도 `highContrastCells`는 유지하도록 승인했다.
+- Codex 제안·변경:
+  - fixture toolbar의 두 list control을 현재·다음 상태가 접근 가능한 단일 버튼으로 바꾸고 theme/motion을 hot apply한다.
+  - 새 `UserSettings` 쓰기 theme을 `dark | light | system`·기본 `dark`로 좁히고 legacy v1 `high-contrast` 읽기는 `dark`로 정규화해 기존 raw를 안전하게 수용한다.
+  - axe 행렬을 `8 states + long copy + system 3 + light 3 + reduced-motion 3`으로 교체하고 visual을 dark/light/system × mobile/tablet/desktop full-fixture 9종으로 다시 생성했다.
+- Commit / PR: 없음. M05 working tree이며 문서·코드 변경은 아직 commit·push하지 않았다.
+- 현재 자동 검증:
+  - focused component/fixture `6 files / 30 tests`; global unit `30 files / 180 tests`; design token `files=16`, hardcodes `0`, annotations `13`
+  - axe `18/18`, serious/critical/external requests `0/0/0`; visual update/no-update `18/18`, 5 viewport, dark/light/system, full-fixture baseline 9, `maxDiffPixels=0`, threshold 0, diff 0
+  - keyboard Chromium·Firefox·WebKit `9/9`; boundaries `files=83 edges=150 violations=0 cycles=0`; static a11y `files=36 targets=8 failures=0`; Codex 새 mobile/tablet/desktop 대표 baseline 육안 `3/3 PASS`
+  - lint·format·typecheck PASS; build 46 modules, CSS `10.49kB`/gzip `3.03kB`, JS `234.55kB`/gzip `75.19kB`; Pages `files=14 bytes=344870 prototypeFiles=10`; verify required 22·missing 0·steps 12 PASS
+- 정직성 경계: 자동 결과는 ADR-0011 변경분을 포함한 현재 working tree 증거이며 fixed commit SHA·원격 CI 증거가 아니다. M05 commit·push는 없고 사람 검증·승인을 자동 결과로 대체하지 않는다.
+- 실패·수정 기록: strict 0-pixel no-update 첫 실행은 transparent backdrop blur가 rounded button corner 한 color channel을 흔들어 mobile 2/18 실패했고, baseline 재생성 뒤 tablet 3/18도 실패했다. toolbar를 opaque canvas token background로 고정하고 baseline을 다시 생성한 뒤 동일 no-update 18/18, `maxDiffPixels=0`, threshold 0, diff 0으로 닫았다.
+- 리스크 해소: custom high-contrast가 ON·preview·selected를 복잡하게 만들어 가독성을 해치던 위험은 option/token/baseline 제거로 닫았다. OS forced-colors와 색 이외 상태 표식은 접근성 계약으로 유지한다.
+- 후속 결론: 프로젝트 오너는 2026-08-29 새 baseline 9종을 모두 승인했다. Android Chrome·실제 스크린리더·200% zoom·색각 시뮬레이션은 `0/4 NOT RUN`이며 ADR-0012에 따라 M10 release-blocking gate로 이관됐다. fixed commit·공개 Pages 증거는 CX-M05-003에서 닫는다.
 
 ## 9. 품질 분류
 

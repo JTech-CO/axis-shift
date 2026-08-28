@@ -2,7 +2,7 @@
 
 - **상태**: 미시작
 - **담당 범위**: 전체 회귀, 브라우저·기기·접근성·성능, GitHub Pages 배포, QA 승인
-- **최종 갱신**: 2026-08-09
+- **최종 갱신**: 2026-08-26
 
 ## 1. 맥락과 목표
 
@@ -15,7 +15,7 @@
 - 전체 CI pipeline과 protected main 기준
 - unit/component/content/generator/E2E/a11y/visual 회귀
 - Chromium·Firefox·WebKit, 모바일·데스크톱 matrix
-- 360px, 768px, 1024px, 1440px, 200% zoom
+- 360px, 768px, 1024px, 1440px, 200% zoom, 운영체제 Forced Colors
 - Lighthouse·bundle·runtime performance 기록
 - GitHub Pages production workflow와 post-deploy smoke
 - manifest·service worker·base path·direct hash route
@@ -35,6 +35,7 @@
 - [ ] 2026-08-21 scope freeze 이후 신규 기능이 없음.
 - [ ] GitHub Pages repository·permissions·base path 준비.
 - [ ] 실제 Android와 iOS Safari 상당 환경 또는 대체 검증 장치 준비.
+- [ ] ADR-0012에서 이관된 Android Chrome 실기기·실제 NVDA/VoiceOver 상당·200% zoom·색각 시뮬레이션 4종의 실행 환경과 증거 절차 준비.
 - [ ] `docs/QA_REPORT.md`, `docs/RELEASE_CHECKLIST.md`의 실행 섹션 준비.
 - [ ] 모든 활성 INV와 결함 심각도 기준 확인.
 
@@ -62,7 +63,7 @@
 2. CI 명령 순서와 artifact 보존을 완성한다.
 3. 깨끗한 환경에서 full regression을 실행한다.
 4. production base로 build·deploy하고 실제 URL smoke를 실행한다.
-5. 브라우저·viewport·테마·locale·input matrix를 실행한다.
+5. 브라우저·viewport·dark/light/system/reduced-motion/forced-colors·locale·input matrix를 실행한다.
 6. 오프라인·PWA update·storage corruption·timezone·sharing capability를 재검증한다.
 7. performance·bundle·Lighthouse를 측정하되 수치와 환경을 함께 기록한다.
 8. 발견 결함을 P0~P3로 triage하고 P0/P1을 전부 수정·재검증한다.
@@ -83,10 +84,10 @@
 - [ ] **DOD-03 — 공개 링크**: 로그인·특수 헤더 없이 production URL이 새 브라우저 프로필에서 열리고 홈·Tutorial·Lab·Daily·Archive·Sprint·Settings·About route가 404 없이 동작한다. E4. (INV-014)
 - [ ] **DOD-04 — 핵심 E2E**: first-run → Tutorial → Lab, Daily solve/reload/share, Archive, Sprint expiry, Settings/i18n, offline restart가 production 또는 동일 artifact에서 통과한다.
 - [ ] **DOD-05 — 브라우저 matrix**: desktop Chromium·Firefox·WebKit 상당에서 핵심 E2E green, 모바일 Android Chrome·iOS Safari 상당에서 E1 수동 핵심 플로우 green.
-- [ ] **DOD-06 — 반응형·테마**: 360×640·390×844·768×1024·1024×768·1440×900, dark/light/high-contrast/reduced-motion에서 horizontal overflow=0, 주요 visual diff가 승인됨.
-- [ ] **DOD-07 — 접근성**: 자동 axe serious/critical=0, 키보드 전체 플로우, 수동 스크린리더·200% zoom·색각 점검이 QA 표에서 통과한다. E4. (INV-015)
+- [ ] **DOD-06 — 반응형·테마**: 360×640·390×844·768×1024·1024×768·1440×900에서 dark/light/system/reduced-motion/forced-colors matrix의 horizontal overflow=0, 주요 visual diff가 승인됨. 커스텀 high-contrast 테마는 matrix에 포함하지 않는다.
+- [ ] **DOD-07 — 접근성**: 자동 axe serious/critical=0, 키보드 전체 플로우, 수동 스크린리더·200% zoom·색각·운영체제 Forced Colors 점검이 QA 표에서 통과하고 색 이외 상태 표식이 유지된다. ADR-0012 이관 4종은 실제 E1 4/4가 필요하며 자동 증거로 대체할 수 없다. E4. (INV-015)
 - [ ] **DOD-08 — PWA·오프라인**: production scope·manifest·installability·precache·offline 핵심 플레이·update prompt가 실제 URL에서 통과한다. (INV-014)
-- [ ] **DOD-09 — 저장 안전성**: production artifact에서 valid/corrupt/future-version/reload/update fixture가 기록 손실 없이 명세대로 처리된다. (INV-011)
+- [ ] **DOD-09 — 저장 안전성**: production artifact에서 valid/corrupt/future-version/reload/update fixture가 기록 손실 없이 명세대로 처리되고, Theme 기본 `dark`·쓰기 allowlist `dark | light | system`·legacy v1 `high-contrast → dark` 읽기 정규화·UI `reduced → on` 저장 매핑이 통과한다. (INV-011)
 - [ ] **DOD-10 — 공유 스포일러**: production text·URL·두 PNG·capability fallback에서 금지 정보 0건, 실제 SNS/공유 시트 1회 이상 검증. (INV-013)
 - [ ] **DOD-11 — 보안·개인정보**: secret scan, dependency audit, CSP, network request, cookie/storage key inventory가 통과하고 외부 런타임 요청·개인 식별 데이터 0건이다. (INV-001, INV-017)
 - [ ] **DOD-12 — 자산·라이선스**: source asset inventory와 `docs/ASSET_LICENSES.md` diff가 일치하고 미등록·불명확 자산 0건이다. (INV-019)
@@ -124,8 +125,13 @@ bundle report, Lighthouse report, asset/network audit
 | Android Chrome 실기기 | first-run→Daily→share→install→offline | 전부 완료 | 영상/체크표 |
 | iOS Safari 상당 | Lab→share fallback→reload | 전부 완료 | 영상/체크표 |
 | Desktop keyboard + SR | 홈부터 결과 공유 | 포인터 없이 완료·상태 이해 | 체크표 |
+| 브라우저 200% zoom | 게임·설정·결과 핵심 흐름 | CTA·board 접근 가능, overflow 없음 | 캡처/체크표 |
+| 색각 시뮬레이션 | selected/preview/on/off 비교 | 색 이외 표식으로 상태 구분 | 캡처/체크표 |
+| Forced Colors | Theme·High Contrast Cells·게임 상태 | 커스텀 테마 없이 OS 색과 비색상 표식 유지 | 캡처/체크표 |
 | Slow 4G/중급 모바일 profile | 첫 로드·입력·share PNG | QA 예산 기록 | Lighthouse/trace |
 | 새 프로필 | 직접 공개 URL | 캐시·기존 storage 없이 성공 | smoke 로그 |
+
+ADR-0012 이관 상태는 Android=`NOT RUN`, screen reader=`NOT RUN`, 200% zoom=`NOT RUN`, color vision=`NOT RUN`이다. 네 항목 중 하나라도 실제 증거가 없으면 M10과 M11 진입을 승인하지 않는다.
 
 ## 10. 증거
 

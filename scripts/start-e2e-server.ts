@@ -1,9 +1,13 @@
 process.env.VITE_BASE_PATH = '/axis-shift/';
 process.env.AXIS_SHIFT_E2E_GENERATOR_PARITY = '1';
 
+const { cleanBuildOutput } = await import('./clean-build-output.ts');
 const { build, preview } = await import('vite');
 
-await build();
+await cleanBuildOutput();
+await build({
+  build: { emptyOutDir: false },
+});
 const server = await preview({
   preview: {
     host: '127.0.0.1',

@@ -42,8 +42,10 @@
 | Streak | 로컬 기기에서 연속 날짜 Daily 완료를 계산한 값. 계정 동기화 없음. |
 | Static-First | 서버 없이 정적 호스팅과 브라우저 API만으로 핵심 기능을 제공하는 원칙. |
 | Offline-Ready | 앱 셸과 필수 콘텐츠가 캐시된 뒤 네트워크 없이 핵심 플레이가 가능한 상태. |
-| Reduced Motion | 시스템 또는 설정에 따라 상태 정보는 유지하면서 sweep·scale·slide를 줄이는 모드. |
-| High Contrast | 색뿐 아니라 2px 경계와 형태 표식을 강화한 테마. |
+| Reduced Motion | 단일 버튼의 `System ↔ Reduced` 중 Reduced 상태. 상태 정보는 유지하면서 sweep·scale·slide를 줄이며 저장 시 `on`으로 매핑한다. |
+| Forced Colors / OS 고대비 | 운영체제가 색을 강제하는 접근성 환경. 커스텀 Theme 옵션이 아니며 비색상 상태 표식을 유지한다. |
+| High Contrast Cells | 현재 Theme과 독립적으로 셀의 경계·pattern·형태 표식을 강화하는 선택 설정. |
+| Custom High Contrast Theme | ADR-0011에 따라 제거된 테마. legacy v1 저장값은 읽을 때 Dark로 정규화하며 사용자에게 노출하지 않는다. |
 
 ## 하네스 용어
 

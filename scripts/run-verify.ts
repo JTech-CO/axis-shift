@@ -15,11 +15,14 @@ const requiredScripts = [
   'generate:level-candidates',
   'validate:levels',
   'audit:daily',
+  'audit:a11y-static',
+  'audit:design-tokens',
   'build',
   'build:pages',
   'test:e2e',
   'test:pages',
   'test:a11y',
+  'test:visual',
   'verify',
 ] as const;
 
@@ -32,6 +35,8 @@ const scripts = [
   'validate:levels',
   'audit:daily',
   'audit:secrets',
+  'audit:a11y-static',
+  'audit:design-tokens',
   'build',
   'build:pages',
 ] as const;

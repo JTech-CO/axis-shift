@@ -1,0 +1,12 @@
+.root {
+  position: absolute;
+  width: var(--visually-hidden-size);
+  height: var(--visually-hidden-size);
+  padding: 0;
+  border: 0;
+  margin: var(--visually-hidden-offset);
+  clip: rect(0 0 0 0);
+  clip-path: inset(var(--clip-hidden-inset));
+  overflow: hidden;
+  white-space: nowrap;
+}

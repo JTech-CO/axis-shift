@@ -31,7 +31,11 @@ import {
 } from "./stopwatch.mjs";
 
 const ROW_LABELS = ["A", "B", "C", "D", "E", "F", "G", "H"];
+const THEME_SEQUENCE = Object.freeze(["dark", "light", "system"]);
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+let theme = "dark";
+let motion = "system";
 
 function requiredElement(id) {
   const element = document.getElementById(id);
@@ -96,6 +100,10 @@ const secureSeedAvailable =
   typeof globalThis.crypto?.getRandomValues === "function";
 
 const app = requiredElement("app");
+const themeButton = requiredElement("theme-button");
+const themeValue = requiredElement("theme-value");
+const motionButton = requiredElement("motion-button");
+const motionValue = requiredElement("motion-value");
 const fixtureLabel = requiredElement("fixture-label");
 const goalChip = requiredElement("goal-chip");
 const stageCurrent = requiredElement("stage-current");
@@ -133,6 +141,34 @@ const stageDialog = requiredElement("stage-dialog");
 const stageDialogTarget = requiredElement("stage-dialog-target");
 const cancelStageChange = requiredElement("cancel-stage-change");
 const confirmStageChange = requiredElement("confirm-stage-change");
+
+function nextTheme(current) {
+  const index = THEME_SEQUENCE.indexOf(current);
+  return THEME_SEQUENCE[(index + 1) % THEME_SEQUENCE.length] ?? "dark";
+}
+
+function nextMotion(current) {
+  return current === "system" ? "reduced" : "system";
+}
+
+function renderAppearance() {
+  const upcomingTheme = nextTheme(theme);
+  const upcomingMotion = nextMotion(motion);
+  document.documentElement.dataset.theme = theme;
+  document.documentElement.dataset.motion = motion;
+  app.dataset.theme = theme;
+  app.dataset.motion = motion;
+  themeValue.textContent = theme.toUpperCase();
+  themeButton.setAttribute("aria-label", `Theme: ${theme}; next: ${upcomingTheme}`);
+  motionValue.textContent = motion.toUpperCase();
+  motionButton.setAttribute("aria-label", `Motion: ${motion}; next: ${upcomingMotion}`);
+  motionButton.setAttribute("aria-pressed", String(motion === "reduced"));
+  app.dataset.pulseDurationMs = String(isReducedMotion() ? 0 : 360);
+}
+
+function isReducedMotion() {
+  return motion === "reduced" || prefersReducedMotion.matches;
+}
 
 function nowMs() {
   return window.performance.now();
@@ -784,13 +820,26 @@ function requestStageChange(stageId) {
   activateStage(stageId, { focus: "button" });
 }
 
+themeButton.addEventListener("click", () => {
+  theme = nextTheme(theme);
+  renderAppearance();
+});
+
+motionButton.addEventListener("click", () => {
+  motion = nextMotion(motion);
+  renderAppearance();
+});
+prefersReducedMotion.addEventListener?.("change", renderAppearance);
+
+
 pulseButton.addEventListener("click", () => {
   const next = beginPulse(session);
   if (next === session) return;
   session = next;
   render();
 
-  const duration = prefersReducedMotion.matches ? 0 : 360;
+  const duration = isReducedMotion() ? 0 : 360;
+  app.dataset.pulseDurationMs = String(duration);
   pulseTimer = window.setTimeout(() => {
     session = commitPulse(session);
     pulseTimer = null;
@@ -889,6 +938,7 @@ document.addEventListener("visibilitychange", () => {
   renderStopwatch();
 });
 
+renderAppearance();
 rebuildBoard();
 render();
 

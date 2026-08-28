@@ -113,9 +113,12 @@ AXIS//SHIFT는 행과 열을 선택해 교차점의 셀을 반전하고 목표 �
 ### Planned product quality
 
 - responsive 360px~desktop
-- dark/light/high-contrast
+- ADR-0011 Theme 단일 버튼: 기본 dark, `dark → light → system → dark`
+- ADR-0011 Motion 단일 버튼: 기본 system, `system ↔ reduced`; UI reduced는 저장값 `on`
+- 커스텀 high-contrast 테마 제거; legacy v1 `high-contrast` 저장값은 dark로 읽기 정규화
+- 운영체제 Forced Colors·색 이외 상태 표식·별도 High Contrast Cells 지원
 - keyboard-only core flow
-- reduced motion
+- Reduced Motion에서도 기능 정보 손실 없음
 - ko/en
 - sound·haptics opt-in settings
 - installable PWA·offline core play

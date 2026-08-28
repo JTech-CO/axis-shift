@@ -1,8 +1,8 @@
 # AXIS//SHIFT 파일 트리·모듈 경계 계약
 
-**버전**: 1.3.0
-**상태**: M01·M02·M03·M04 완료 + 후속 phase 목표 계약
-**최종 갱신**: 2026-08-26
+**버전**: 1.4.0
+**상태**: M01·M02·M03·M04 완료 + M05 종료 후보·public Pages close 대기 + 후속 phase 목표 계약
+**최종 갱신**: 2026-08-29
 **관련 불변식**: INV-002, INV-003, INV-017, INV-019
 
 ## 1. 목표
@@ -14,7 +14,7 @@
 
 ## 2. 목표 저장소 트리
 
-> **물리 배치 주의 (2026-08-21)**: 아래 트리는 M11까지의 목표 구조이며 모든 항목이 현재 존재한다는 뜻이 아니다. 구현 항목(`prototypes/`, `src/`, `public/`, `tests/`, `scripts/`, 설정 파일)은 부모 `PROJECT_ROOT` 기준이고, phase·ADR·불변식·증거 문서는 개발 중 `PROJECT_ROOT/AXIS_SHIFT_Harness_KR/`에 유지한다. 바로 아래 §2.1~2.4에 M01~M04 실제 범위를 별도로 적는다.
+> **물리 배치 주의 (2026-08-21)**: 아래 트리는 M11까지의 목표 구조이며 모든 항목이 현재 존재한다는 뜻이 아니다. 구현 항목(`prototypes/`, `src/`, `public/`, `tests/`, `scripts/`, 설정 파일)은 부모 `PROJECT_ROOT` 기준이고, phase·ADR·불변식·증거 문서는 개발 중 `PROJECT_ROOT/AXIS_SHIFT_Harness_KR/`에 유지한다. 바로 아래 §2.1~2.5에 M01~M05 실제 범위를 별도로 적는다.
 
 ```text
 axis-shift/
@@ -290,13 +290,72 @@ vitest.m04.config.ts
 - `domain/scoring`은 Par 기반 base grade와 Hint cap, 완료 event에서만 만드는 runtime opaque candidate, `grade → PULSE → active elapsed` best tuple을 제공한다. candidate authenticity는 module-private `WeakSet` provenance가 보장하며 symbol brand만 복사한 객체는 거부한다.
 - `services/clock`만 `Date.now()`와 epoch→canonical UTC ISO 변환을 소유한다. domain은 `Date`를 import하지 않는다.
 - `services/id`는 scope별 issued ledger, hydrated seed, `reserveId()`, invalid·duplicate retry와 exhaustion을 제공한다. M06가 이를 앱 singleton과 crypto-backed source에 연결한다.
-- `services/storage`는 settings·progress·session·generator-map 네 v1 root와 `StoragePort`를 제공한다. 시작 전 Hint·visibility는 canonical `ready`, 시작된 미해결 snapshot은 open segment를 한 번 합산하고 `hiddenAtEpochMs === lastObservedEpochMs`인 `paused`로 정규화한다. null-prototype Lab map·year≥1 UTC guard를 적용하고, 손상 raw는 기존 quarantine key를 덮어쓰지 않는 최대 128회 collision 탐색과 backup 성공 뒤에만 제거한다. progress salvage는 제거 성공 뒤 repaired primary로 다시 저장한다.
+- `services/storage`는 settings·progress·session·generator-map 네 v1 root와 `StoragePort`를 제공한다. 시작 전 Hint·visibility는 canonical `ready`, 시작된 미해결 snapshot은 open segment를 한 번 합산하고 `hiddenAtEpochMs === lastObservedEpochMs`인 `paused`로 정규화한다. null-prototype Lab map·year≥1 UTC guard를 적용하고, 손상 raw는 기존 quarantine key를 덮어쓰지 않는 최대 128회 collision 탐색과 backup 성공 뒤에만 제거한다. progress salvage는 제거 성공 뒤 repaired primary로 다시 저장한다. [ADR-0011](../decisions/0011-appearance-cycle-controls.md)에 따라 새 settings 쓰기 theme은 `dark | light | system`·기본 `dark`이고 legacy v1 `high-contrast` 읽기는 `dark`로 정규화한다. OS forced-colors와 별도 `highContrastCells` 필드는 유지한다.
 - v1은 최초 공개 schema이므로 migration registry는 비어 있는 상태가 정상이다. 실제 이전 schema가 생길 때만 순차 단계를 추가한다.
 - `vitest.m04.config.ts`는 M04 핵심 구현 11개 파일마다 branches 95%를 요구한다. 완료 기준선은 focused 12파일/92테스트, M04 S98.90/B98.79/F100/L98.95, per-file branch 11/11·최저 `best-record.ts` 95.45%(selectors 95.65%, repository 97.67%), global 23파일/147테스트 S93.06/B91.81/F97.61/L94.31이다.
 - canonical app build는 기존 `dist`에서 발생한 Vite 8 Windows native cleanup crash를 피하려 `scripts/clean-build-output.ts`가 검증된 `dist`만 preclean하고 Vite는 `emptyOutDir=false`로 실행한다.
 - 공통 `vitest.config.ts`는 Vitest 4의 Windows fork startup 포화를 피하도록 thread pool을 최대 4개로 제한하고, 부하 시 jsdom false-timeout을 피하는 30초 test timeout을 적용한다.
-- React GameScreen, `IdGenerator` singleton·crypto source, Page Visibility dispatch, paused resume, Lab result 저장과 browser reload E2E는 M05·M06에 남아 있다. UTC Daily·streak·Archive는 M07, Sprint 절대 타이머·점수는 M08 범위다.
+- production GameScreen/controller, `IdGenerator` singleton·crypto source, Page Visibility dispatch, paused resume, Lab result 저장과 browser reload E2E는 M06에 남아 있다. M05가 제공한 shared UI는 아래 §2.5의 presentational 범위로 제한한다. UTC Daily·streak·Archive는 M07, Sprint 절대 타이머·점수는 M08 범위다.
 
+### 2.5 M05 디자인 시스템의 실제 구현 범위
+
+2026-08-26 현재 M05에서 실제 생성·활성화한 production/test 트리는 다음 범위다.
+
+```text
+src/styles/
+├── reset.css
+├── tokens.css
+├── global.css
+└── utilities.css
+src/components/
+├── common/
+│   ├── Button.{tsx,module.css,test.tsx}
+│   ├── IconButton.{tsx,module.css}
+│   ├── Dialog.{tsx,module.css,test.tsx}
+│   ├── Toast.{tsx,module.css}
+│   ├── VisuallyHidden.{tsx,module.css}
+│   └── index.ts
+├── layout/
+│   ├── AppShell.{tsx,module.css}
+│   ├── Header.{tsx,module.css}
+│   ├── Footer.{tsx,module.css}
+│   └── index.ts
+└── game/
+    ├── AxisToggle.{tsx,module.css,test.tsx}
+    ├── TensorGrid.{tsx,module.css,test.tsx}
+    ├── TargetPreview.{tsx,module.css,test.tsx}
+    ├── PulseButton.{tsx,module.css}
+    ├── StatusStrip.{tsx,module.css}
+    ├── HintPanel.{tsx,module.css}
+    ├── ResultPanel.{tsx,module.css}
+    ├── GameStage.{tsx,module.css,test.tsx}
+    ├── types.ts
+    └── index.ts
+src/test/
+├── fixtures/game-ui.ts
+├── ui-fixture-app.{tsx,module.css,test.tsx}
+└── ui-fixture-main.tsx
+tests/
+├── a11y/ui-fixtures.spec.ts
+├── e2e/keyboard-core.spec.ts
+└── visual/
+    ├── ui-fixtures.spec.ts
+    └── __snapshots__/               # Windows canonical PNG 9개
+scripts/
+├── check-a11y-targets.ts
+├── check-design-tokens.ts
+└── start-ui-fixtures-server.ts
+playwright.ui-fixtures.config.ts
+tsconfig.playwright.json
+tests/ui-fixtures/index.html
+```
+
+- `game-ui.ts`는 reducer·selector 결과에서 만든 `idle`, `selected`, `preview`, `pulsing`, `paused`, `solved`, `error`, `disabled`의 8개 상태 fixture를 제공한다. test-only fixture entry는 production router와 Pages 공개 route에 포함하지 않는다.
+- common·layout·game 컴포넌트는 번역된 문자열, 표시 DTO, callback만 받는 presentational 계층이다. 세션 규칙을 다시 계산하거나 production controller·storage·Page Visibility를 소유하지 않는다. 실제 Result·Lab 저장과 reload orchestration은 M06 범위다.
+- `playwright.ui-fixtures.config.ts`와 `start-ui-fixtures-server.ts`는 axe·키보드·visual fixture를 동일한 test-only Vite entry에서 실행한다. Theme 단일 버튼은 기본 dark에서 dark→light→system→dark로, Motion 단일 버튼은 기본 system에서 system↔reduced로 전환한다. 5개 viewport, dark/light/system, reduced motion, 긴 문자열, 최소 44px target과 overlap을 검사한다.
+- `tests/visual/__snapshots__`의 9개 `*-ui-fixtures-win32.png`는 dark/light/system × mobile/tablet/desktop의 full-fixture Windows canonical test baseline이며 runtime 자산이 아니다. custom high-contrast baseline은 ADR-0011로 제거했고 OS forced-colors 지원은 유지한다.
+- M05 자동 E2/E3는 focused 7파일/33테스트, global 30파일/180테스트, token 16파일·하드코드 0·예외 13, axe 18/18, visual 18/18·baseline 9·strict diff 0, keyboard 3엔진, boundary/static a11y, build를 통과했다. 프로젝트 오너 baseline 9/9는 승인됐고 수동 E1 0/4는 `DEFERRED_TO_M10`이다. Pages 후보는 14 files·353631 bytes·prototypeFiles 10, 3엔진 30/30, H00 browser 908단언이다.
+- M05 fixed commit·push·공개 Pages smoke는 이번 종료 작업의 원격 증거로 기록한다.
 ## 3. 계층별 책임
 
 | 계층 | 책임 | 허용되는 부수효과 |

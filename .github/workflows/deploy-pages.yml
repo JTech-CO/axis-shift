@@ -44,10 +44,13 @@ jobs:
           VITE_BASE_PATH: ${{ steps.pages.outputs.base_path }}/
 
       - name: Audit static accessibility targets
-        run: npm run test:a11y
+        run: npm run audit:a11y-static
 
       - name: Install deployment smoke browser
         run: npx playwright install --with-deps chromium
+
+      - name: Audit M05 UI fixtures with axe
+        run: npm run test:a11y -- --project=ui-fixtures
 
       - name: Smoke-test core M01 routes
         run: npm run test:e2e -- --project=chromium

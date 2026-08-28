@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ko" data-theme="dark" data-motion="system">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="dark" />
+    <meta name="color-scheme" content="dark light" />
     <title>AXIS//SHIFT — Tensor Puzzle</title>
     <link rel="icon" href="data:," />
     <link rel="stylesheet" href="./styles.css" />
@@ -20,7 +20,30 @@
             <span>AXIS</span><b aria-hidden="true">//</b>SHIFT
           </h1>
         </div>
-        <p class="fixture-label" id="fixture-label">STAGE 01 · 쉬움</p>
+        <div class="masthead-meta">
+          <div class="appearance-controls" role="group" aria-label="화면 설정">
+            <button
+              class="appearance-button"
+              id="theme-button"
+              type="button"
+              aria-label="Theme: dark; next: light"
+            >
+              <span>Theme</span>
+              <strong id="theme-value">DARK</strong>
+            </button>
+            <button
+              class="appearance-button"
+              id="motion-button"
+              type="button"
+              aria-label="Motion: system; next: reduced"
+              aria-pressed="false"
+            >
+              <span>Motion</span>
+              <strong id="motion-value">SYSTEM</strong>
+            </button>
+          </div>
+          <p class="fixture-label" id="fixture-label">STAGE 01 · 쉬움</p>
+        </div>
       </header>
 
       <section class="briefing" aria-labelledby="briefing-title">

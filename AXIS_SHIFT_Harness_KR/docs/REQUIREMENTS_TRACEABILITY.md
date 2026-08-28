@@ -1,8 +1,8 @@
 # AXIS//SHIFT 요구사항 추적표
 
 **버전**: 1.0.0  
-**상태**: M00·M01·M02·M03·M04 verified / H00 v0.1 submission slice verified / v1 roadmap baseline
-**최종 갱신**: 2026-08-26
+**상태**: M00·M01·M02·M03·M04 verified / M05 automated E2/E3 PASS·owner baseline 9/9 approved·manual E1 0/4 deferred to M10 / H00 v0.1 submission slice verified
+**최종 갱신**: 2026-08-29
 
 > 기능 요구사항 ID는 기술 백서 §2.2.2를 따른다. `NFR-*`는 백서의 성능·접근성·배포·개인정보 기준을 하네스에서 추적 가능하게 부여한 ID다. 이 표가 새로운 제품 요구를 만드는 것은 아니며, 원문 기준의 검증 경로를 연결한다.
 
@@ -20,8 +20,8 @@
 
 | ID | 요구사항·승인 조건 | Phase | 기준 모듈 | 자동 검증 | INV | 상태 |
 |---|---|---|---|---|---|---|
-| FR-CORE-001 | 행·열 복수 선택과 독립 토글, 시각·ARIA 상태 | M05·M06 | `components/game/AxisToggle`, session reducer | component + keyboard E2E | 010,015 | Planned |
-| FR-CORE-002 | PULSE 전 실제 변경 없는 교차점 preview | M05·M06 | `TensorGrid`, selectors | fixture snapshot + component | 005,015 | Planned |
+| FR-CORE-001 | 행·열 복수 선택과 독립 토글, 시각·ARIA 상태 | M05·M06 | `components/game/AxisToggle`, session reducer | component + keyboard E2E | 010,015 | In Progress |
+| FR-CORE-002 | PULSE 전 실제 변경 없는 교차점 preview | M05·M06 | `TensorGrid`, selectors | fixture snapshot + component | 005,015 | In Progress |
 | FR-CORE-003 | 선택 교차점만 XOR 반전, 이동 1건 | M02·M04·M06 | `domain/board`, session reducer | property + rapid-input E2E | 005,010 | In Progress |
 | FR-CORE-004 | 목표 일치 시 완료 event 1회 | M04·M06 | session reducer | idempotency + E2E | 010 | In Progress |
 | FR-CORE-005 | Undo가 직전 PULSE를 역산·기록 복원 | M04·M06 | session reducer | reducer + E2E | 005,010 | In Progress |
@@ -46,10 +46,10 @@
 | NFR-DET-001 | seed·factorization·signature 결정성 | M02·M03·M09 | golden vectors·browser parity | 006,008 | In Progress |
 | NFR-STORAGE-001 | 네 v1 root의 schema guard·migration·비덮어쓰기 격리·부분 복구 영속화 | M04 | 10-fixture round-trip + clock/ledger/prototype/collision fault injection | 011 | Verified |
 | NFR-ID-001 | session·action·quarantine ID의 앱·저장 수명 고유성 | M04·M06 | issued-ledger seed/reserve/retry unit + singleton/crypto integration E2E | 010,011 | In Progress |
-| NFR-RESP-001 | 360px부터 가로 스크롤·가림 없음 | M05·M10 | viewport E2E + 실기기 | 015 | Planned |
-| NFR-A11Y-001 | 키보드 전체 흐름, 44px, 색 외 표식 | M05~M10 | axe·computed size·manual SR | 015 | Planned |
-| NFR-MOTION-001 | Reduced Motion에서 정보·기능 동일 | M05·M09 | media fixture + E2E | 015 | Planned |
-| NFR-I18N-001 | ko/en key 누락·hardcoded copy 0 | M05·M09 | key parity·lint | 016 | Planned |
+| NFR-RESP-001 | 360px부터 가로 스크롤·가림 없음 | M05·M10 | viewport E2E + 실기기 | 015 | In Progress |
+| NFR-A11Y-001 | 키보드 전체 흐름, 44px, 색 외 표식 | M05~M10 | axe·computed size·manual SR | 015 | In Progress |
+| NFR-MOTION-001 | 기본 system·단일 버튼 system↔reduced, Reduced Motion에서 정보·기능 동일 | M05·M09 | media fixture + E2E | 015 | In Progress |
+| NFR-I18N-001 | ko/en key 누락·hardcoded copy 0 | M05·M09 | key parity·lint | 016 | In Progress |
 | NFR-PERF-001 | JS/CSS/cache·Web Vitals·계산 예산 기록 | M10 | bundle/Lighthouse/bench report | 018 | Planned |
 | NFR-OFFLINE-001 | same-origin 자산과 offline 핵심 플레이 | M09·M10 | request audit + offline E2E | 014,017 | Planned |
 | NFR-PRIVACY-001 | 계정·식별정보·analytics·cookie 없음 | M09·M10 | network/storage/CSP audit | 001,017 | Planned |
@@ -65,7 +65,9 @@
 
 > **M03 완료 증거 (2026-08-26)**: Tutorial 6 + Lab 48(4 chapter×12), fallback 14, 객관 검증 실패 0이며 프로젝트 오너가 54개 패턴과 progression 5행을 전체 승인했다. approval fingerprint `5a60604a…b7e6a`와 validator self-check 22개가 manifest·catalog·machine scaffold를 fail-closed한다. candidate `1c313bd29e1d24c483749af90a8734542988be5d`의 clean detached worktree는 Node v24.19.0/npm 11.6.2, `npm ci` 취약점 0, browser parity 9/9, verify 10/10, unit 11파일/55테스트, boundary 위반·cycle 0을 통과했다. 서로 다른 출력 디렉터리의 3,650일 audit 2회는 output hash `997df1b0…10b0`와 report/JSON SHA `b1102aee…6d49`가 일치했고 모든 오류 counter 0, 최대 시도 107, 실행 전후 status 0이었다. 이로 M03 DOD-01~11은 완료됐지만 M06 화면/진행 E2E·M07 UTC adapter/Archive 회귀·M09 signature가 남아 있으므로 FR-LAB-001·FR-DAILY-001·NFR-CONTENT-001·NFR-DET-001 행은 `In Progress`로 유지한다.
 
-> **M04 완료 증거 (2026-08-26)**: append-only action ledger·원자 PULSE·완료 event, `TIMER_TICK` high-water, pre-start canonical `ready`와 started-unsolved `paused` normalization, exact ledger cardinality·paused clock equality, Hint cap·best tuple, `WeakSet` provenance, canonical UTC year≥1, null-prototype Lab map, 네 v1 root와 quarantine backup-before-delete·128회 collision 탐색·progress salvage primary 재저장을 구현했다. `IdGenerator` issued ledger의 seed·reserve·retry·exhaustion과 Reset 후 별도 Daily progress root 보존도 검증했다. focused M04는 12파일/92테스트, migration 3/3, M04 aggregate S98.90/B98.79/F100/L98.95와 per-file branch 11/11(최저 95.45%), global 23파일/147테스트 S93.06/B91.81/F97.61/L94.31이며 lint·format·typecheck·boundaries와 `npm run verify`(scriptContract 19/19, steps 10/10)도 통과했다. 이로 storage service 자체인 NFR-STORAGE-001은 `Verified`지만 `IdGenerator` singleton·crypto source, 실제 UI token·Page Visibility·reload·Result 저장은 M05·M06, UTC Daily·streak·Archive는 M07에 남아 NFR-ID-001과 FR-CORE-003~007·FR-HINT-001·FR-DAILY-002·NFR-TIME-001·NFR-SCORE-001은 `In Progress`다. Sprint 산식은 M08 범위다.
+> **M04 완료 증거 (2026-08-26)**: append-only action ledger·원자 PULSE·완료 event, `TIMER_TICK` high-water, pre-start canonical `ready`와 started-unsolved `paused` normalization, exact ledger cardinality·paused clock equality, Hint cap·best tuple, `WeakSet` provenance, canonical UTC year≥1, null-prototype Lab map, 네 v1 root와 quarantine backup-before-delete·128회 collision 탐색·progress salvage primary 재저장을 구현했다. `IdGenerator` issued ledger의 seed·reserve·retry·exhaustion과 Reset 후 별도 Daily progress root 보존도 검증했다. focused M04는 12파일/92테스트, migration 3/3, M04 aggregate S98.90/B98.79/F100/L98.95와 per-file branch 11/11(최저 95.45%), global 23파일/147테스트 S93.06/B91.81/F97.61/L94.31이며 lint·format·typecheck·boundaries와 `npm run verify`(scriptContract 19/19, steps 10/10)도 통과했다. milestone commit `95fbff2b4bff261ff16784099dc2a02df7473069`는 원격 `codex/m04-session-persistence-scoring`에 push됐고 PR은 만들지 않았다. 이로 storage service 자체인 NFR-STORAGE-001은 `Verified`지만 `IdGenerator` singleton·crypto source, 실제 UI token·Page Visibility·reload·Result 저장은 M05·M06, UTC Daily·streak·Archive는 M07에 남아 NFR-ID-001과 FR-CORE-003~007·FR-HINT-001·FR-DAILY-002·NFR-TIME-001·NFR-SCORE-001은 `In Progress`다. Sprint 산식은 M08 범위다.
+
+> **M05 ADR-0011/0012 체크포인트 증거 (2026-08-29)**: Theme은 기본 `dark`에서 `dark → light → system → dark`, Motion은 기본 `system`에서 `system ↔ reduced`로 동작하며 custom high-contrast option/token/baseline은 없다. OS forced-colors·`highContrastCells`·legacy `high-contrast → dark` 정규화는 유지한다. focused 7파일/33테스트, global 30파일/180테스트, token 16파일·hardcode 0·예외 13, axe 18/18, visual 18/18·baseline 9·diff 0, keyboard 3엔진, boundary/static a11y/build가 통과했고 오너가 baseline 9/9를 승인했다. Pages 후보는 14 files·353631 bytes·prototypeFiles 10, 3엔진 30/30이며 제출 URL용 playable H00 adapter는 908단언·외부 요청/콘솔 오류 0이다. Android·실제 screen reader·200% zoom·color vision은 0/4 `NOT RUN`·`DEFERRED_TO_M10`으로 PASS/면제가 아니다. fixed commit·원격 Pages·공개 URL smoke는 M05 phase와 PROGRESS에 별도 기록한다.
 
 ## 4. H00 해커톤 제출 슬라이스 추적
 

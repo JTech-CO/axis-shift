@@ -26,7 +26,7 @@ export type PrimaryStorageKey = (typeof STORAGE_KEYS)[StorageKeyKind];
 export interface UserSettings {
   readonly schemaVersion: 1;
   readonly locale: 'ko' | 'en';
-  readonly theme: 'system' | 'dark' | 'light' | 'high-contrast';
+  readonly theme: 'dark' | 'light' | 'system';
   readonly soundEnabled: boolean;
   readonly soundVolume: number;
   readonly hapticsEnabled: boolean;
@@ -143,7 +143,7 @@ const SPRINT_FIELDS = ['achievedAt', 'sGradeCount', 'score', 'solvedCount'] as c
 export const DEFAULT_USER_SETTINGS: UserSettings = Object.freeze({
   schemaVersion: 1,
   locale: 'ko',
-  theme: 'system',
+  theme: 'dark',
   soundEnabled: true,
   soundVolume: 0.7,
   hapticsEnabled: true,
@@ -244,13 +244,16 @@ export function normalizeSettings(
     issues.push('settings-values');
     return { issues, valid: false, value: cloneSettings(fallback) };
   }
+  const legacyHighContrastTheme = value.theme === 'high-contrast';
+  if (legacyHighContrastTheme) issues.push('settings-theme-high-contrast');
+
   return {
     issues,
     valid: true,
     value: {
       schemaVersion: 1,
       locale: value.locale as UserSettings['locale'],
-      theme: value.theme as UserSettings['theme'],
+      theme: legacyHighContrastTheme ? 'dark' : (value.theme as UserSettings['theme']),
       soundEnabled: value.soundEnabled,
       soundVolume: value.soundVolume,
       hapticsEnabled: value.hapticsEnabled,

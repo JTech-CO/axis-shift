@@ -542,6 +542,56 @@ async function expectGeneratedFixture(page, expected, context) {
 
   await page.goto(baseUrl, { waitUntil: "networkidle" });
   equal(await page.title(), "AXIS//SHIFT — Tensor Puzzle", "document title");
+  const appearanceUrl = page.url();
+  const appearanceRows = await page.locator("#current-grid").getAttribute("data-rows");
+  equal(
+    await page.locator("html").getAttribute("data-theme"),
+    "dark",
+    "Theme defaults to dark",
+  );
+  equal(
+    await page.locator("html").getAttribute("data-motion"),
+    "system",
+    "Motion defaults to system",
+  );
+  equal(
+    await page.locator("#theme-button").getAttribute("aria-label"),
+    "Theme: dark; next: light",
+    "Theme exposes current and next values",
+  );
+  equal(
+    await page.locator("#motion-button").getAttribute("aria-pressed"),
+    "false",
+    "system Motion is not pressed",
+  );
+  const darkThemeBackground = await page.locator("html").evaluate((element) =>
+    getComputedStyle(element).getPropertyValue("--bg").trim(),
+  );
+  await activate(page, page.locator("#theme-button"));
+  equal(await page.locator("html").getAttribute("data-theme"), "light", "Theme cycles to light");
+  const lightThemeBackground = await page.locator("html").evaluate((element) =>
+    getComputedStyle(element).getPropertyValue("--bg").trim(),
+  );
+  check(lightThemeBackground !== darkThemeBackground, "light palette differs from dark");
+  await activate(page, page.locator("#theme-button"));
+  equal(await page.locator("html").getAttribute("data-theme"), "system", "Theme cycles to system");
+  await activate(page, page.locator("#theme-button"));
+  equal(await page.locator("html").getAttribute("data-theme"), "dark", "Theme wraps to dark");
+  await activate(page, page.locator("#motion-button"));
+  equal(await page.locator("html").getAttribute("data-motion"), "reduced", "Motion toggles to reduced");
+  equal(
+    await page.locator("#motion-button").getAttribute("aria-pressed"),
+    "true",
+    "reduced Motion is pressed",
+  );
+  await activate(page, page.locator("#motion-button"));
+  equal(await page.locator("html").getAttribute("data-motion"), "system", "Motion returns to system");
+  equal(page.url(), appearanceUrl, "appearance controls preserve the URL");
+  equal(
+    await page.locator("#current-grid").getAttribute("data-rows"),
+    appearanceRows,
+    "appearance controls preserve the current board",
+  );
   equal(await page.locator(".stage-button").count(), 6, "six playable stages");
   check(
     await page.locator(".stage-button").evaluateAll((buttons) =>
@@ -1189,6 +1239,27 @@ async function expectGeneratedFixture(page, expected, context) {
     if (message.type() === "error") browserErrors.push("motion console: " + message.text());
   });
   await motionPage.goto(baseUrl, { waitUntil: "networkidle" });
+  equal(
+    await motionPage.locator("#app").getAttribute("data-pulse-duration-ms"),
+    "360",
+    "system Motion uses 360ms without an OS reduction preference",
+  );
+  await activate(motionPage, motionPage.locator("#motion-button"));
+  equal(
+    await motionPage.locator("#app").getAttribute("data-pulse-duration-ms"),
+    "0",
+    "explicit reduced Motion removes the PULSE wait",
+  );
+  const reducedTransitionMs = await motionPage.locator(".current-signal").first().evaluate((element) => {
+    return Number.parseFloat(getComputedStyle(element).transitionDuration) * 1000;
+  });
+  check(reducedTransitionMs <= 80, "explicit reduced Motion limits CSS transitions to 80ms");
+  await activate(motionPage, motionPage.locator("#motion-button"));
+  equal(
+    await motionPage.locator("#app").getAttribute("data-pulse-duration-ms"),
+    "360",
+    "Motion returns to the system duration",
+  );
   await selectMask(motionPage, "col", 1);
   await selectMask(motionPage, "row", 1);
   await motionPage.locator("#pulse-button").click();

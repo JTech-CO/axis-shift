@@ -2,7 +2,7 @@
 
 - **상태**: 미시작
 - **담당 범위**: 스포일러 없는 결과 공유, PNG, 한·영, 설정, 사운드·햅틱, PWA·오프라인
-- **최종 갱신**: 2026-08-09
+- **최종 갱신**: 2026-08-26
 
 ## 1. 맥락과 목표
 
@@ -17,7 +17,7 @@
 - Canvas 1080×1080·1200×630 PNG
 - ko/en locale, key parity, locale persistence
 - Settings·About·Credits·Privacy 설명
-- theme, reduced motion, sound, volume, haptics, keyboard hints
+- Theme 단일 순환 버튼(`dark → light → system → dark`, 기본 `dark`), Motion 단일 버튼(`system ↔ reduced`, 기본 `system`), sound, volume, haptics, highContrastCells, keyboard hints
 - Web Audio 합성 피드백과 Vibration 기능 감지
 - manifest, icons, service worker, precache, update prompt, offline
 - CSP·network request audit
@@ -75,7 +75,7 @@ public/icons/*
 3. 텍스트·URL·Web Share·Clipboard 폴백을 구현한다.
 4. Canvas 카드 2개 비율과 font fallback을 구현한다.
 5. ko/en key·formatting·locale detection/persistence를 연결한다.
-6. Settings와 system preference adapter를 구현한다.
+6. ADR-0011의 Theme·Motion 단일 버튼, system preference adapter, legacy Theme 읽기 정규화와 설정 persistence를 구현한다.
 7. Web Audio·Vibration을 사용자 gesture·설정 뒤에 연결한다.
 8. manifest·service worker·precache·update prompt를 구성한다.
 9. 실제 base path에서 offline·update·network·spoiler 검증을 실행한다.
@@ -83,7 +83,7 @@ public/icons/*
 ## 6. 참조
 
 - **불변식**: INV-001, INV-008~019
-- **ADR**: ADR-0003~0007
+- **ADR**: ADR-0003~0007, ADR-0011
 - **기술 백서**: §2.4, §4.7~9, §5.3~4, §7, §8.3~4
 - **디자인 백서**: Result·Share Card·Settings·About·motion·accessibility
 - **문서**: `docs/ASSET_LICENSES.md`, `docs/REQUIREMENTS_TRACEABILITY.md`
@@ -96,14 +96,14 @@ public/icons/*
 - [ ] **DOD-04 — 폴백 완전성**: files share → text share → clipboard → selectable textarea 각 capability matrix에서 사용자가 결과를 획득할 수 있다. API 실패가 게임 결과를 잃게 하지 않는다.
 - [ ] **DOD-05 — PNG 출력**: 1080×1080과 1200×630 PNG가 정확한 크기, 투명하지 않은 배경, safe area, ko/en 긴 문자열, font fallback에서 생성된다. 일반 모바일 500ms 목표 측정치를 QA에 기록한다.
 - [ ] **DOD-06 — i18n parity**: ko/en key set 동일, 빈 번역·raw key 노출·컴포넌트 하드코딩 0건. 숫자·날짜·시간은 locale formatter를 사용한다. (INV-016)
-- [ ] **DOD-07 — 설정 지속성**: locale/theme/sound/volume/haptics/reduced motion/high contrast/keyboard hints가 즉시 적용되고 reload 후 검증된 값으로 복구된다. 손상 값은 default로 복구한다. (INV-011)
+- [ ] **DOD-07 — 설정 지속성**: locale, Theme 단일 버튼, Motion 단일 버튼, sound/volume/haptics, 별도 highContrastCells, keyboard hints가 즉시 적용되고 reload 후 검증된 값으로 복구된다. Theme은 기본 `dark`에서 `dark → light → system → dark`, Motion은 기본 `system`에서 `system ↔ reduced`로 순환한다. 쓰기 Theme은 `dark | light | system`, UI `reduced`는 저장값 `on`이며 legacy v1 `high-contrast` Theme은 읽을 때 `dark`로 정규화한다. 커스텀 high-contrast 테마는 노출하지 않고 운영체제 Forced Colors 지원을 유지한다. 손상 값은 default로 복구한다. (INV-011)
 - [ ] **DOD-08 — 피드백 선택성**: AudioContext는 첫 gesture 후에만 생성, sound/haptics off에서는 호출 0건, API 미지원에서도 기능 흐름이 동일하다. 상태 정보는 시각·텍스트로 유지된다. (INV-015)
 - [ ] **DOD-09 — PWA 범위**: manifest `start_url`, `scope`, Vite base, service worker scope가 동일 repository path에 있고 root를 가로채지 않는다. (INV-014)
 - [ ] **DOD-10 — 오프라인**: 최초 온라인 방문·precache 후 네트워크 차단 상태에서 홈, Tutorial, Lab, 오늘 Daily 생성, 진행 저장·재시작이 가능하다. E3. (INV-014, INV-017)
 - [ ] **DOD-11 — 업데이트 안전성**: 새 worker는 자동 강제 reload하지 않고 update prompt를 보인다. 진행 세션 저장 후 사용자가 승인할 때만 적용되고 새 버전 후 resume 또는 안전 복구된다.
 - [ ] **DOD-12 — 외부 요청 0건**: production build의 핵심 플레이·공유·설정 중 same-origin 정적 asset 외 네트워크 요청, cookie, remote analytics가 0건이다. E3. (INV-017)
 - [ ] **DOD-13 — 자산 권리**: icon·font·image·sound source가 `docs/ASSET_LICENSES.md`에 등록되고 미확인 자산 0건. 합성음은 생성 방식과 권리 메모를 기록한다. (INV-019)
-- [ ] **DOD-14 — 접근성**: Share·Settings·update prompt를 키보드·스크린리더로 완료하고 axe serious/critical=0. 200% zoom과 360px overflow=0. (INV-015)
+- [ ] **DOD-14 — 접근성**: Share·Settings·update prompt를 키보드·스크린리더로 완료하고 axe serious/critical=0. 200% zoom과 360px overflow=0이며 운영체제 Forced Colors에서도 색 이외 상태 표식이 유지된다. (INV-015)
 - [ ] **DOD-15 — 문서 정합성**: privacy·offline 한계·공유 필드·설정·PWA 갱신 정책을 About, docs, 추적표, `PROGRESS.md`에 반영한다.
 
 ## 8. 검증 명령
@@ -128,6 +128,8 @@ npm run build
 | 설치 PWA | offline 실행·update prompt | 핵심 플레이·안전 갱신 | 녹화 |
 | ko/en 공유 카드 | 긴 문자열 포함 두 크기 | 잘림·스포일러 없음 | PNG fixture |
 | Reduced Motion/Sound Off | 전체 1회 플레이 | 기능 정보 손실·음향 호출 없음 | 체크표 |
+| Theme/Motion 설정 | 키보드로 각 버튼 순환·reload·legacy fixture | 순서·기본값·저장 매핑·`high-contrast → dark` 정규화 일치 | 체크표/E2E |
+| 운영체제 Forced Colors | Settings와 게임 핵심 흐름 | 커스텀 테마 없이 색 이외 상태 표식 유지 | 캡처/체크표 |
 
 ## 10. 증거
 
@@ -161,4 +163,5 @@ npm run build
 - production share fixtures와 PWA cache manifest
 - ko/en 완성 문자열과 자산 inventory
 - network request baseline
+- ADR-0011 Theme/Motion 저장·legacy 정규화 검증 결과
 - M10 실제 URL에서 재검증할 offline·update·share 절차
