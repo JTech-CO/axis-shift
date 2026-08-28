@@ -1,7 +1,7 @@
 # AXIS//SHIFT 개발·검증·배포 환경 계약
 
 **버전**: 1.2.0
-**상태**: M01~M04 완료 + M05 자동 E2/E3 PASS·오너 baseline 9/9 승인·수동 E1 0/4 M10 이관; public Pages close 대기
+**상태**: M01~M05 완료; M05 원격 CI·Pages·공개 제출 URL smoke 통과, 수동 E1 0/4는 M10 release-blocking gate로 이관
 **최종 갱신**: 2026-08-29
 
 ## 1. 기준 환경
@@ -54,24 +54,27 @@ M03은 candidate `1c313bd29e1d24c483749af90a8734542988be5d`의 clean detached wo
 
 | 항목 | 실제 기준 |
 |---|---|
-| Phase/evidence | `READY_FOR_PUBLIC_CLOSE`; 자동 E2/E3 PASS, 오너 baseline 9/9 승인, 수동 E1 0/4 `DEFERRED_TO_M10` |
+| Phase/evidence | `COMPLETE`; DOD-01~13 PASS, 오너 baseline 9/9 승인, 수동 E1 0/4 `DEFERRED_TO_M10` |
 | Focused component/fixture | 7파일 / 33테스트 PASS |
 | Global unit/component | 30파일 / 180테스트 PASS |
 | Design token audit | files 16, color/spacing/radius/duration hardcode 0/0/0/0 |
 | Token 예외 주석 | 13개: 계산식 2, 투명도 2, breakpoint 9 |
 | Static accessibility | files 36, interactiveTargets 8, failures 0 |
 | axe UI fixtures | 18/18 PASS: 8 states + long copy + system 3 + light 3 + reduced-motion 3; serious 0, critical 0, external requests 0 |
-| Visual regression | update/no-update 18/18 PASS, full-fixture baseline 9, viewport 5, dark/light/system, `maxDiffPixels=0`, threshold 0, diff 0; Codex 대표 3/3 PASS |
+| Local visual strict | update/no-update 18/18 PASS, full-fixture baseline 9, viewport 5, dark/light/system, `maxDiffPixels=0`, threshold 0, diff 0; Codex 대표 3/3·오너 9/9 PASS |
+| Remote CI visual | 구조·mobile/desktop snapshot 15 PASS; GitHub Windows system-font metric 비이식성 때문에 tablet snapshot 3개 명시적 SKIP |
 | Keyboard core | Chromium·Firefox·WebKit 9/9 PASS |
 | Module boundaries | files 83, edges 150, violations 0, cycles 0 |
 | Full verify | script contract required 22, missing 0; 12단계 PASS |
 | Production build | 46 modules; CSS 10.49 kB (gzip 3.03), JS 234.56 kB (gzip 75.20) |
-| Pages artifact | files 14, bytes 353631, prototypeFiles 10; 3엔진 30/30; prototype browser 908단언 |
+| Local Pages artifact | files 14, bytes 353631, prototypeFiles 10; 3엔진 30/30; prototype browser 908단언 |
+| Runtime/deployment | implementation `f039bb8088d35df91ef393a9b226f22481981ca3`; final runtime/Pages head `1608c26cf4e8d3ca6be2c3765b20fb00bc7b06b9`; CI `33207406441`·Pages `33207406497` success |
+| Public validation | Pages 3엔진 30/30; `https://jtech-co.github.io/axis-shift/prototypes/rule-proof/` 908단언, external requests 0, console errors 0 |
 | 정적 품질 | lint·format·typecheck PASS |
 
 token 예외 13개는 CSS custom property를 사용할 수 없는 media query 문법 경계와 명시적 주석으로만 허용한다. 세부 분류는 계산식 2개, 투명도 2개, breakpoint 9개다. [ADR-0011](../decisions/0011-appearance-cycle-controls.md)은 Theme 기본 dark·dark→light→system 순환, Motion 기본 system·system↔reduced를 고정하고 custom high-contrast option/token/baseline을 제거한다. OS forced-colors와 `highContrastCells`, legacy v1 `high-contrast` 읽기의 dark 정규화는 유지한다.
 
-자동 증거와 수동 E1을 분리한다. ADR-0011 변경분을 포함한 자동 E2/E3와 오너 baseline 9/9 승인은 확보했다. 실제 Android Chrome, NVDA/VoiceOver 동등 스크린리더, 200% zoom, 색각 검토는 0/4 `NOT RUN`이며 ADR-0012로 M10에 이관했다. 이는 PASS나 면제가 아니다. M05 후보의 fixed commit·push·공개 Pages smoke는 이번 종료 작업에서 기록한다.
+자동 증거와 수동 E1을 분리한다. ADR-0011 변경분을 포함한 자동 E2/E3, 오너 baseline 9/9, 고정 SHA 원격 CI·Pages와 실제 공개 제출 URL smoke를 확보해 M05를 완료했다. 실제 Android Chrome, NVDA/VoiceOver 동등 스크린리더, 200% zoom, 색각 검토는 0/4 `NOT RUN`이며 ADR-0012로 M10에 이관했다. 이는 PASS나 면제가 아니다.
 
 strict 0-pixel visual 재실행에서는 transparent backdrop blur가 rounded button corner 한 color channel을 비결정적으로 바꿔 mobile 2/18, 이어 tablet 3/18 실패했다. toolbar를 opaque canvas token background로 고정하고 baseline을 재생성한 뒤 동일 no-update가 18/18, `maxDiffPixels=0`, threshold 0, diff 0으로 통과했다.
 ## 2. 지원 개발 OS
@@ -289,7 +292,7 @@ checkout
 → M05 visual regression
 ```
 
-Windows dark/light/system full-fixture baseline 9개를 canonical로 사용한다. 생성 후 무갱신 재실행은 `maxDiffPixels=0`, threshold 0, diff 0으로 통과했으며, OS별 font rasterization 차이를 Linux quality job의 visual failure로 혼합하지 않는다.
+로컬 Windows dark/light/system full-fixture baseline 9개는 프로젝트 오너 승인 canonical이며 무갱신 18/18, `maxDiffPixels=0`, threshold 0, diff 0을 유지한다. GitHub `windows-latest`의 system-font rasterization은 로컬과 달라 원격에서는 `maxDiffPixelRatio=0.025`로 mobile/desktop snapshot을 검사하고 tablet snapshot 3건만 명시적으로 SKIP한다. 구조·접근성 검사는 계속 실행하며, tablet 차이를 덮기 위한 6% 임계치 완화는 채택하지 않았다.
 
 main Pages pipeline:
 

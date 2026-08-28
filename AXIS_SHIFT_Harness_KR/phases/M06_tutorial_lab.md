@@ -31,7 +31,7 @@
 
 ## 3. 진입조건 (DoR)
 
-- [ ] M05 DoD 통과.
+- [x] M05 DoD 통과.
 - [ ] Tutorial 6·Lab 48 validator 통과 상태.
 - [ ] M04 storage·session API와 M05 component API가 안정됨.
 - [ ] Tutorial 카피의 ko/en key가 초안 상태로 존재.

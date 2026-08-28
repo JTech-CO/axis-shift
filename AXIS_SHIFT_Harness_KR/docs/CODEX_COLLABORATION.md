@@ -107,7 +107,7 @@ Codex가 제안·생성·수정한 항목
 | CX-M04-001 | 2026-08-26 | M04 | 세션·일반 타이머·점수·ID·storage v1 | `95fbff2b4bff261ff16784099dc2a02df7473069`; 원격 branch push·PR 없음 | focused 12파일/92테스트, migration 3/3, M04 B98.79%·per-file 11/11, global 23파일/147테스트, 정적 gate PASS | M06 singleton/crypto·Sprint M08·UI 경계 유지 | 완료 / DOD-01~13 PASS |
 | CX-M05-001 | 2026-08-26 | M05 | shared Design System·게임 UI fixture 초기 checkpoint | working tree; commit/PR 없음 | focused 6/30, global 30/179, axe 18/18, visual 18/18·baseline 9, keyboard 3엔진 9/9 | 오너가 M05 착수; 초기 high-contrast 행렬은 후속 ADR-0011로 대체 | 역사적 자동 checkpoint / 현행 아님 |
 | CX-M05-002 | 2026-08-26 | M05 | Theme·Motion 단일 순환 버튼과 appearance 계약 정정 | [ADR-0011](../decisions/0011-appearance-cycle-controls.md); 당시 working tree·commit/PR 없음 | global 30/180, token 16/0/13, axe 18/18, visual no-update 18/18·diff 0·baseline 9, keyboard 3엔진 9/9, verify 12/12 | 오너가 dark 기본·custom high-contrast 제거를 확정; 당시 실제 수동·baseline 전체 승인은 미제공 | 역사적 pre-approval checkpoint / 후속 CX-M05-003으로 대체 |
-| CX-M05-003 | 2026-08-29 | M05 | checkpoint 종료 후보·제출 URL appearance adapter | [ADR-0012](../decisions/0012-m05-checkpoint-manual-evidence-deferral.md); candidate branch, fixed commit·Pages pending | focused 7/33, global 30/180, Pages 30/30·353631 bytes, prototype browser 908 | 오너 baseline 9/9 승인; manual 0/4는 NOT RUN·M10 이관 | READY_FOR_PUBLIC_CLOSE / 배포 증거 대기 |
+| CX-M05-003 | 2026-08-29 | M05 | Design System checkpoint·제출 URL appearance adapter 공개 종료 | implementation `f039bb8`; runtime `1608c26`; CI `33207406441`; Pages `33207406497` | local strict visual 18/18; remote 15 PASS+3 SKIP; public Pages 30/30·prototype 908 | 오너 baseline 9/9 승인; manual 0/4는 NOT RUN·M10 이관 | Accepted / M05 complete |
 
 ## 8. 상세 로그 템플릿
 
@@ -441,6 +441,21 @@ Codex가 제안·생성·수정한 항목
 - 실패·수정 기록: strict 0-pixel no-update 첫 실행은 transparent backdrop blur가 rounded button corner 한 color channel을 흔들어 mobile 2/18 실패했고, baseline 재생성 뒤 tablet 3/18도 실패했다. toolbar를 opaque canvas token background로 고정하고 baseline을 다시 생성한 뒤 동일 no-update 18/18, `maxDiffPixels=0`, threshold 0, diff 0으로 닫았다.
 - 리스크 해소: custom high-contrast가 ON·preview·selected를 복잡하게 만들어 가독성을 해치던 위험은 option/token/baseline 제거로 닫았다. OS forced-colors와 색 이외 상태 표식은 접근성 계약으로 유지한다.
 - 후속 결론: 프로젝트 오너는 2026-08-29 새 baseline 9종을 모두 승인했다. Android Chrome·실제 스크린리더·200% zoom·색각 시뮬레이션은 `0/4 NOT RUN`이며 ADR-0012에 따라 M10 release-blocking gate로 이관됐다. fixed commit·공개 Pages 증거는 CX-M05-003에서 닫는다.
+
+### CX-M05-003 — Design System checkpoint 공개 종료
+
+- 날짜: 2026-08-29
+- Phase / DoD: M05 / DOD-01~13 PASS
+- 관련 INV / ADR: INV-003·010·011·015·018 / [ADR-0011](../decisions/0011-appearance-cycle-controls.md), [ADR-0012](../decisions/0012-m05-checkpoint-manual-evidence-deferral.md)
+- 사람 결정: 프로젝트 오너가 Theme 기본 `dark` 순환, Motion 기본 `system` 토글, custom high-contrast 제거와 full-fixture baseline 9/9를 승인했다. Android Chrome·실제 스크린리더·200% zoom·색각 시뮬레이션 0/4는 PASS나 면제가 아니라 M10 release-blocking gate로 이관했다.
+- Codex 역할: shared token·presentational UI·8상태 fixture·axe/keyboard/visual harness를 구현하고, 제출 URL의 playable H00에 ADR-0011 Theme/Motion adapter를 이식했다. 아직 controller가 없는 M05 React fixture는 공개 게임으로 승격하지 않았다.
+- Commit / deployment: implementation `f039bb8088d35df91ef393a9b226f22481981ca3`, 최종 runtime/Pages head `1608c26cf4e8d3ca6be2c3765b20fb00bc7b06b9`. 후자는 `origin/codex/m05-design-system`과 `main`에 push됐다.
+- 로컬 자동 검증: focused 7파일/33테스트, global 30파일/180테스트, token hardcode 0·예외 13, axe 18/18, keyboard 3엔진 9/9, boundary/static a11y/build/verify PASS. 오너 승인 baseline 9종의 visual은 18/18, `maxDiffPixels=0`, threshold 0, 실제 diff 0이다.
+- 원격 자동 검증: CI [33207406441](https://github.com/JTech-CO/axis-shift/actions/runs/33207406441)와 Pages [33207406497](https://github.com/JTech-CO/axis-shift/actions/runs/33207406497)은 head SHA 일치·success다. CI visual은 구조·mobile/desktop snapshot 15 PASS, 비이식적인 GitHub Windows system-font metric의 tablet snapshot 3건을 명시적으로 SKIP했다.
+- 공개 호환 검증: Pages Chromium·Firefox·WebKit 30/30, 제출 URL `https://jtech-co.github.io/axis-shift/prototypes/rule-proof/` browser 908단언, 외부 요청 0, 콘솔 오류 0이다. 18 signal과 stage/signal/seed/hash 호환, 실제 PULSE 플레이를 유지한다.
+- 실패·수정 기록: 첫 원격 visual은 9 snapshot에서 1~2% raster 차이가 났고 후속 두 실행은 tablet 3건의 높이·font metric 차이를 재현했다. 임계치를 6%로 넓히지 않고 local strict·오너 승인 기준을 유지하며 원격 tablet 3건만 명시적으로 분리했다.
+- Codex/사람 경계: Codex는 코드·테스트·배포 검증과 증거 기록을 담당했다. 디자인 방향·baseline 9종 승인·수동 E1 이관은 프로젝트 오너 결정이다.
+- 남은 위험·인계: M06는 M05 선행 조건만 충족했다. production controller·session/storage/reload 연결은 M06, 이관한 수동 접근성 4종은 M10에서 완료해야 한다.
 
 ## 9. 품질 분류
 

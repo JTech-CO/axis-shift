@@ -1,7 +1,7 @@
 # AXIS//SHIFT Release Notes
 
-**상태**: `v0.1.0-hackathon` released·해커톤 제출 완료 확인 / v1.0.0 계획
-**최종 갱신**: 2026-08-26
+**상태**: `v0.1.0-hackathon` released·해커톤 제출 완료 확인 / M05 post-submission compatibility deployed / v1.0.0 계획
+**최종 갱신**: 2026-08-29
 
 > H00 항목만 현재 해커톤 프로토타입을 나타낸다. 아래 v1.0.0 절은 계속 `Planned`이며 H00 제출 문구로 인용하지 않는다.
 
@@ -72,6 +72,18 @@
 - 18개 고정 signal은 Lab 48이 아니며 고정 signal 이후 랜덤 반복을 제공한다.
 - 저장·계정·동기화·분석이 없고 진행 정보는 서버로 전송되지 않는다.
 - `UNLICENSED`/All Rights Reserved 상태를 유지하며 공개 오픈소스 라이선스는 M11 전에 별도 오너 결정한다.
+
+## Post-submission compatibility update — M05
+
+`v0.1.0-hackathon` tag·release·capture SHA `6690f5778f706e1875b452d552bd75ba1c06ee9a`는 변경하지 않았다. 제출 링크를 계속 플레이 가능하게 유지하기 위한 Pages 호환 업데이트만 다음과 같이 별도 배포했다.
+
+- implementation base `f039bb8088d35df91ef393a9b226f22481981ca3`, 최종 runtime/Pages head `1608c26cf4e8d3ca6be2c3765b20fb00bc7b06b9`
+- 제출 URL: `https://jtech-co.github.io/axis-shift/prototypes/rule-proof/`
+- M05 React fixture는 아직 production controller가 아니므로 공개 게임으로 승격하지 않았다. 기존 playable H00 18-signal game에 Theme 기본 dark 순환 버튼과 Motion 기본 system 토글만 이식했다.
+- CI `33207406441`·Pages `33207406497` success; 공개 Pages Chromium·Firefox·WebKit 30/30
+- 공개 prototype browser 908단언, 외부 요청 0, 콘솔 오류 0; stage/signal/seed/hash와 PULSE 플레이 호환 유지
+- local visual strict 18/18·오너 baseline 9/9, remote visual 15 PASS+tablet 3 explicit SKIP
+- Android Chrome·실제 screen reader·200% zoom·색각 시뮬레이션은 0/4 `NOT RUN`이며 ADR-0012에 따라 M10 release-blocking gate로 남는다.
 
 ## v1.0.0 — Planned
 

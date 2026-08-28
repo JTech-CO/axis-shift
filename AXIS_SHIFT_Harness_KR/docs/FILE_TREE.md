@@ -1,7 +1,7 @@
 # AXIS//SHIFT 파일 트리·모듈 경계 계약
 
 **버전**: 1.4.0
-**상태**: M01·M02·M03·M04 완료 + M05 종료 후보·public Pages close 대기 + 후속 phase 목표 계약
+**상태**: M01·M02·M03·M04·M05 완료 + 후속 phase 목표 계약
 **최종 갱신**: 2026-08-29
 **관련 불변식**: INV-002, INV-003, INV-017, INV-019
 
@@ -299,7 +299,7 @@ vitest.m04.config.ts
 
 ### 2.5 M05 디자인 시스템의 실제 구현 범위
 
-2026-08-26 현재 M05에서 실제 생성·활성화한 production/test 트리는 다음 범위다.
+2026-08-29 M05 종료 기준 실제 생성·활성화한 production/test 트리는 다음 범위다.
 
 ```text
 src/styles/
@@ -354,8 +354,8 @@ tests/ui-fixtures/index.html
 - common·layout·game 컴포넌트는 번역된 문자열, 표시 DTO, callback만 받는 presentational 계층이다. 세션 규칙을 다시 계산하거나 production controller·storage·Page Visibility를 소유하지 않는다. 실제 Result·Lab 저장과 reload orchestration은 M06 범위다.
 - `playwright.ui-fixtures.config.ts`와 `start-ui-fixtures-server.ts`는 axe·키보드·visual fixture를 동일한 test-only Vite entry에서 실행한다. Theme 단일 버튼은 기본 dark에서 dark→light→system→dark로, Motion 단일 버튼은 기본 system에서 system↔reduced로 전환한다. 5개 viewport, dark/light/system, reduced motion, 긴 문자열, 최소 44px target과 overlap을 검사한다.
 - `tests/visual/__snapshots__`의 9개 `*-ui-fixtures-win32.png`는 dark/light/system × mobile/tablet/desktop의 full-fixture Windows canonical test baseline이며 runtime 자산이 아니다. custom high-contrast baseline은 ADR-0011로 제거했고 OS forced-colors 지원은 유지한다.
-- M05 자동 E2/E3는 focused 7파일/33테스트, global 30파일/180테스트, token 16파일·하드코드 0·예외 13, axe 18/18, visual 18/18·baseline 9·strict diff 0, keyboard 3엔진, boundary/static a11y, build를 통과했다. 프로젝트 오너 baseline 9/9는 승인됐고 수동 E1 0/4는 `DEFERRED_TO_M10`이다. Pages 후보는 14 files·353631 bytes·prototypeFiles 10, 3엔진 30/30, H00 browser 908단언이다.
-- M05 fixed commit·push·공개 Pages smoke는 이번 종료 작업의 원격 증거로 기록한다.
+- M05 자동 E2/E3는 focused 7파일/33테스트, global 30파일/180테스트, token 16파일·하드코드 0·예외 13, axe 18/18, local visual 18/18·baseline 9·strict diff 0, keyboard 3엔진, boundary/static a11y, build를 통과했다. 프로젝트 오너 baseline 9/9는 승인됐고 수동 E1 0/4는 `DEFERRED_TO_M10`이다. 로컬 Pages artifact는 14 files·353631 bytes·prototypeFiles 10, 3엔진 30/30, H00 browser 908단언이다.
+- implementation `f039bb8088d35df91ef393a9b226f22481981ca3`와 runtime/Pages `1608c26cf4e8d3ca6be2c3765b20fb00bc7b06b9`를 배포했다. CI `33207406441`·Pages `33207406497` success, remote visual 15 PASS+tablet 3 explicit SKIP, 공개 Pages 30/30, `https://jtech-co.github.io/axis-shift/prototypes/rule-proof/` 908단언·external/console 0이다.
 ## 3. 계층별 책임
 
 | 계층 | 책임 | 허용되는 부수효과 |

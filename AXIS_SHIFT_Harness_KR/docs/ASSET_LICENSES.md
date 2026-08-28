@@ -91,7 +91,7 @@ H00 제출 전용 자산 AST-007~AST-009는 등록·검증을 마쳤다. AST-001
 - M05 production UI의 글꼴은 AST-006 system font stack만 사용한다. 저장소에 font file을 포함하거나 재배포하지 않는다.
 - 셀·축·상태 glyph·focus indicator는 CSS와 텍스트로 구성했다. 새 runtime image·audio·font asset과 외부 URL hotlink는 0이며, axe fixture 18/18의 network 감사에서도 external request 0을 확인했다.
 - `tests/visual/__snapshots__/*-ui-fixtures-win32.png` 9개는 dark/light/system × mobile/tablet/desktop full-fixture 회귀용 test-only baseline이다. [ADR-0011](../decisions/0011-appearance-cycle-controls.md)에 따라 custom high-contrast baseline은 제거했으며 OS forced-colors와 별도 `highContrastCells` 지원은 유지한다. 이 파일들은 production bundle·Pages runtime asset inventory에 포함하지 않는다. strict 0-pixel 무갱신 18/18(diff 0), Codex 대표 3/3 검토와 프로젝트 오너 9/9 승인을 통과했다.
-- M05 후보 Pages artifact 감사 결과는 files 14, bytes 353631, prototypeFiles 10이며 새 외부·미등록 production asset은 없다.
+- M05 로컬 Pages artifact 감사는 files 14, bytes 353631, prototypeFiles 10이며 새 외부·미등록 production asset은 없다. runtime/Pages head `1608c26cf4e8d3ca6be2c3765b20fb00bc7b06b9`의 공개 제출 URL browser smoke도 external request 0을 확인했다.
 - 개발 전용 접근성 검사 의존성 `@axe-core/playwright@4.13.0`과 그 의존성 `axe-core@4.13.0`은 모두 MPL-2.0이다. `devDependencies`와 test runner에서만 사용하며 production runtime bundle에는 포함하지 않는다.
 - 따라서 M05에서 새 production asset ID를 등록하지 않는다. M11의 전체 lockfile license report와 production asset inventory 승인은 별도 gate로 유지한다.
 ## 4. 자산 등록 필수 필드

@@ -4,9 +4,9 @@
 
 ## 현재 상태
 
-- **현재 phase**: M05 — Design System & Shared Game UI 종료 후보; public Pages 검증 중
-- **상태**: 자동 E2/E3 PASS·프로젝트 오너 visual baseline 9/9 승인; 수동 E1 0/4는 ADR-0012로 M10 이관; fixed commit·public submitted-URL smoke 대기
-- **마지막 갱신**: 2026-08-29 / global 30파일 180테스트, axe 18/18, visual 18/18·diff 0, Pages 3브라우저 30/30, prototype browser 908단언 PASS
+- **현재 phase**: M05 — Design System & Shared Game UI 완료; 다음 M06 DoR 검토
+- **상태**: M05 DOD-01~13 PASS·원격 CI/Pages·공개 제출 URL smoke 통과; 수동 E1 0/4는 ADR-0012에 따라 M10 release-blocking gate로 이관
+- **마지막 갱신**: 2026-08-29 / runtime·Pages head `1608c26`, CI `33207406441`·Pages `33207406497` success, public Pages 30/30·prototype 908단언 PASS
 - **목표 릴리스**: `v0.1.0-hackathon` — OpenAI Game Builders Seoul Track 1 제출 슬라이스 완료
 - **제출 접수 종료**: 2026-08-26
 
@@ -71,11 +71,12 @@
 - [x] M04 원격 체크포인트 — commit `95fbff2b4bff261ff16784099dc2a02df7473069`를 `origin/codex/m04-session-persistence-scoring`에 push; PR 없음
 - [x] M05 shared UI 자동 체크포인트 — dark/light/system token, Theme 기본 dark 순환 버튼, Motion 기본 system 토글, common/layout/game presentational component, 8개 상태+long-copy fixture, keyboard·axe·visual harness 구현
 - [x] M05 ADR-0011 자동 품질 — focused 7파일 33테스트, global 30파일 180테스트, token 16파일·하드코드 0·예외 13, axe 18/18, visual update/no-update 18/18·full-fixture baseline 9·strict diff 0, keyboard 3브라우저 9/9, boundary·static a11y·build·Pages·verify PASS
+- [x] M05 고정 SHA 공개 E4 — implementation `f039bb8`, runtime/Pages `1608c26`, CI `33207406441`·Pages `33207406497` success, 공개 Pages 30/30·제출 URL 908단언·외부 요청/콘솔 오류 0
 
 ## 다음 할 일
 
-1. M05 후보를 commit·push하고 Pages workflow를 실행해 기존 제출 URL의 Theme/Motion·18-signal 플레이·stage/signal/seed/hash를 공개 smoke한다.
-2. public smoke 뒤 M05를 닫고 M06 DoR를 확인한다. M06는 M04 `IdGenerator` singleton·crypto source, Page Visibility·tick, paused resume, Result/Lab best 저장과 reload E2E를 실제 feature controller에 연결한다.
+1. M06 DoR에서 M05 선행 완료 외의 조건을 확인하고 Tutorial 6·Lab 48의 실제 feature controller 조합 범위를 고정한다.
+2. M06는 M04 `IdGenerator` singleton·crypto source, Page Visibility·tick, paused resume, Result/Lab best 저장과 reload E2E를 실제 화면에 연결한다.
 3. M07은 UTC Daily·streak·Archive를 추가하고, Sprint 180초 절대 종료·총점·동점 규칙은 계속 M08까지 결정하지 않는다.
 4. H00 비공개 playtest·submission 자료와 두 backup은 Git에 넣지 않는다. 제출 완료 조건은 충족됐지만 이번 작업에서는 삭제하지 않았으며, 프로젝트 오너의 명시적 정리 결정 전까지 보존한다.
 5. H00의 권리 상태는 `UNLICENSED` / All Rights Reserved로 고정했다. 공개 OSS 라이선스 채택 여부는 M11 오너 결정으로 남긴다.
@@ -110,7 +111,7 @@
 | M02 | Board & GF(2) Core | 완료 — DOD-01~10 | 3×3 전수 512 mismatch 0, 4~8 총 50,000 round-trip·결정성 실패 0, core coverage 각 100% |
 | M03 | Generator & Content Pipeline | 완료 — DOD-01~11 | 오너 전체 승인 + candidate `1c313bd…98be5d` exact-SHA 감사 2회 동일 + PR #7 CI PASS |
 | M04 | Session, Persistence & Scoring | 완료 — DOD-01~13 | 12파일 92테스트, B98.79%, 11/11 per-file branch·네 v1 root·격리·재개 정규화 |
-| M05 | Design System & Shared UI | 종료 후보 — 자동 PASS·오너 baseline 9/9 승인·수동 E1 0/4 M10 이관; public Pages 대기 | 30파일/180 unit·18 axe·18 visual diff 0·Pages 30/30·prototype 908단언 |
+| M05 | Design System & Shared UI | 완료 — DOD-01~13, 오너 baseline 9/9, 수동 E1 0/4 M10 이관 | implementation `f039bb8`·runtime `1608c26`, CI/Pages success, public 30/30·908단언 |
 | M06 | Tutorial & Lab | 미시작 | 튜토리얼 6 + Lab 48 전체 플레이 가능 |
 | M07 | Daily & Archive | 미시작 | 날짜 결정성·streak·archive 회귀 |
 | M08 | Sprint | 미시작 | 180초 절대 종료·점수 재현 |
@@ -127,6 +128,7 @@
 | 2026-08-26 | M05 | ADR-0011 DOD-03~04 keyboard·입력 원자성 E3 | `npm run test:e2e -- tests/e2e/keyboard-core.spec.ts` | **PASS** — Chromium·Firefox·WebKit 9/9; Theme→Motion 버튼 focus 순서, pointer/shortcut/repeat coalescing, reset focus 복귀, result heading focus | `tests/e2e/keyboard-core.spec.ts` |
 | 2026-08-29 | M05 | 제출 URL adapter 포함 최종 로컬 자동 회귀 | global unit + boundary/static a11y + lint/format/typecheck + build/Pages artifact + Pages 3브라우저 + prototype smoke + `npm run verify` | **PASS** — unit 30 files/180; boundary 83/150/0/0; static 36/8/0; build 46 modules CSS 10.49kB gzip 3.03, JS 234.56kB gzip 75.20; Pages 14 files/353631 bytes/prototype 10·30/30; prototype browser 908; verify required 22 missing 0 steps 12 | `phases/M05_design_system.md` §10 |
 | 2026-08-29 | M05 | 수동 E1·오너 visual 승인 | Android 실기기·실제 SR·200% zoom·색각 시뮬레이션 + baseline 9종 검토 | **CHECKPOINT ACCEPTED** — 프로젝트 오너 9/9 승인; manual 0/4는 `NOT RUN`·`DEFERRED_TO_M10`이며 PASS/면제 아님 | `phases/M05_design_system.md` §9~10, ADR-0012 |
+| 2026-08-29 | M05 | fixed-SHA 원격 E4·공개 제출 URL 호환 | implementation `f039bb8088d35df91ef393a9b226f22481981ca3` → runtime/main `1608c26cf4e8d3ca6be2c3765b20fb00bc7b06b9` → CI·Pages → 공개 3엔진·browser smoke | **PASS** — CI `33207406441`, Pages `33207406497` success; remote visual 15 PASS+tablet 3 explicit SKIP; public Pages 30/30; `https://jtech-co.github.io/axis-shift/prototypes/rule-proof/` 908단언·external 0·console 0 | `phases/M05_design_system.md` §10 |
 | 2026-08-09 | 문서 준비 | Harness completeness | 파일 구조·내부 참조 검증 | 생성 완료 | 이 패키지 `MANIFEST.sha256` |
 | 2026-08-21 | M03 | DOD-01·07 PRNG/브라우저 parity E3 | generator unit + `npm run test:e2e -- tests/e2e/generator-parity.spec.ts` | generator 14/14; seed 20×100 + Daily golden 20, Chromium·Firefox·WebKit 9/9; UTC·서울·LA 시간대 프로세스 3개 × 프로세스별 반복 10, hash mismatch 0 | `src/domain/generator/*.test.ts`, `tests/e2e/generator-parity.spec.ts` |
 | 2026-08-26 | M03 | DOD-02·03 정적 콘텐츠 E3 | 후보 생성 + fail-closed level validator | levels=54, tutorial=6, Lab=48, chapter별=12; rank/solution/tag checks=68/68/68; validatorSelfChecks=22; idChanges=0, failures=0; catalogHash=`c625d543…1738484`; approvalFingerprint=`5a60604a…b7e6a`; `curation=preserved` | `src/content/`, `scripts/lib/curation-evidence.ts`, `evidence/M03/content-curation-v1.md` |
@@ -173,8 +175,8 @@
 ### M05 최신 검증 출력
 
 ```text
-status=READY_FOR_PUBLIC_CLOSE; automated E2/E3=PASS; manual E1=0/4 DEFERRED_TO_M10; projectOwnerFull9=APPROVED
-candidate=codex/m05-design-system working tree; implementation commit/push/Pages run=pending this turn
+status=COMPLETE; DOD-01~13=PASS; automated E2/E3=PASS; manual E1=0/4 DEFERRED_TO_M10; projectOwnerFull9=APPROVED
+implementation=f039bb8088d35df91ef393a9b226f22481981ca3; finalRuntimeAndDeployHead=1608c26cf4e8d3ca6be2c3765b20fb00bc7b06b9; CI=33207406441 success; Pages=33207406497 success
 focused component+fixture unit: files=7 tests=33 failures=0
 global unit: files=30 tests=180 failures=0
 design tokens: files=16 color=0 spacing=0 radius=0 duration=0 exceptionAnnotations=13
@@ -182,17 +184,19 @@ token annotations: calculation=2 transparency=2 mediaQueryBreakpoints=9
 axe: tests=18/18 serious=0 critical=0 externalRequests=0 matrix=8states+longCopy+system3+light3+reducedMotion3
 visual update+no-update: tests=18/18 baselines=9 fullFixture=true viewports=5 themes=dark/light/system contrastPairs=AA maxDiffPixels=0 threshold=0 actualDiff=0
 visual review: Codex representative=3/3 PASS projectOwnerFull9=APPROVED on 2026-08-29
+visual remote CI: structural+mobile/desktop snapshots=15 PASS; tablet snapshots=3 explicit SKIP for non-portable GitHub Windows system-font metrics
 keyboard: chromium+firefox+webkit tests=9/9
 boundaries: files=83 edges=150 violations=0 cycles=0
 static a11y: files=36 interactiveTargets=8 failures=0
 build: modules=46 CSS=10.49kB gzip=3.03kB JS=234.56kB gzip=75.20kB
 lint=pass formatCheck=pass typecheck=pass diffCheck=pass
 verify: scriptContract required=22 missing=0 passedSteps=12
-Pages local: artifact files=14 bytes=353631 prototypeFiles=10; chromium+firefox+webkit=30/30; submitted URL adapter local browserAssertions=908 externalRequests=0 consoleErrors=0; remote pending
+Pages local: artifact files=14 bytes=353631 prototypeFiles=10; chromium+firefox+webkit=30/30; submitted URL adapter local browserAssertions=908 externalRequests=0 consoleErrors=0
+public: Pages chromium+firefox+webkit=30/30; https://jtech-co.github.io/axis-shift/prototypes/rule-proof/ browserAssertions=908 externalRequests=0 consoleErrors=0
 manual: Android Chrome=NOT RUN screenReader=NOT RUN zoom200=NOT RUN colorVision=NOT RUN; all DEFERRED_TO_M10
 ```
 
-ADR-0011 변경분과 제출 URL appearance adapter의 local 자동 E2/E3는 PASS했다. M05 React UI는 아직 실제 feature controller가 아니므로 제출 URL은 기존 playable H00 game과 18개 신호를 보존한다. fixed-SHA·원격 Pages·공개 URL smoke 뒤 checkpoint를 닫는다. Playwright·axe·OS forced-colors는 이관된 수동 E1 4종을 대체하지 않는다.
+ADR-0011 변경분과 제출 URL appearance adapter는 local 자동 E2/E3, 고정 SHA 원격 CI·Pages, 실제 공개 URL smoke를 통과했다. M05 React UI는 아직 실제 feature controller가 아니므로 제출 URL은 기존 playable H00 game과 18개 신호를 보존하면서 Theme/Motion 계약만 갱신했다. 이 증거로 M05 checkpoint를 닫는다. Playwright·axe·OS forced-colors는 이관된 수동 E1 4종을 대체하지 않는다.
 
 ### M04 최신 검증 출력
 
@@ -429,3 +433,4 @@ STOP 발동 시 아래 형식으로 추가한다.
 - 2026-08-26: M04에서 append-only action ledger, `TIMER_TICK` high-water, `WeakSet` completion provenance, Hint cap·best tuple, issued-ledger ID service, 네 v1 storage root와 canonical ready/paused normalization·격리·부분 복구를 고정했다. focused 12파일 92테스트와 migration 3테스트, aggregate B98.79%·per-file branch 11/11, global 23파일 147테스트, 정적 gate와 `npm run verify`(scriptContract 19/19, steps 10/10)를 통과해 DOD-01~13을 닫았다. commit `95fbff2b4bff261ff16784099dc2a02df7473069`는 `origin/codex/m04-session-persistence-scoring`에 push됐고 PR은 없다. M06은 ID singleton·crypto source와 실제 UI·visibility·reload, M07은 UTC Daily·streak·Archive, M08은 Sprint 산식을 맡는다.
 - 2026-08-29: M05 자동 E2/E3와 오너 visual baseline 9/9를 checkpoint exit evidence로 승인했다. Android 실기기·실제 스크린리더·200% zoom·색각 시뮬레이션은 0/4 `NOT RUN`이며 ADR-0012에 따라 M10의 blocking gate로 이관한다. 제출 URL은 M05 React fixture로 대체하지 않고 playable H00에 Theme/Motion adapter를 이식한다.
 - 2026-08-29: 프로젝트 오너는 [ADR-0011](decisions/0011-appearance-cycle-controls.md)의 Theme·Motion 계약과 full-fixture baseline 9/9를 승인했다. [ADR-0012](decisions/0012-m05-checkpoint-manual-evidence-deferral.md)는 수동 E1 0/4를 M10으로 이관하되 PASS나 면제로 재분류하지 않는다.
+- 2026-08-29: implementation `f039bb8088d35df91ef393a9b226f22481981ca3`와 최종 runtime/Pages head `1608c26cf4e8d3ca6be2c3765b20fb00bc7b06b9`가 원격 CI `33207406441`·Pages `33207406497`를 통과했다. 공개 Pages 3엔진 30/30과 제출 URL `https://jtech-co.github.io/axis-shift/prototypes/rule-proof/` 908단언·외부 요청/콘솔 오류 0을 확인해 M05를 완료했다. M05 fixture는 production controller로 승격하지 않았고 playable H00에 Theme/Motion adapter만 적용했다.

@@ -1,7 +1,7 @@
 # AXIS//SHIFT 요구사항 추적표
 
 **버전**: 1.0.0  
-**상태**: M00·M01·M02·M03·M04 verified / M05 automated E2/E3 PASS·owner baseline 9/9 approved·manual E1 0/4 deferred to M10 / H00 v0.1 submission slice verified
+**상태**: M00·M01·M02·M03·M04·M05 verified / M05 manual E1 0/4 deferred to M10 / H00 v0.1 submission slice verified
 **최종 갱신**: 2026-08-29
 
 > 기능 요구사항 ID는 기술 백서 §2.2.2를 따른다. `NFR-*`는 백서의 성능·접근성·배포·개인정보 기준을 하네스에서 추적 가능하게 부여한 ID다. 이 표가 새로운 제품 요구를 만드는 것은 아니며, 원문 기준의 검증 경로를 연결한다.
@@ -67,7 +67,7 @@
 
 > **M04 완료 증거 (2026-08-26)**: append-only action ledger·원자 PULSE·완료 event, `TIMER_TICK` high-water, pre-start canonical `ready`와 started-unsolved `paused` normalization, exact ledger cardinality·paused clock equality, Hint cap·best tuple, `WeakSet` provenance, canonical UTC year≥1, null-prototype Lab map, 네 v1 root와 quarantine backup-before-delete·128회 collision 탐색·progress salvage primary 재저장을 구현했다. `IdGenerator` issued ledger의 seed·reserve·retry·exhaustion과 Reset 후 별도 Daily progress root 보존도 검증했다. focused M04는 12파일/92테스트, migration 3/3, M04 aggregate S98.90/B98.79/F100/L98.95와 per-file branch 11/11(최저 95.45%), global 23파일/147테스트 S93.06/B91.81/F97.61/L94.31이며 lint·format·typecheck·boundaries와 `npm run verify`(scriptContract 19/19, steps 10/10)도 통과했다. milestone commit `95fbff2b4bff261ff16784099dc2a02df7473069`는 원격 `codex/m04-session-persistence-scoring`에 push됐고 PR은 만들지 않았다. 이로 storage service 자체인 NFR-STORAGE-001은 `Verified`지만 `IdGenerator` singleton·crypto source, 실제 UI token·Page Visibility·reload·Result 저장은 M05·M06, UTC Daily·streak·Archive는 M07에 남아 NFR-ID-001과 FR-CORE-003~007·FR-HINT-001·FR-DAILY-002·NFR-TIME-001·NFR-SCORE-001은 `In Progress`다. Sprint 산식은 M08 범위다.
 
-> **M05 ADR-0011/0012 체크포인트 증거 (2026-08-29)**: Theme은 기본 `dark`에서 `dark → light → system → dark`, Motion은 기본 `system`에서 `system ↔ reduced`로 동작하며 custom high-contrast option/token/baseline은 없다. OS forced-colors·`highContrastCells`·legacy `high-contrast → dark` 정규화는 유지한다. focused 7파일/33테스트, global 30파일/180테스트, token 16파일·hardcode 0·예외 13, axe 18/18, visual 18/18·baseline 9·diff 0, keyboard 3엔진, boundary/static a11y/build가 통과했고 오너가 baseline 9/9를 승인했다. Pages 후보는 14 files·353631 bytes·prototypeFiles 10, 3엔진 30/30이며 제출 URL용 playable H00 adapter는 908단언·외부 요청/콘솔 오류 0이다. Android·실제 screen reader·200% zoom·color vision은 0/4 `NOT RUN`·`DEFERRED_TO_M10`으로 PASS/면제가 아니다. fixed commit·원격 Pages·공개 URL smoke는 M05 phase와 PROGRESS에 별도 기록한다.
+> **M05 완료 증거 (2026-08-29)**: Theme은 기본 `dark`에서 `dark → light → system → dark`, Motion은 기본 `system`에서 `system ↔ reduced`로 동작하며 custom high-contrast option/token/baseline은 없다. OS forced-colors·`highContrastCells`·legacy `high-contrast → dark` 정규화는 유지한다. focused 7파일/33테스트, global 30파일/180테스트, token 16파일·hardcode 0·예외 13, axe 18/18, local visual 18/18·baseline 9·diff 0, keyboard 3엔진, boundary/static a11y/build가 통과했고 오너가 baseline 9/9를 승인했다. implementation `f039bb8088d35df91ef393a9b226f22481981ca3`, runtime/Pages `1608c26cf4e8d3ca6be2c3765b20fb00bc7b06b9`, CI `33207406441`·Pages `33207406497` success이며 remote visual은 15 PASS+tablet 3 explicit SKIP이다. 공개 Pages 30/30과 `https://jtech-co.github.io/axis-shift/prototypes/rule-proof/` 908단언·외부 요청/콘솔 오류 0을 확인했다. Android·실제 screen reader·200% zoom·color vision은 0/4 `NOT RUN`·`DEFERRED_TO_M10`으로 PASS/면제가 아니다. 이 완료는 M06 이후가 남은 개별 FR/NFR 행을 조기 `Verified`로 승격하지 않는다.
 
 ## 4. H00 해커톤 제출 슬라이스 추적
 

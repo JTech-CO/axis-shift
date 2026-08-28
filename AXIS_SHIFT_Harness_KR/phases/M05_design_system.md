@@ -1,6 +1,6 @@
 # M05 — Design System & Shared Game UI ★
 
-- **상태**: 종료 후보 — 자동 E2/E3 PASS·프로젝트 오너 baseline 9/9 승인, 수동 E1 0/4는 ADR-0012에 따라 M10 이관; public Pages smoke 대기
+- **상태**: 완료 — DOD-01~13 PASS; 자동 E2/E3·오너 baseline 9/9·고정 SHA 원격 CI/Pages·공개 제출 URL smoke 통과, 수동 E1 0/4는 ADR-0012에 따라 M10 release-blocking gate로 이관
 - **담당 범위**: 토큰, 레이아웃, 공통 컴포넌트, TensorGrid, 축 입력, 접근성·반응형 fixture
 - **최종 갱신**: 2026-08-29
 
@@ -134,8 +134,8 @@ Playwright viewport·axe·theme/motion 결과와 OS forced-colors 지원은 각�
 ## 10. 증거
 
 ```text
-status=READY_FOR_PUBLIC_CLOSE; automated E2/E3=PASS; manual E1=0/4 DEFERRED_TO_M10; projectOwnerFull9=APPROVED
-candidate=codex/m05-design-system working tree; implementation commit/push/Pages run=pending this turn
+status=COMPLETE; DOD-01~13=PASS; automated E2/E3=PASS; manual E1=0/4 DEFERRED_TO_M10; projectOwnerFull9=APPROVED
+implementation=f039bb8088d35df91ef393a9b226f22481981ca3; runtimeAndPagesEvidenceHead=1608c26cf4e8d3ca6be2c3765b20fb00bc7b06b9; deployedMainAtEvidence=1608c26cf4e8d3ca6be2c3765b20fb00bc7b06b9
 focused component+fixture unit: files=7 tests=33 failures=0
 global unit: files=30 tests=180 failures=0
 design tokens: files=16 color=0 spacing=0 radius=0 duration=0 exceptionAnnotations=13
@@ -145,6 +145,7 @@ axe matrix: 8 states + long-copy + system 3 + light 3 + reduced-motion 3
 visual update+no-update: tests=18/18 baselines=9 full-fixture viewports=5 themes=dark/light/system contrastPairs=AA
 visual strict no-update: maxDiffPixels=0 threshold=0 actualDiff=0
 visual review: Codex representative 3/3 PASS; project-owner full 9=APPROVED on 2026-08-29
+visual remote CI: structural+mobile/desktop snapshots=15 PASS; tablet snapshots=3 explicit SKIP because GitHub Windows system-font metrics are non-portable; local owner-approved tablet remains strict
 keyboard: chromium+firefox+webkit tests=9/9
 boundaries: files=83 edges=150 violations=0 cycles=0
 static a11y: files=36 interactiveTargets=8 failures=0
@@ -153,14 +154,16 @@ lint=pass formatCheck=pass typecheck=pass diffCheck=pass
 verify: scriptContract required=22 missing=0 passedSteps=12
 Pages local: artifact files=14 bytes=353631 prototypeFiles=10; Chromium+Firefox+WebKit=30/30
 submitted URL adapter local: H00 campaign browserAssertions=908 externalRequests=0 consoleErrors=0
-Pages remote workflow and public submitted-URL smoke=pending this turn
+remote: CI run=33207406441 success; Pages run=33207406497 success headSha=1608c26cf4e8d3ca6be2c3765b20fb00bc7b06b9; public Pages Chromium+Firefox+WebKit=30/30; public submitted URL https://jtech-co.github.io/axis-shift/prototypes/rule-proof/ browserAssertions=908 externalRequests=0 consoleErrors=0
 manual: Android Chrome=NOT RUN screenReader=NOT RUN zoom200=NOT RUN colorVision=NOT RUN; all DEFERRED_TO_M10
 ```
 
-ADR-0011 변경분과 제출 URL appearance adapter를 포함한 focused·global·token·axe·visual·keyboard·boundary·static a11y·build·Pages artifact·prototype browser smoke는 현재 working tree에서 통과했다. M05 React fixture는 아직 실제 feature controller가 아니므로 공개 URL은 기존 playable H00 game을 유지한다. fixed commit·원격 Pages·공개 URL smoke가 끝나면 checkpoint를 최종 닫는다.
+ADR-0011 변경분과 제출 URL appearance adapter를 포함한 focused·global·token·axe·visual·keyboard·boundary·static a11y·build·Pages artifact·prototype browser smoke는 고정 SHA와 실제 공개 URL에서 통과했다. M05 React fixture는 아직 실제 feature controller가 아니므로 공개 URL은 기존 playable H00 game을 유지하면서 Theme/Motion만 최신 계약으로 교체했다. 이 증거로 M05 checkpoint를 닫는다.
 
 strict 0-pixel visual 첫 재실행은 transparent backdrop blur가 rounded button corner의 한 color channel을 비결정적으로 바꿔 mobile에서 2/18, 이어 tablet에서 3/18 실패했다. fixture toolbar 배경을 opaque canvas token으로 고정하고 baseline을 재생성한 뒤 동일 무갱신 명령이 18/18, `maxDiffPixels=0`, threshold 0, diff 0으로 통과했다.
 최종 keyboard 재실행의 첫 시도는 일반 빌드가 만든 `dist` 뒤에서 Playwright programmatic Vite build가 canonical preclean 계약을 우회해 Windows native cleanup 종료 코드 `3221226505`로 중단됐다. `start-e2e-server.ts`도 검증된 `cleanBuildOutput() + emptyOutDir=false` 경로를 사용하게 수정한 뒤 Chromium·Firefox·WebKit `9/9`와 전체 `verify 12/12`를 통과했다.
+첫 원격 CI visual은 local Windows baseline과 GitHub Windows system-font rasterization 차이로 9 snapshot이 실패했고, 두 번째·세 번째 시도는 tablet 높이·font metric 차이 3건을 재현했다. 임계치를 6%로 완화하지 않고 local strict 18/18·오너 승인 9/9를 유지했으며, remote는 구조·접근성·mobile/desktop snapshot 15 PASS와 tablet snapshot 3개 명시적 SKIP을 분리해 run `33207406441`에서 성공했다.
+
 
 
 ## 11. 롤백 계획
@@ -190,4 +193,4 @@ strict 0-pixel visual 첫 재실행은 transparent backdrop blur가 rounded butt
 - 모바일·desktop 레이아웃 계약
 - 키보드·focus·ARIA 규칙
 
-presentational component API와 ADR-0011 appearance fixture, 자동 E2/E3, 오너 9/9 승인은 M06가 조합할 수 있는 형태로 준비됐다. 수동 E1 0/4는 ADR-0012에 따라 M10으로 이관했으며, public Pages smoke 후 M05 checkpoint를 닫고 M06 DoR를 판정한다.
+presentational component API와 ADR-0011 appearance fixture, 자동 E2/E3, 오너 9/9 승인, 원격 CI·Pages와 공개 제출 URL smoke가 모두 준비돼 M05 checkpoint를 닫았다. M06는 선행 M05 조건만 충족했으며, 나머지 DoR를 별도로 확인한 뒤 실제 feature controller 조합을 시작한다. 수동 E1 0/4는 ADR-0012에 따라 M10 release-blocking gate로 남는다.
