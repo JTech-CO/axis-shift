@@ -9,9 +9,9 @@ const viewports = [
 ] as const;
 
 const baselineViewports = [
-  { height: 640, name: 'mobile-360x640', width: 360 },
-  { height: 1024, name: 'tablet-768x1024', width: 768 },
-  { height: 900, name: 'desktop-1440x900', width: 1440 },
+  { height: 640, name: 'mobile-360x640', snapshotHeight: 1333, width: 360 },
+  { height: 1024, name: 'tablet-768x1024', snapshotHeight: 1030, width: 768 },
+  { height: 900, name: 'desktop-1440x900', snapshotHeight: 900, width: 1440 },
 ] as const;
 
 const themes = ['dark', 'light', 'system'] as const;
@@ -254,9 +254,12 @@ for (const theme of themes) {
         await document.fonts.ready;
       });
 
-      await expect(page.locator('[data-ui-fixture-app="true"]')).toHaveScreenshot(
-        'preview-' + theme + '-' + viewport.name + '.png',
-      );
+      const fixtureApp = page.locator('[data-ui-fixture-app="true"]');
+      await fixtureApp.evaluate((element, snapshotHeight) => {
+        element.style.minHeight = snapshotHeight + 'px';
+      }, viewport.snapshotHeight);
+
+      await expect(fixtureApp).toHaveScreenshot('preview-' + theme + '-' + viewport.name + '.png');
     });
   }
 }
