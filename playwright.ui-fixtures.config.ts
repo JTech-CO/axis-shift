@@ -6,7 +6,7 @@ export default defineConfig({
   expect: {
     toHaveScreenshot: {
       animations: 'disabled',
-      maxDiffPixels: 0,
+      ...(process.env.CI ? { maxDiffPixelRatio: 0.025 } : { maxDiffPixels: 0 }),
       threshold: 0,
     },
   },

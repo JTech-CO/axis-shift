@@ -11,7 +11,15 @@ function monitorPageErrors(page: Page): string[] {
 
 async function expectSuccessfulNavigation(page: Page, relativeUrl: string): Promise<void> {
   const response = await page.goto(relativeUrl);
-  expect(response?.status()).toBe(200);
+  if (response) {
+    expect(response.status()).toBe(200);
+    return;
+  }
+
+  const finalDocumentUrl = new URL(page.url());
+  finalDocumentUrl.hash = '';
+  const documentResponse = await page.request.get(finalDocumentUrl.toString());
+  expect(documentResponse.status()).toBe(200);
 }
 
 test('keeps the public root on the playable M00 prototype', async ({ page }) => {
