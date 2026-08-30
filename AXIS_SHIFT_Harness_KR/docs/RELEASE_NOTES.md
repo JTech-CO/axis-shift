@@ -1,9 +1,9 @@
 # AXIS//SHIFT Release Notes
 
-**상태**: `v0.1.0-hackathon` released·해커톤 제출 완료 확인 / M05 post-submission compatibility deployed / v1.0.0 계획
-**최종 갱신**: 2026-08-29
+**상태**: `v0.1.0-hackathon`·H00 제출·M05 호환 배포는 역사 기록 / 다음 일반 공개 웹게임 릴리스 식별·일정·채널 `TBD`
+**최종 갱신**: 2026-08-30
 
-> H00 항목만 현재 해커톤 프로토타입을 나타낸다. 아래 v1.0.0 절은 계속 `Planned`이며 H00 제출 문구로 인용하지 않는다.
+> H00 항목은 완료된 해커톤 프로토타입의 사실 기록이며 tag·SHA·URL·수치를 변경하지 않는다. 아래 일반 공개 릴리스 계획은 `Planned`이고, 버전·날짜·채널·canonical URL/도메인·라이선스는 프로젝트 오너 승인 전까지 `TBD`다. H00 제출 문구·양식·자산을 정규 출시 증거로 재사용하지 않는다.
 
 ## v0.1.0-hackathon — Release record
 
@@ -71,9 +71,9 @@
 - H00은 M00 기반 폐기 가능한 정적 프로토타입이며 M02~M11 완료를 뜻하지 않는다.
 - 18개 고정 signal은 Lab 48이 아니며 고정 signal 이후 랜덤 반복을 제공한다.
 - 저장·계정·동기화·분석이 없고 진행 정보는 서버로 전송되지 않는다.
-- `UNLICENSED`/All Rights Reserved 상태를 유지하며 공개 오픈소스 라이선스는 M11 전에 별도 오너 결정한다.
+- H00은 `UNLICENSED`/All Rights Reserved 상태로 릴리스됐다. 다음 일반 공개 릴리스의 라이선스·권리 정책은 프로젝트 오너 승인 전까지 `TBD`다.
 
-## Post-submission compatibility update — M05
+## H00 post-submission compatibility update — M05 (historical)
 
 `v0.1.0-hackathon` tag·release·capture SHA `6690f5778f706e1875b452d552bd75ba1c06ee9a`는 변경하지 않았다. 제출 링크를 계속 플레이 가능하게 유지하기 위한 Pages 호환 업데이트만 다음과 같이 별도 배포했다.
 
@@ -85,19 +85,24 @@
 - local visual strict 18/18·오너 baseline 9/9, remote visual 15 PASS+tablet 3 explicit SKIP
 - Android Chrome·실제 screen reader·200% zoom·색각 시뮬레이션은 0/4 `NOT RUN`이며 ADR-0012에 따라 M10 release-blocking gate로 남는다.
 
-## v1.0.0 — Planned
+## Next public web-game release — Planned (identity TBD)
 
 ### Release metadata
 
 | 항목 | 값 |
 |---|---|
-| Release date | 예정 |
-| Tag | 예정: `v1.0.0` |
-| Commit SHA | M11에서 입력 |
-| Gameplay URL | M11에서 입력 |
-| Build artifact SHA-256 | M11에서 입력 |
-| Generator version | 예정: `v1` |
-| Storage schema | 예정: `v1` |
+| Release version / tag | `TBD` — 프로젝트 오너 승인 필요 |
+| Release date | `TBD` — 프로젝트 오너 승인 필요 |
+| Release channel | `TBD` — production·preview 등 실제 승격 채널 기록 |
+| Canonical gameplay URL / domain | `TBD` — 승인된 GitHub Pages path 또는 도메인 기록 |
+| Owner-approved RC freeze SHA | `TBD` |
+| Final commit SHA | `TBD` |
+| Build artifact SHA-256 / manifest | `TBD` |
+| Generator version | M03 승인 결과와 실제 build 대조 후 기록 |
+| Storage schema | 실제 build 대조 후 기록 |
+| License / rights policy | `TBD` — 공개 OSS 여부 포함 |
+| Support / feedback channel | `TBD` |
+| Promotion / rollback owner | `TBD` |
 | QA decision | NOT EVALUATED |
 
 ### Product summary
@@ -146,7 +151,7 @@ AXIS//SHIFT는 행과 열을 선택해 교차점의 셀을 반전하고 목표 �
 - deterministic versioned Daily generator
 - no backend·runtime AI API·remote analytics
 
-### Known limitations planned for v1.0
+### Known limitations planned for the next public release
 
 - 기록은 현재 browser의 LocalStorage에만 저장된다.
 - 기기 간 동기화·계정·친구·global leaderboard가 없다.
@@ -154,9 +159,9 @@ AXIS//SHIFT는 행과 열을 선택해 교차점의 셀을 반전하고 목표 �
 - offline Daily는 기기 clock을 신뢰하며 clock 조작을 막지 않는다.
 - Web Share file 지원은 browser마다 달라 text/clipboard fallback을 사용한다.
 - 결과 grade는 개인 성취 지표이며 server-verified competition이 아니다.
-- v1 보드는 정사각 3×3~6×6이고 binary cell만 지원한다.
+- 최초 일반 공개 범위의 보드는 정사각 3×3~6×6이고 binary cell만 지원한다.
 
-### Privacy plan
+### Privacy, local data, and support plan
 
 - 계정·이메일·닉네임·위치 수집 없음
 - cookie 없음
@@ -164,6 +169,9 @@ AXIS//SHIFT는 행과 열을 선택해 교차점의 셀을 반전하고 목표 �
 - external runtime API 없음
 - 진행도·설정은 local browser에 저장
 - 공유 결과에 사용자 식별자·정답 board·raw move 없음
+- LocalStorage 데이터 확인·초기화 방법을 About/Privacy와 README에 안내
+- support/feedback 채널과 담당자는 출시 전 확정하며 불필요한 개인정보를 요구하지 않음
+- feedback 수집·보관 범위와 공개 issue에 올리면 안 되는 정보를 사용자에게 안내
 
 ### Verification to attach
 
@@ -173,20 +181,30 @@ AXIS//SHIFT는 행과 열을 선택해 교차점의 셀을 반전하고 목표 �
 - browser/device/accessibility matrix
 - PWA offline/update smoke
 - performance·bundle report
-- production URL smoke
+- owner-approved RC의 full CI와 release artifact manifest
+- actual production URL post-deploy smoke와 Daily golden hash
+- service worker를 포함한 마지막 green rollback rehearsal
+- license/assets/privacy/support/operations handoff 대조
+
+### Launch and operations gate
+
+- 프로젝트 오너가 고정 RC commit과 feature/dependency freeze를 승인한다.
+- required CI가 green인 동일 SHA의 artifact만 production 채널로 승격한다.
+- manifest에 release identity, commit, build 환경과 파일별 SHA-256을 기록한다.
+- 외부 네트워크·새 프로필·mobile 상당 환경에서 canonical URL, route, offline/update를 post-deploy smoke한다.
+- 마지막 green artifact와 rollback trigger·승인자·명령·support 공지 경로를 검증한다.
+- support/feedback, privacy/local data, license/assets와 운영 접근 권한의 인계를 완료한다.
 
 ## Version history
 
 | Version | Status | Summary |
 |---|---|---|
 | 0.1.0-hackathon | Released prerelease | 18 signal·AXIS/PULSE 공개 프로토타입 |
-| 1.0.0 | Planned | 최초 공개 release·hackathon submission 목표 |
-| 1.0.0-rc.1 | Future | M10 QA용 release candidate |
-| 1.0.0-preview.1 | Future | 내부·플레이테스트 preview |
+| TBD | Planned | 마일스톤 완결·M10 QA·M11 일반 공개 출시 승인 후 식별 |
 
 태그는 이동·덮어쓰기하지 않는다. 수정 build는 새 version/tag를 만든다.
 
-## Post-v1 backlog — Not committed
+## Post-launch backlog — Not committed
 
 - 추가 Lab pack·season Daily
 - 선택적 privacy-preserving analytics
@@ -196,15 +214,16 @@ AXIS//SHIFT는 행과 열을 선택해 교차점의 셀을 반전하고 목표 �
 - multi-state cell
 - 별도 3D tensor experiment
 
-이 목록은 v1.0 약속이 아니며 새 ADR·phase·범위 승인 없이 구현하지 않는다.
+이 목록은 다음 공개 릴리스 약속이 아니며 새 ADR·phase·범위 승인 없이 구현하지 않는다.
 
 ## Release 작성 규칙
 
 실제 릴리스 시:
 
-1. `Planned` 표현을 실제 상태로 교체한다.
-2. 구현되지 않은 기능은 숨기지 않고 `Deferred`로 이동한다.
-3. QA 수치·known issue·P2 waiver를 기록한다.
-4. tag·SHA·URL·artifact hash를 입력한다.
-5. asset/license·privacy 내용이 실제 build와 일치하는지 대조한다.
-6. 제출 당시 notes를 이후 버전으로 덮어쓰지 않는다.
+1. 프로젝트 오너가 승인한 버전·날짜·채널·canonical URL/도메인·라이선스만 기록하고 모든 `TBD`를 해소한다.
+2. `Planned` 표현을 실제 shipped/deferred 상태로 교체하고 구현되지 않은 기능을 숨기지 않는다.
+3. QA 수치·known issue·P2 waiver를 고정 RC commit과 연결한다.
+4. tag·SHA·URL·artifact manifest·배포 run·post-deploy smoke를 입력한다.
+5. asset/license·privacy/local data·support/feedback 내용이 실제 build와 일치하는지 대조한다.
+6. rollback rehearsal과 production promotion·운영 인계 증거를 연결한다.
+7. H00 제출 당시 notes·tag·SHA·URL·수치를 이후 버전으로 덮어쓰지 않는다.

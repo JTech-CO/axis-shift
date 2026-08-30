@@ -1,14 +1,14 @@
 # AXIS//SHIFT Release Checklist
 
 **문서 버전**: 1.0.0  
-**상태**: H00 v0.1 릴리스·해커톤 제출 완료 확인 / M10·M11 v1 체크 미실행
-**최종 갱신**: 2026-08-26
+**상태**: H00 v0.1 릴리스·해커톤 제출 완료 역사 보존 / 일반 공개 출시 M10·M11 게이트 미실행·출시 식별 `TBD`
+**최종 갱신**: 2026-08-30
 
 > 체크박스가 비어 있으면 미검증이다. “해당 없음”은 이유와 승인자를 기록해야 하며, 불변식·P0/P1 항목에는 사용할 수 없다.
 
 ## H00 v0.1 해커톤 프로토타입 부록
 
-> 이 부록은 ADR-0010의 제한된 H00 릴리스만 다룬다. 아래 M10·M11 v1.0 체크박스를 완료 처리하거나 M02~M11 완료를 뜻하지 않는다.
+> 이 부록은 ADR-0010의 제한된 H00 릴리스만 다룬다. 아래 일반 공개 출시 M10·M11 체크박스를 완료 처리하거나 M02~M11 완료를 뜻하지 않는다.
 
 - [x] M00 종료 기록과 H00 구현을 별도 commit으로 고정했다.
 - [x] PR #1에서 18 signal campaign과 AXIS/PULSE vertical slice를 검토·병합했다.
@@ -23,21 +23,29 @@
 - [x] final CI `32453169036`, Pages `32453169029`, artifact digest `sha256:07a222cc7af5ad221e3d4be3524f53992cdf01823e6af56b7723c00282671998`와 공개 browser 891·외부 요청/콘솔 오류 0으로 DOD-09를 통과했다.
 - [x] `v0.1.0-hackathon` annotated remote tag와 GitHub prerelease가 SHA `6690f577…`를 가리키는지 대조했다.
 - [x] source·Pages archive, 14-entry `MANIFEST.sha256`와 제출 자산을 primary `.private/submission/H00` 및 사용자 Documents `v0.1.0-hackathon`에 각 15 files로 백업하고 hash delta 0을 확인했다.
-- [x] H00 phase·PROGRESS·traceability를 완료 상태로 고정했고, 이후 프로젝트 오너의 공식 Google 양식 제출 완료 확인을 기록했다. 이는 아래 M10·M11 v1.0 제출 게이트를 완료 처리하지 않는다.
+- [x] H00 phase·PROGRESS·traceability를 완료 상태로 고정했고, 이후 프로젝트 오너의 공식 Google 양식 제출 완료 확인을 기록했다. 이는 아래 M10·M11 일반 출시 게이트를 완료 처리하지 않는다.
 - [x] 비공개 제출 원자료는 Git에 넣지 않았다. 제출 완료로 정리 조건은 충족했지만 삭제 권한은 별도로 부여되지 않았으므로 오너의 명시적 정리 결정 전까지 보존한다.
 
-현재 공개 자산과 공식 양식 값은 `SUBMISSION_PACKAGE.md`, 자산 권리는 `ASSET_LICENSES.md`, 실제 기능은 `RELEASE_NOTES.md`를 단일 대조 기준으로 사용한다.
+H00 공개 자산과 공식 양식 값은 보관된 `SUBMISSION_PACKAGE.md`를, 자산 권리는 `ASSET_LICENSES.md`를, 실제 기능은 `RELEASE_NOTES.md`를 대조 기준으로 사용한다. `SUBMISSION_PACKAGE.md`는 정규 M11의 입력·게이트·승인 증거에서 제외한다.
 
-## 0. 릴리스 식별
+## 0. 일반 공개 출시 식별
 
-- Release candidate: M10에서 입력
-- Commit SHA: M10에서 입력
-- Production URL: M10에서 입력
-- Generator version: M03에서 입력
-- Storage schema: v1 예정
+- Release version / tag: `TBD` — 프로젝트 오너 승인 전 임의 지정 금지
+- Release date: `TBD` — 프로젝트 오너 승인 전 임의 지정 금지
+- Release channel: `TBD` — production·preview 등 실제 승격 채널을 승인 후 기록
+- Canonical gameplay URL / domain: `TBD` — GitHub Pages repository path 또는 승인된 도메인을 기록
+- Release candidate / freeze commit: `TBD` — M10 QA를 통과하고 프로젝트 오너가 freeze한 고정 SHA
+- Final commit SHA: `TBD`
+- Build artifact SHA-256 / manifest: `TBD`
+- Generator version: M03 승인 결과와 대조 후 기록
+- Storage schema: 실제 build와 대조 후 기록
+- License / rights policy: `TBD` — 공개 OSS 여부를 포함해 프로젝트 오너 승인 필요
 - QA report: `QA_REPORT.md`
 - Release notes: `RELEASE_NOTES.md`
-- Submission package: `SUBMISSION_PACKAGE.md`
+- Support / feedback channel and owner: `TBD`
+- Production promotion / rollback owner: `TBD`
+
+출시 식별값 하나라도 `TBD`이면 M11 최종 `GO`를 선언하지 않는다. H00 tag·SHA·URL·제출 자산은 이 표의 빈칸을 채우는 값이 아니다.
 
 ## 1. 진입·동결
 
@@ -47,11 +55,15 @@
 - [ ] 활성 P0 0건
 - [ ] 활성 P1 0건
 - [ ] 승인 없는 P2 0건
-- [ ] 2026-08-21 이후 새 mode·규칙·대형 의존성 없음
-- [ ] 2026-08-23 이후 feature·dependency freeze 준수
-- [ ] freeze 이후 변경 파일이 P0/P1·문서·제출 자산 허용 목록과 연결됨
+- [ ] 출시 버전·날짜·채널·canonical URL/도메인·라이선스 정책을 프로젝트 오너가 승인함
+- [ ] M10 QA를 통과한 고정 commit을 프로젝트 오너가 RC로 승인하고 feature·dependency freeze 시작점을 기록함
+- [ ] freeze 이후 변경은 P0/P1 수정, 정확성·보안·접근성 수정, 문서·배포·운영 보완의 허용 목록과 연결됨
+- [ ] freeze 이후 변경마다 영향 범위 테스트와 required CI를 재실행하고 RC 승인자가 다시 판정함
 - [ ] Sprint 점수식과 tie-break를 사람이 승인하고 문서·golden vector에 고정
 - [ ] 공개 시작일·Archive 하한·기본 locale 정책을 사람이 승인
+- [ ] support/feedback 채널·담당자·공개 응답 범위가 확정됨
+- [ ] About/Privacy의 local data·삭제 방법·offline·analytics·권리 설명이 실제 build와 일치함
+- [ ] production 승격·post-deploy smoke·rollback·사고 대응의 운영 담당자와 접근 권한이 준비됨
 
 ## 2. Source·재현성
 
@@ -324,13 +336,14 @@
 
 ## 18. 자산·라이선스
 
-- [ ] repository LICENSE 최종 선택·commit
+- [ ] 공개 라이선스 또는 All Rights Reserved 정책을 프로젝트 오너가 승인하고 repository·package·About에 동일하게 기록
 - [ ] package dependency license report 확인
 - [ ] public/src asset inventory 생성
 - [ ] `ASSET_LICENSES.md`와 inventory 일치
 - [ ] 자산별 source·author·license·modification 기록
 - [ ] 사용권 불명확 자산 0
-- [ ] thumbnail·video 자산도 동일 검토
+- [ ] 게임 UI·icon·share card·README·일반 출시 홍보 자산도 동일 검토
+- [ ] H00 thumbnail·video는 역사 패키지에만 귀속되고 정규 출시 권리 증거로 재사용되지 않음
 - [ ] 제3자 상표·로고 무단 사용 없음
 - [ ] 생성형 자산 사용 시 도구·후처리·권리 메모
 - [ ] 삭제한 자산이 build/cache에 남지 않음
@@ -342,8 +355,12 @@
 - [ ] `npm run test:a11y`
 - [ ] `npm run test:visual`
 - [ ] `npm run build`
-- [ ] CI Pages artifact 생성
+- [ ] owner-approved RC commit의 required CI가 모두 green
+- [ ] production 승격은 승인된 RC SHA와 1:1인 CI Pages artifact만 사용
+- [ ] artifact manifest에 release 식별값, commit SHA, build 환경, 파일별 SHA-256을 기록
+- [ ] release manifest와 배포 run·environment URL을 변경 불가능한 증거로 보존
 - [ ] public URL 로그인 없이 접속
+- [ ] canonical URL·repository base·legacy 호환 URL의 역할이 문서와 실제 redirect/route에 일치
 - [ ] home route
 - [ ] Tutorial route
 - [ ] Lab route/direct level
@@ -352,10 +369,17 @@
 - [ ] Sprint route
 - [ ] Settings/About
 - [ ] unknown route 복구
+- [ ] manifest `start_url`·`scope`, service worker scope, Vite base 일치
+- [ ] fresh profile·기존 worker update·offline restart를 실제 production URL에서 검증
+- [ ] 외부 네트워크의 desktop·mobile 상당 환경에서 post-deploy smoke 실행
+- [ ] post-deploy smoke에 배포 SHA, URL, 실행 시각, 브라우저, 결과를 기록
 - [ ] post-deploy Daily golden hash
 - [ ] post-deploy offline/update
+- [ ] post-deploy CSP·same-origin network·storage/cookie inventory 확인
 - [ ] artifact SHA-256 기록
-- [ ] 마지막 green rollback 경로 확인
+- [ ] 마지막 green artifact·commit·manifest를 식별하고 접근 가능함
+- [ ] rollback trigger·승인자·명령·사용자 공지 경로를 runbook에 기록
+- [ ] service worker cache를 포함한 rollback rehearsal 뒤 canonical URL smoke 통과
 
 ## 20. 저장소 문서
 
@@ -364,33 +388,32 @@
 - [ ] README local setup·test·build
 - [ ] README architecture·math 요약
 - [ ] README deployment URL
-- [ ] README accessibility·privacy
-- [ ] README LICENSE·asset credits
+- [ ] README accessibility·privacy·local data 삭제 방법
+- [ ] README LICENSE·asset credits·권리 정책
 - [ ] README Codex collaboration 링크
+- [ ] README support/feedback 채널과 known limitations
 - [ ] 기술·디자인 백서 최신
 - [ ] ADR 상태 최신
 - [ ] 요구사항 전부 Verified
 - [ ] `PROGRESS.md` 실제 phase·SHA 최신
-- [ ] `RUNBOOK.md` 반복 장애 반영
+- [ ] `RUNBOOK.md` production 승격·post-deploy smoke·rollback·장애 대응 반영
 - [ ] `QA_REPORT.md` 실제 수치·환경
 - [ ] `RELEASE_NOTES.md` 실제 shipped 기능·제약
 
-## 21. 행사 제출
+## 21. 일반 공개 출시·운영 인계
 
-- [ ] 공식 안내를 제출 당일 재확인
-- [ ] 게임 제목 최종
-- [ ] 소개문 문자 제한 통과
-- [ ] gameplay URL final smoke
-- [ ] 16:9 JPG/PNG thumbnail
-- [ ] thumbnail 권장 파일 크기 이내
-- [ ] 최대 3분 demo 영상
-- [ ] 영상은 final commit 빌드 사용
-- [ ] Codex 활용 설명이 실제 로그·commit과 일치
-- [ ] repository 공개 상태 확인
-- [ ] 링크·영상 외부 권한 확인
-- [ ] 양식 필드 독립 2회 대조
-- [ ] 제출 완료 캡처·일시 기록
-- [ ] source/artifact/thumbnail/video/hash 백업
+- [ ] 프로젝트 오너가 release identity와 최종 `GO` 범위를 서면 기록
+- [ ] canonical gameplay URL을 외부 네트워크·새 프로필·모바일에서 다시 확인
+- [ ] production artifact manifest·source archive·release notes를 두 위치 이상에 보관
+- [ ] public support/feedback 링크가 로그인 요구·권한 오류 없이 열림
+- [ ] feedback 경로가 불필요한 개인정보를 요구하지 않고 수집·보관 범위를 설명함
+- [ ] About/Privacy가 계정·cookie·analytics 유무, LocalStorage 저장·삭제, offline·기기 시계 한계를 설명함
+- [ ] 라이선스·자산 권리·상표 정책을 repository와 실제 build에서 대조함
+- [ ] 운영 담당자가 Pages 배포·환경 설정·마지막 green artifact·rollback runbook에 접근 가능함
+- [ ] 장애 심각도·rollback trigger·support 공지 책임을 운영 인계표에 기록함
+- [ ] post-deploy smoke와 rollback rehearsal 증거를 `QA_REPORT.md`와 release notes에 연결함
+- [ ] 알려진 제한·승인된 P2·사용자 영향과 복구 방법을 공개 release notes에 기록함
+- [ ] H00 `SUBMISSION_PACKAGE.md`와 행사 양식·200자 소개·3분 영상·마감은 일반 출시 gate에서 참조하지 않음
 
 ## 22. 최종 승인
 
@@ -400,8 +423,9 @@
 | UX/플레이테스트 | — | — | — | — |
 | QA | — | — | — | — |
 | 자산·라이선스 | — | — | — | — |
+| 운영·지원 | — | — | — | — |
 | 프로젝트 오너 | — | — | — | — |
 
 - [ ] 모든 필수 체크 완료
 - [ ] 최종 판정 `GO`
-- [ ] `PROGRESS.md`를 M11/제출 상태로 갱신
+- [ ] `PROGRESS.md`를 M11/일반 공개 출시 상태와 실제 release identity로 갱신

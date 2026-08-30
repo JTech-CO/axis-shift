@@ -127,7 +127,7 @@ completion dispatch at 180000 ms
 
 - sequence, timer, score, UI를 분리 커밋한다.
 - scoring 회귀는 승인 golden vector 기준 구현으로 롤백한다.
-- Sprint가 M10 일정의 P0/P1을 유발하면 임의 삭제하지 않고 사용자에게 범위 결정을 요청한다.
+- Sprint가 M10 release gate의 P0/P1을 유발하면 임의 삭제하지 않고 사용자에게 범위 결정을 요청한다.
 
 ## 12. 리스크·미지수
 

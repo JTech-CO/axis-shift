@@ -147,7 +147,7 @@ npm run build
 
 - 브라우저별 Web Share files 지원 차이.
 - Canvas font metric·emoji 렌더링 차이.
-- service worker 캐시가 제출 직전 구버전을 유지할 위험.
+- service worker 캐시가 production 배포·업데이트 뒤 구버전을 유지할 위험.
 - signature 입력에 raw move sequence의 정보가 지나치게 반영될 가능성.
 
 ## 13. STOP 트리거

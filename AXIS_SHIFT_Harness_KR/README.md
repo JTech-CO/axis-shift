@@ -4,7 +4,9 @@
 **작성일**: 2026-08-09  
 **프로젝트**: AXIS//SHIFT — A Daily Tensor Puzzle  
 **대상 에이전트**: OpenAI Codex 우선, Claude Code 호환  
-**상태**: M00·M01·M02·M03 및 H00 완료 / 다음 M04 DoR 확인
+**상태**: M00~M05 완료 / M06 구현 체크포인트(DOD-03 신규 사용자 E1 대기) / ADR-0013 일반 공개 출시 roadmap
+
+출시 version·날짜·최종 도메인·공개 라이선스는 프로젝트 오너 결정 전까지 `TBD`다. H00 `v0.1.0-hackathon`은 완료된 역사 기록이며 현재 출시 목표가 아니다.
 
 AXIS//SHIFT를 여러 세션에 걸쳐 구현하더라도 게임 규칙, 수학적 정확성, 디자인 품질, 검증 기준이 표류하지 않도록 만든 다중 파일 작업 하네스다. 이 팩은 단순 작업 목록이 아니라 다음을 분리해 관리한다.
 
@@ -22,8 +24,8 @@ AXIS//SHIFT를 여러 세션에 걸쳐 구현하더라도 게임 규칙, 수학�
 
 1. 원본은 Claude Code 자동 로드 문서인 `CLAUDE.md`를 중심으로 한다. 본 프로젝트는 Codex가 주 개발 도구이므로 `AGENTS.md`를 단일 계약 원본으로 추가하고, `CLAUDE.md`는 이를 읽도록 하는 호환 진입점으로 유지했다.
 2. 원본 README는 `docs/`를 참조하지만 KR 저장소의 골격 파일은 `docx/README.md`에 위치한다. 본 팩에서는 문서 의도에 맞춰 경로를 `docs/`로 정규화했다.
-3. 원본의 범용 M0 예시는 제거하지 않고 프로젝트별 12개 phase로 구체화했다.
-4. 기술·디자인 백서 원문을 `docs/`에 포함하고, 파일 경계·환경·수학·추적성·플레이테스트·QA·제출 문서를 추가했다.
+3. 원본의 범용 M0 예시는 제거하지 않고 정규 M00~M11 12개 phase와 완료된 역사적 H00 lane으로 구체화했다.
+4. 기술·디자인 백서 원문을 `docs/`에 포함하고, 파일 경계·환경·수학·추적성·플레이테스트·QA·일반 출시 문서와 H00 제출 기록을 추가했다.
 5. 모든 `{{...}}` 자리표시는 실제 프로젝트 값으로 채웠다. 자리표시는 `_TEMPLATE.md` 파일에만 남는다.
 
 ## 2. 설치 위치
@@ -68,7 +70,7 @@ axis-shift/                         # PROJECT_ROOT: Git·구현 루트
 | `phases/_TEMPLATE.md` | 신규 phase 작성 템플릿 | 고정 |
 | `phases/M00…M11.md` | 단계별 범위, 산출물, DoD, 검증, 롤백, 위험 | 작업 중 |
 | `decisions/_TEMPLATE.md` | ADR 템플릿 | 고정 |
-| `decisions/0001…0007.md` | 이미 백서에서 채택한 핵심 설계 결정 | 결정 변경 시 |
+| `decisions/0001…0013.md` | 채택한 핵심 설계 결정과 H00→일반 공개 출시 전환 기록 | 결정 변경 시 |
 | `docs/TECHNICAL_WHITEPAPER.md` | 전체 기술 명세 | 기준 변경 시 |
 | `docs/DESIGN_WHITEPAPER.md` | 전체 UI/UX·디자인 시스템 명세 | 기준 변경 시 |
 | `docs/FILE_TREE.md` | 저장소 트리, 패키지 책임, import 허용·금지 | 구조 변경 시 |
@@ -79,7 +81,7 @@ axis-shift/                         # PROJECT_ROOT: Git·구현 루트
 | `docs/PLAYTEST_PROTOCOL.md` | 규칙 이해도·첫 성공·관찰 기록 절차 | 플레이테스트 시 |
 | `docs/QA_REPORT.md` | 테스트 결과와 알려진 위험의 릴리스 보고서 | 릴리스 전 |
 | `docs/RELEASE_CHECKLIST.md` | 상용 웹 게임 수준의 최종 승인표 | 릴리스 전 |
-| `docs/SUBMISSION_PACKAGE.md` | 해커톤 제출물과 3분 시연 패키지 | 제출 전 |
+| `docs/SUBMISSION_PACKAGE.md` | 완료된 H00 해커톤 제출물과 3분 시연 패키지의 역사 기록 | H00 기록 보존 시 |
 | `docs/ASSET_LICENSES.md` | 이미지·폰트·음원·아이콘 출처와 라이선스 | 자산 추가 시 |
 | `docs/RELEASE_NOTES.md` | 버전·의존성·배포 URL·커밋 해시 | 릴리스 시 |
 | `MANIFEST.sha256` | 배포 패키지 파일 무결성 검증용 SHA-256 목록 | 패키징 시 |
@@ -91,8 +93,8 @@ M00 Rule Proof
   ↓
 M01 Production Scaffolding
   ↓
-H00 Hackathon Submission Slice (한시적 v0.1 lane)
-  ↓ 제출 후 정규 roadmap 복귀
+H00 Hackathon Submission Slice (완료된 역사적 v0.1 lane)
+  ↓ 정규 product roadmap 복귀
 M02 Board & GF(2) Core
   ↓
 M03 Generator & Content Pipeline
@@ -109,9 +111,9 @@ M08 Sprint
   ↓
 M09 Sharing, PWA, i18n & Feedback
   ↓
-M10 Integration QA & Deployment
+M10 Integration QA, Performance & Production RC
   ↓
-M11 Release Freeze & Submission
+M11 Release Freeze, Launch & Operations Handoff
 ```
 
 원칙적으로 한 번에 한 phase만 진행한다. 다만 M03의 콘텐츠 후보 생성과 M05의 시각 fixture 제작처럼 코드 경계가 독립적이고 선행 DoR이 모두 충족된 작업은 사용자가 명시적으로 허용한 경우에만 병렬화한다.
@@ -153,4 +155,4 @@ AXIS//SHIFT에서 완료는 다음 세 조건을 동시에 만족하는 상태�
 
 ## 7. 첫 실행
 
-현재 시작점은 `PROGRESS.md`와 `phases/M04_session_persistence.md`의 DoR다. M00·M01·M02·M03과 한시적 H00 v0.1 제출 lane은 완료됐다. M03은 오너의 54개 패턴·progression 5행 승인과 candidate `1c313bd29e1d24c483749af90a8734542988be5d` clean detached worktree의 3,650일 감사 2회 동일 hash로 DOD-01~11을 닫았다. Tutorial/Lab/Daily 화면은 M06/M07 범위이므로 M03 완료를 프로덕션 UI 완료로 해석하지 않는다.
+현재 시작점은 `PROGRESS.md`와 `phases/M06_tutorial_lab.md`다. M00~M05는 완료됐고 H00 v0.1 해커톤 lane은 별도의 역사 기록으로 동결됐다. M06은 Home·Tutorial 6·Lab 48·GameScreen을 연결한 구현 체크포인트와 자동 E2/E3를 확보했지만, 최종 배포 후보의 신규 사용자 n≥5 DOD-03 E1과 fixed-SHA 원격 배포 증거가 없어 아직 완료가 아니다. DOD-03을 통과해 M06을 닫은 뒤 M07 Daily·Archive로 진행하며, ADR-0013에 따라 M11까지 일반 공개 출시 품질 게이트를 순서대로 유지한다.

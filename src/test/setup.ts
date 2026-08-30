@@ -2,6 +2,7 @@ import '@testing-library/jest-dom/vitest';
 
 import { cleanup } from '@testing-library/react';
 import { afterEach } from 'vitest';
+import { resetAppGameSessionRuntimeForTests } from '../app/runtime';
 
 Object.defineProperty(window, 'matchMedia', {
   configurable: true,
@@ -28,6 +29,7 @@ if (typeof HTMLDialogElement !== 'undefined') {
 
 afterEach(() => {
   cleanup();
+  resetAppGameSessionRuntimeForTests();
   window.history.replaceState(null, '', '/');
   document.documentElement.removeAttribute('data-theme');
   document.documentElement.removeAttribute('data-motion');

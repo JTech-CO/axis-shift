@@ -4,11 +4,11 @@
 
 ## 현재 상태
 
-- **현재 phase**: M05 — Design System & Shared Game UI 완료; 다음 M06 DoR 검토
-- **상태**: M05 DOD-01~13 PASS·원격 CI/Pages·공개 제출 URL smoke 통과; 수동 E1 0/4는 ADR-0012에 따라 M10 release-blocking gate로 이관
-- **마지막 갱신**: 2026-08-29 / runtime·Pages head `1608c26`, CI `33207406441`·Pages `33207406497` success, public Pages 30/30·prototype 908단언 PASS
-- **목표 릴리스**: `v0.1.0-hackathon` — OpenAI Game Builders Seoul Track 1 제출 슬라이스 완료
-- **제출 접수 종료**: 2026-08-26
+- **현재 phase**: M06 — Tutorial & Lab Product Flow 구현 체크포인트
+- **상태**: DOD-01~02·04~13 자동 E2/E3 PASS; DOD-03은 최종 배포 후보의 신규 사용자 n≥5 E1 대기로 M06 미완료
+- **마지막 갱신**: 2026-08-30 / 로컬 작업 트리 E2E 26 PASS·10 intentional skip, actual-route axe 3/3, verify 12/12, Pages 36/36; fixed SHA·원격 배포·신규 사용자 E1 없음
+- **목표 릴리스**: 일반 공개 웹 게임 출시 — M06→M11 순차 완료
+- **출시 식별자·일정**: 프로젝트 오너 결정 대기(`TBD`); 임의 날짜를 위해 phase gate를 축소하지 않음
 
 ## 이미 끝낸 것
 
@@ -62,6 +62,7 @@
 - [x] M03 환경 parity — PRNG 20 seed×100 출력과 Daily golden 20개를 Chromium·Firefox·WebKit 9/9로 확인, UTC·서울·LA 시간대별 프로세스 3개에서 각각 10회 해시 불일치 0
 - [x] M03 DOD-10 fixed-SHA 종료 — candidate `1c313bd29e1d24c483749af90a8734542988be5d`, clean Node `v24.19.0`/npm `11.6.2`, verify 10/10·3브라우저 9/9, 서로 다른 출력 경로의 3,650일 감사 2회 report SHA `b1102aee…6d49` 동일
 - [x] H00 공식 제출 — 프로젝트 오너가 공식 양식 제출 완료를 확인했다. 정확한 접수 시각·접수 ID·확인 화면은 제공되지 않아 생성하지 않으며 Codex는 인증·개인정보·동의·Submit을 수행하지 않았다.
+- [x] 해커톤 lane 종료·정규 로드맵 복귀 — 본선에는 진출하지 못했으며 H00 제출·태그·SHA·공개 URL 증거는 역사 기록으로 동결한다. 일반 공개 출시는 ADR-0013과 M06→M11 gate를 따른다.
 - [x] M04 session reducer·selector — actionId append-only ledger, 원자 PULSE·완료 event, Undo·호출자 고유-ID Reset, Hint 1~3, `TIMER_TICK` high-water와 visibility pause
 - [x] M04 ID service — issued ledger seed·reserve·invalid/duplicate retry·128회 exhaustion; M06 singleton·crypto source integration 경계 보존
 - [x] M04 scoring·clock — `WeakSet` provenance completion→opaque record projection, S/A/B/C·Hint cap, `grade→PULSE→active elapsed` best tuple, 주입 Clock·year≥1 canonical UTC 변환
@@ -72,14 +73,19 @@
 - [x] M05 shared UI 자동 체크포인트 — dark/light/system token, Theme 기본 dark 순환 버튼, Motion 기본 system 토글, common/layout/game presentational component, 8개 상태+long-copy fixture, keyboard·axe·visual harness 구현
 - [x] M05 ADR-0011 자동 품질 — focused 7파일 33테스트, global 30파일 180테스트, token 16파일·하드코드 0·예외 13, axe 18/18, visual update/no-update 18/18·full-fixture baseline 9·strict diff 0, keyboard 3브라우저 9/9, boundary·static a11y·build·Pages·verify PASS
 - [x] M05 고정 SHA 공개 E4 — implementation `f039bb8`, runtime/Pages `1608c26`, CI `33207406441`·Pages `33207406497` success, 공개 Pages 30/30·제출 URL 908단언·외부 요청/콘솔 오류 0
+- [x] M06 제품 플로우 구현 — Home first-run·Continue, Tutorial 6 selector/coachmark/back/skip, Lab 4챕터×12 자유 접근, 실제 GameScreen session·Hint·Undo·Reset·Result·best·resume 연결
+- [x] M06 자동 체크포인트 — Tutorial 6 시작·해결·session clear·이동 및 Lab 48 결과 저장·이동 실패 0, 통합 E2E 26 PASS·10 intentional skip, persistence 3브라우저 9/9, actual-route axe 3/3, 360px geometry, i18n parity, verify 12/12, M05 visual 18/18·Pages 36/36
+- [x] M06 게임 route 최소 헤더 — Tutorial·개별 Lab에서 상시 GNB를 제거하고 브랜드·현재 모드만 유지해 디자인 백서 §2.2.2와 모바일 56px 헤더 계약을 복구
+- [x] H00 공개 URL 호환 계약 — `prototypes/rule-proof/` 기본 접속은 M06 React 게임으로, 기존 stage/signal/seed/anchor 링크는 `legacy.html` H00으로 분기하는 Pages artifact를 3개 브라우저에서 검증
 
 ## 다음 할 일
 
-1. M06 DoR에서 M05 선행 완료 외의 조건을 확인하고 Tutorial 6·Lab 48의 실제 feature controller 조합 범위를 고정한다.
-2. M06는 M04 `IdGenerator` singleton·crypto source, Page Visibility·tick, paused resume, Result/Lab best 저장과 reload E2E를 실제 화면에 연결한다.
-3. M07은 UTC Daily·streak·Archive를 추가하고, Sprint 180초 절대 종료·총점·동점 규칙은 계속 M08까지 결정하지 않는다.
+1. M06 최종 배포 후보를 fixed SHA로 배포한 뒤 서로 다른 신규 사용자 n≥5를 새 프로필에서 테스트한다. DOD-03은 `Tutorial 1≤90초·I2/I3 없음 4/5`, `첫 Lab 유효 PULSE 4/5`, `반복 P0 혼동<2명`, `360px control 가림 0`, `다음 CTA 발견 4/5`를 모두 충족해야 한다. M00-R1은 재사용하지 않는다.
+2. Android 실기기와 실제 스크린리더 수동 체크는 아직 `NOT RUN`이다. M06 체크포인트의 자동 360px·keyboard·axe 결과와 구분하고 늦어도 M10 release-blocking gate에서 완료한다.
+3. DOD-03 E1 통과·문서 기록 뒤 M06을 닫고 M07의 UTC Daily·streak·Archive를 시작한다. Sprint 180초 절대 종료·총점·동점 규칙은 M08까지 임의로 고정하지 않는다.
 4. H00 비공개 playtest·submission 자료와 두 backup은 Git에 넣지 않는다. 제출 완료 조건은 충족됐지만 이번 작업에서는 삭제하지 않았으며, 프로젝트 오너의 명시적 정리 결정 전까지 보존한다.
 5. H00의 권리 상태는 `UNLICENSED` / All Rights Reserved로 고정했다. 공개 OSS 라이선스 채택 여부는 M11 오너 결정으로 남긴다.
+6. 일반 공개 출시의 버전·날짜·채널·프로덕션 URL은 해당 DoR에서 프로젝트 오너가 승인한다. 승인 전에는 임의 식별자나 마감으로 고정하지 않는다.
 
 ### Formal Easy 게이트 종료 경계
 
@@ -92,6 +98,7 @@
 
 ## 현재 미결 질문 / 사용자 결정 대기
 
+- 일반 공개 출시 식별자·목표일·배포 채널. M10 release candidate 승인 전까지 `TBD`로 유지한다.
 - M11 공개 OSS 라이선스: H00 v0.1은 `private: true`·`UNLICENSED` / All Rights Reserved로 확정했으며, 이후 라이선스 부여는 프로젝트 오너가 별도로 결정한다.
 - 최종 프로덕션 URL: GitHub Pages 경로와 별도 도메인 사용 여부.
 - 앱 표시 기본 언어: 브라우저 언어 자동 감지 후 한국어/영어 폴백 순서 확인.
@@ -112,17 +119,21 @@
 | M03 | Generator & Content Pipeline | 완료 — DOD-01~11 | 오너 전체 승인 + candidate `1c313bd…98be5d` exact-SHA 감사 2회 동일 + PR #7 CI PASS |
 | M04 | Session, Persistence & Scoring | 완료 — DOD-01~13 | 12파일 92테스트, B98.79%, 11/11 per-file branch·네 v1 root·격리·재개 정규화 |
 | M05 | Design System & Shared UI | 완료 — DOD-01~13, 오너 baseline 9/9, 수동 E1 0/4 M10 이관 | implementation `f039bb8`·runtime `1608c26`, CI/Pages success, public 30/30·908단언 |
-| M06 | Tutorial & Lab | 미시작 | 튜토리얼 6 + Lab 48 전체 플레이 가능 |
+| M06 | Tutorial & Lab | 구현 체크포인트 — DOD-01~02·04~13 자동 PASS, DOD-03 E1 대기 | Tutorial 6 + Lab 48 자동 플레이 실패 0; final deployed candidate 신규 사용자 n≥5 필요 |
 | M07 | Daily & Archive | 미시작 | 날짜 결정성·streak·archive 회귀 |
 | M08 | Sprint | 미시작 | 180초 절대 종료·점수 재현 |
 | M09 | Sharing, PWA, i18n & Feedback | 미시작 | 스포일러 없는 공유·오프라인·한영 |
-| M10 | Integration QA & Deployment | 미시작 | 전체 CI·실제 URL·P0/P1 0건 |
-| M11 | Release Freeze & Submission | 미시작 | 제출 패키지·태그·최종 링크 고정 |
+| M10 | Integration QA, Performance & Production RC | 미시작 | fixed-SHA CI·실제 URL·수동 접근성·rollback·P0/P1 0건 |
+| M11 | Release Freeze, Public Launch & Operations Handoff | 미시작 | release manifest·tag/SHA/artifact/URL 일치·launch smoke·rollback·운영 인계 |
 
 ## 최근 게이트 증거
 
 | 일시 | Phase | Gate | 명령/절차 | 결과 | 증거 위치 |
 |---|---|---|---|---|---|
+| 2026-08-30 | M06 | DoR 5/5·DOD-01~02·04~09·11~12 제품 플로우 E3 | Tutorial/Lab/game-session focused unit + `validate:levels` + 통합 product E2E | **자동 PASS** — 54 levels failures=0; focused 4 files/27 tests; E2E 26 PASS·10 intentional browser skip; canonical Tutorial 6 시작·해결·session clear·이동 및 Lab 48 결과 저장·이동 실패 0; rapid PULSE·Hint cap·best merge·Reset·resume/손상 복구·저장 실패 전환 차단 PASS | `phases/M06_tutorial_lab.md` §10, `tests/e2e/tutorial.spec.ts`, `tests/e2e/lab.spec.ts`, `tests/e2e/persistence.spec.ts` |
+| 2026-08-30 | M06 | DOD-10~11 실제 route 접근성·반응형 E3 | keyboard-only first-run, 360px geometry, `npm run test:a11y -- --grep "Tutorial|Lab"` | **자동 PASS** — keyboard first-run→첫 Lab, 360 overflow=0·board/sticky overlap=0, actual Tutorial/Lab catalog/Lab game axe 3/3 serious/critical=0; 실제 Android·스크린리더는 NOT RUN | `phases/M06_tutorial_lab.md` §9~10 |
+| 2026-08-30 | M06 | 통합 회귀·artifact E3 | `npm run verify` + M05 visual no-update + `npm run test:pages` | **PASS** — verify 22/22·12/12, global unit 36 files/218 tests, boundary 97/199/0/0, token hardcode 0, visual 18/18 baseline diff 0, Pages Chromium/Firefox/WebKit 36/36 | `phases/M06_tutorial_lab.md` §10 |
+| 2026-08-30 | M06 | DOD-03 학습 실효 E1 | final deployed candidate 신규 사용자 n≥5 | **NOT RUN / BLOCKING M06 CLOSE** — Tutorial 1≤90초·I2/I3 없음 4/5, 첫 Lab 유효 PULSE 4/5, 반복 P0<2명, 360px 가림 0, CTA 발견 4/5의 표본 없음; M00-R1 재사용 금지; PASS·면제·M10 이관 아님 | `phases/M06_tutorial_lab.md` §7·§9~10 |
 | 2026-08-26 | M05 | ADR-0011 DOD-01~02·05·08~09·13 focused/token/axe E2/E3 | focused unit + `audit:design-tokens` + `npm run test:a11y -- --project=ui-fixtures` | **자동 PASS** — focused 6 files/30 tests; token files=16 hardcode=0 annotations=13; axe 18/18 serious/critical=0 externalRequests=0, matrix=8 states+long copy+system 3+light 3+reduced-motion 3 | `phases/M05_design_system.md` §10 |
 | 2026-08-26 | M05 | ADR-0011 DOD-06~09·12 responsive/theme/motion/visual E3 | visual update → strict no-update rerun | **PASS** — visual 18/18, 5 viewport, dark/light/system, AA contrast, full-fixture baseline 9, `maxDiffPixels=0`, threshold 0, diff 0; Codex 새 mobile/tablet/desktop 3/3 육안 PASS | `tests/visual` |
 | 2026-08-26 | M05 | ADR-0011 DOD-03~04 keyboard·입력 원자성 E3 | `npm run test:e2e -- tests/e2e/keyboard-core.spec.ts` | **PASS** — Chromium·Firefox·WebKit 9/9; Theme→Motion 버튼 focus 순서, pointer/shortcut/repeat coalescing, reset focus 복귀, result heading focus | `tests/e2e/keyboard-core.spec.ts` |
@@ -370,11 +381,12 @@ public browserAssertions=140 viewport=360x640 easyMoves=2 normalMoves=3 hardMove
 | R-01 | 텐서 소재가 첫 사용자에게 어렵게 느껴짐 | 중 | 매우 높음 | M00 이해도 게이트, 첫 플레이에서 수학 용어 제거 | M00·M06 |
 | R-02 | generator/par 오답이 전체 신뢰를 훼손 | 낮음 | 매우 높음 | 전수·property test, 단일 도메인 코어 | M02·M03 |
 | R-03 | 48개 Lab 콘텐츠 큐레이션 일정 부족 | 중 | 높음 | 자동 후보 생성 + 사람이 패턴·난도 검수 | M03·M06 |
-| R-04 | PWA 캐시가 제출 직전 구버전을 제공 | 중 | 높음 | prompt update, 실제 URL cache reset·smoke | M09·M10 |
+| R-04 | PWA 캐시가 production 배포·업데이트 후 구버전을 제공 | 중 | 높음 | prompt update, 실제 URL cache reset·smoke | M09·M10 |
 | R-05 | 모바일 6×6에서 축 타깃과 PULSE가 겹침 | 중 | 높음 | 5 viewport 자동 fixture는 PASS; Android Chrome 실기기는 `NOT RUN / DEFERRED_TO_M10` | M05·M10 |
 | R-06 | 공유 서명이 정답/이동을 간접 노출 | 낮음 | 높음 | 금지 필드 invariant, payload snapshot, 수동 검토 | M09 |
-| R-07 | 정규 v1 범위가 8/26 제출 일정 안에 과도함 | 낮음 | 매우 높음 | H00 v0.1 구현·tag·제출 준비 패키지는 동결 완료; 오너는 정규 범위를 추가하지 않고 공식 양식만 최종 제출 | H00·전역 |
+| R-07 | 일반 출시 범위가 release identifier·일정 승인 전에 계속 확장됨 | 중 | 높음 | M06→M11 순차 DoD, 추가 범위는 ADR·오너 승인, RC 승인 시 feature/dependency freeze | 전역·M10·M11 |
 | R-08 | rank/Par만으로 난도를 정하면 단일 축 순회가 최적 또는 준최적이 됨 | 높음 | 매우 높음 | `sweepBound`·`compressionGap` 검증, full-rank를 난도 stage가 아닌 대조군으로 분리, 사람 비교 | M00·M03·M06 |
+| R-10 | 출시 버전·도메인·라이선스 결정이 늦어 RC promotion이 지연됨 | 중 | 중 | 각 결정의 latest responsible moment를 M10·M11 DoR에 명시하고 승인 전 `TBD` 유지 | M10·M11 |
 
 해소된 위험: R-09는 ADR-0009 artifact workflow 전환, legacy backup branch, 공개 M00 573단언·M01 8/8 smoke로 2026-08-14 닫았다.
 ## 막힘 기록
@@ -397,6 +409,8 @@ STOP 발동 시 아래 형식으로 추가한다.
 ```
 
 ## 결정 로그
+- 2026-08-30: 프로젝트 오너가 해커톤 본선 미진출 결과를 기록하고 일반 게임 개발·정상 배포/런칭으로 목표를 전환했다. H00은 완료된 역사 lane으로 동결하며, 현재 M06 차단 게이트와 M06→M11 순서는 유지한다. 일반 출시 버전·날짜·채널·도메인·라이선스는 해당 DoR 승인 전 `TBD`이고, 일정만을 이유로 DoD를 축소하지 않는다.
+- 2026-08-30: M06은 Home first-run/Continue, Tutorial 6 selector·coachmark·back/skip, Lab 48 자유 접근, 실제 GameScreen session·Hint·Undo·Reset·Result·best·resume를 통합했다. 게임 route는 디자인 백서 §2.2.2에 맞춰 상시 GNB를 제거했다. 자동 E2/E3로 DOD-01~02·04~13을 통과했지만, DOD-03은 final deployed candidate의 신규 사용자 n≥5 E1이 없어 차단 상태다. M00-R1을 재사용하거나 PASS·면제·M10 이관으로 바꾸지 않는다.
 
 - ADR-0001: 도메인 코어를 단일 TypeScript 기준 구현으로 둔다.
 - ADR-0002: `GF(2)` 랭크를 공식 Par로 사용한다.
@@ -408,6 +422,7 @@ STOP 발동 시 아래 형식으로 추가한다.
 - ADR-0010: 정규 M02~M11과 분리한 H00 `v0.1.0-hackathon` 제출 lane을 채택한다.
 - [ADR-0011](decisions/0011-appearance-cycle-controls.md): Theme·Motion 단일 순환 버튼, dark 기본, custom high-contrast 제거와 legacy 설정 정규화를 채택한다.
 - [ADR-0012](decisions/0012-m05-checkpoint-manual-evidence-deferral.md): M05 자동 E2/E3와 오너 baseline 9/9로 checkpoint 종료를 허용하되, 수동 E1 0/4를 PASS·면제 없이 M10의 release-blocking gate로 이관한다.
+- [ADR-0013](decisions/0013-post-hackathon-production-launch.md): H00 해커톤 lane을 역사 기록으로 동결하고, M06→M11의 일반 공개 웹 게임 출시·운영 인계 계약으로 복귀한다.
 - ADR-0008: M00 formal E1을 통과 처리하지 않은 채 M01의 도구·경계·라우팅·CI 체크포인트만 선행 착수한다.
 - Workspace-2026-08-09: 부모 `AXIS SHIFT (Tensor)`를 Git·구현 루트로, `AXIS_SHIFT_Harness_KR`를 가이드·증거 폴더로 유지한다.
 - 2026-08-09: 내부 파일럿 run 2회에서 Easy stage의 관측 최저는 3 PULSE였고, 초기 계산이 어긋난 흐름은 4~5 PULSE까지 이어질 수 있었다. 이는 수학적 Par 2를 바꾸지 않으며 참가자 수·시간·개입은 미보고로 둔다.

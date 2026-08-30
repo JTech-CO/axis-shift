@@ -1,10 +1,12 @@
 # AXIS//SHIFT 요구사항 추적표
 
-**버전**: 1.0.0  
-**상태**: M00·M01·M02·M03·M04·M05 verified / M05 manual E1 0/4 deferred to M10 / H00 v0.1 submission slice verified
-**최종 갱신**: 2026-08-29
+**버전**: 1.1.0
+**상태**: M00·M01·M02·M03·M04·M05 verified / M06 구현·자동 검증 checkpoint(DOD-03 `NOT RUN`) / M05 manual E1 0/4 deferred to M10 / H00 v0.1 submission slice verified(역사 기록) / ADR-0013 일반 공개 출시 목표
+**최종 갱신**: 2026-08-30
 
 > 기능 요구사항 ID는 기술 백서 §2.2.2를 따른다. `NFR-*`는 백서의 성능·접근성·배포·개인정보 기준을 하네스에서 추적 가능하게 부여한 ID다. 이 표가 새로운 제품 요구를 만드는 것은 아니며, 원문 기준의 검증 경로를 연결한다.
+
+> ADR-0013에 따라 활성 목표는 M06~M11을 순서대로 통과한 일반 공개 출시다. H00 요구·증거는 당시 제출 슬라이스의 역사 기록으로만 유지하고 정규 제품 FR/NFR 완료 근거로 재분류하지 않는다. release version·출시일·최종 도메인·공개 라이선스는 오너 결정 전까지 `TBD`다.
 
 ## 1. 상태 코드
 
@@ -20,15 +22,15 @@
 
 | ID | 요구사항·승인 조건 | Phase | 기준 모듈 | 자동 검증 | INV | 상태 |
 |---|---|---|---|---|---|---|
-| FR-CORE-001 | 행·열 복수 선택과 독립 토글, 시각·ARIA 상태 | M05·M06 | `components/game/AxisToggle`, session reducer | component + keyboard E2E | 010,015 | In Progress |
-| FR-CORE-002 | PULSE 전 실제 변경 없는 교차점 preview | M05·M06 | `TensorGrid`, selectors | fixture snapshot + component | 005,015 | In Progress |
-| FR-CORE-003 | 선택 교차점만 XOR 반전, 이동 1건 | M02·M04·M06 | `domain/board`, session reducer | property + rapid-input E2E | 005,010 | In Progress |
-| FR-CORE-004 | 목표 일치 시 완료 event 1회 | M04·M06 | session reducer | idempotency + E2E | 010 | In Progress |
-| FR-CORE-005 | Undo가 직전 PULSE를 역산·기록 복원 | M04·M06 | session reducer | reducer + E2E | 005,010 | In Progress |
-| FR-CORE-006 | 확인 후 initial state Reset, 확정 기록 보존 | M04·M06 | reducer, Dialog | reducer + component/E2E | 010,011 | In Progress |
-| FR-CORE-007 | 새로고침 후 유효 미완료 세션 복구 | M04·M06·M07 | storage repository | migration + reload E2E | 011 | In Progress |
-| FR-HINT-001 | 남은 Par → 한 축 → 전체 PULSE 단계형 Hint | M02·M04·M06 | factorization, selectors | rank/factorization + UI | 006 | In Progress |
-| FR-LAB-001 | Tutorial 이후 Lab 진입·48레벨 진행 | M03·M06 | content, lab feature | level validator + E2E | 007,011 | In Progress |
+| FR-CORE-001 | 행·열 복수 선택과 독립 토글, 시각·ARIA 상태 | M05·M06 | `components/game/AxisToggle`, `features/game-session` | component + keyboard/product E2E | 010,015 | In Progress |
+| FR-CORE-002 | PULSE 전 실제 변경 없는 교차점 preview | M05·M06 | `TensorGrid`, game-session presenter | fixture snapshot + component/product E2E | 005,015 | In Progress |
+| FR-CORE-003 | 선택 교차점만 XOR 반전, 이동 1건 | M02·M04·M06 | `domain/board`, `features/game-session` | property + rapid-input product E2E | 005,010 | In Progress |
+| FR-CORE-004 | 목표 일치 시 완료 event 1회 | M04·M06 | session reducer, game-session controller | idempotency + `persistence.spec.ts` | 010 | In Progress |
+| FR-CORE-005 | Undo가 직전 PULSE를 역산·기록 복원 | M04·M06 | session reducer, `features/game-session` | reducer + product E2E | 005,010 | In Progress |
+| FR-CORE-006 | 확인 후 initial state Reset, 확정 기록 보존 | M04·M06 | reducer, Dialog, `ProductRoutes` | reducer + component/product E2E | 010,011 | In Progress |
+| FR-CORE-007 | 새로고침 후 유효 미완료 세션 복구 | M04·M06·M07 | storage repository, app/game-session runtime | migration + `persistence.spec.ts` 3-engine | 011 | In Progress |
+| FR-HINT-001 | 남은 Par → 한 축 → 전체 PULSE 단계형 Hint | M02·M04·M06 | factorization, game-session presenter/controller | rank/factorization + product E2E | 006 | In Progress |
+| FR-LAB-001 | Tutorial 이후 Lab 진입·48레벨 진행 | M03·M06 | content, `features/tutorial`, `features/lab`, `ProductRoutes` | validator + `tutorial.spec.ts`/`lab.spec.ts` | 007,011 | In Progress |
 | FR-DAILY-001 | 동일 UTC date/version에서 동일 퍼즐 | M03·M07 | generator, UTC adapter | 3,650-day audit + timezone E2E | 008,009 | In Progress |
 | FR-DAILY-002 | 날짜별 완료와 local streak | M04·M07 | record repository, streak | record merge + truth table + E2E | 011,012 | In Progress |
 | FR-SPRINT-001 | `sessionEndAt` 기준 180초 연속 세션 | M08 | sprint reducer, score | fake clock + browser E2E | 010,012 | Planned |
@@ -42,23 +44,23 @@
 | ID | 백서 기준 | Phase | 자동·수동 검증 | INV | 상태 |
 |---|---|---|---|---|---|
 | NFR-MATH-001 | Par=`rank_GF2(current XOR target)` | M02 | 3×3 512 전수 BFS 패리티 | 006 | Verified |
-| NFR-CONTENT-001 | Tutorial 6 + Lab 48 전부 유효 | M03·M06 | validator + canonical solve | 007 | In Progress |
+| NFR-CONTENT-001 | Tutorial 6 + Lab 48 전부 유효 | M03·M06 | validator + 54-level canonical product solve | 007 | In Progress |
 | NFR-DET-001 | seed·factorization·signature 결정성 | M02·M03·M09 | golden vectors·browser parity | 006,008 | In Progress |
 | NFR-STORAGE-001 | 네 v1 root의 schema guard·migration·비덮어쓰기 격리·부분 복구 영속화 | M04 | 10-fixture round-trip + clock/ledger/prototype/collision fault injection | 011 | Verified |
-| NFR-ID-001 | session·action·quarantine ID의 앱·저장 수명 고유성 | M04·M06 | issued-ledger seed/reserve/retry unit + singleton/crypto integration E2E | 010,011 | In Progress |
+| NFR-ID-001 | session·action·quarantine ID의 앱·저장 수명 고유성 | M04·M06 | issued-ledger unit + app singleton/Web Crypto/hydrate-reserve E2E | 010,011 | In Progress |
 | NFR-RESP-001 | 360px부터 가로 스크롤·가림 없음 | M05·M10 | viewport E2E + 실기기 | 015 | In Progress |
-| NFR-A11Y-001 | 키보드 전체 흐름, 44px, 색 외 표식 | M05~M10 | axe·computed size·manual SR | 015 | In Progress |
+| NFR-A11Y-001 | 키보드 전체 흐름, 44px, 색 외 표식 | M05~M10 | actual-route axe `3/3` + keyboard/product E2E + manual SR | 015 | In Progress |
 | NFR-MOTION-001 | 기본 system·단일 버튼 system↔reduced, Reduced Motion에서 정보·기능 동일 | M05·M09 | media fixture + E2E | 015 | In Progress |
-| NFR-I18N-001 | ko/en key 누락·hardcoded copy 0 | M05·M09 | key parity·lint | 016 | In Progress |
+| NFR-I18N-001 | ko/en key 누락·hardcoded copy 0 | M05·M09 | M06 Tutorial·Lab·Game·54 title key parity + lint | 016 | In Progress |
 | NFR-PERF-001 | JS/CSS/cache·Web Vitals·계산 예산 기록 | M10 | bundle/Lighthouse/bench report | 018 | Planned |
 | NFR-OFFLINE-001 | same-origin 자산과 offline 핵심 플레이 | M09·M10 | request audit + offline E2E | 014,017 | Planned |
 | NFR-PRIVACY-001 | 계정·식별정보·analytics·cookie 없음 | M09·M10 | network/storage/CSP audit | 001,017 | Planned |
 | NFR-LICENSE-001 | 모든 배포 자산 권리 등록 | M09~M11 | asset inventory | 019 | Planned |
-| NFR-DEPLOY-001 | GitHub Pages base/hash route/PWA scope 정합 | M01·M09·M10 | non-root + production smoke | 014 | Planned |
-| NFR-TIME-001 | Lab·Daily active time의 high-water·hidden 제외·안전 재개 | M04·M06·M07 | fake clock reducer + visibility/reload E2E | 012 | In Progress |
-| NFR-SCORE-001 | Par base grade·Hint cap·`WeakSet` provenance completion projection·best tuple | M04·M06·M07 | grade/projection/forgery/merge boundary + Result E2E | 006,011 | In Progress |
-| NFR-RECOVERY-001 | 오류·저장·PWA update에서 안전 복구 | M04·M09·M10 | fault injection E2E | 011,014 | In Progress |
-| NFR-RELEASE-001 | P0/P1·INV 위반 0 | M10·M11 | QA_REPORT + issue audit | 020 | Planned |
+| NFR-DEPLOY-001 | GitHub Pages base/hash route/PWA scope·production artifact identity·post-deploy smoke·rollback 정합 | M01·M09·M10·M11 | non-root + M06 Pages artifact 3-engine + fixed-SHA production smoke + rollback drill | 014,018,020 | Planned |
+| NFR-TIME-001 | Lab·Daily active time의 high-water·hidden 제외·안전 재개 | M04·M06·M07 | fake clock + Page Visibility/reload E2E | 012 | In Progress |
+| NFR-SCORE-001 | Par base grade·Hint cap·`WeakSet` provenance completion projection·best tuple | M04·M06·M07 | boundary + Result/Lab best product E2E | 006,011 | In Progress |
+| NFR-RECOVERY-001 | 오류·저장·PWA update에서 안전 복구 | M04·M09·M10 | corrupt storage quarantine/recovery + fault injection E2E | 011,014 | In Progress |
+| NFR-RELEASE-001 | P0/P1·INV 위반 0, 오너 승인 release identity와 commit·tag·artifact·production URL 일치 | M10·M11 | QA_REPORT + issue audit + release manifest + post-deploy identity check | 018,020 | Planned |
 | NFR-CODEX-001 | Codex 기여·사람 판단·검증 증거 구분 | 전 phase·M11 | collaboration log + commit links | 018 | In Progress |
 
 > **M02 완료 증거 (2026-08-21)**: `matrixCount=512 oracleUnvisited=0 rankMismatch=0 factorizationMismatch=0 pulseInvariantFailures=0`, 고정 시드 `randomMatrices=50000 determinismFailures=0`; `board`·`pulse`·`guards`·`gf2-rank`·`factorization` 5개 파일은 파일별 statements/branches/functions/lines 100%, `src/domain` test 27/27이다. 경계 검사는 `files=43 edges=40 violations=0 cycles=0 coreFiles=27 coreFixtureImplementations=5 coreFixtureAssertions=2`로 production 중복 구현과 의도적 self-check를 함께 검증했다. 이 증거는 M02 수학 계층만 닫으며 FR-CORE-003의 M04/M06 session·UI와 FR-HINT-001의 M04/M06 selector·UI는 아직 완료하지 않는다.
@@ -68,6 +70,8 @@
 > **M04 완료 증거 (2026-08-26)**: append-only action ledger·원자 PULSE·완료 event, `TIMER_TICK` high-water, pre-start canonical `ready`와 started-unsolved `paused` normalization, exact ledger cardinality·paused clock equality, Hint cap·best tuple, `WeakSet` provenance, canonical UTC year≥1, null-prototype Lab map, 네 v1 root와 quarantine backup-before-delete·128회 collision 탐색·progress salvage primary 재저장을 구현했다. `IdGenerator` issued ledger의 seed·reserve·retry·exhaustion과 Reset 후 별도 Daily progress root 보존도 검증했다. focused M04는 12파일/92테스트, migration 3/3, M04 aggregate S98.90/B98.79/F100/L98.95와 per-file branch 11/11(최저 95.45%), global 23파일/147테스트 S93.06/B91.81/F97.61/L94.31이며 lint·format·typecheck·boundaries와 `npm run verify`(scriptContract 19/19, steps 10/10)도 통과했다. milestone commit `95fbff2b4bff261ff16784099dc2a02df7473069`는 원격 `codex/m04-session-persistence-scoring`에 push됐고 PR은 만들지 않았다. 이로 storage service 자체인 NFR-STORAGE-001은 `Verified`지만 `IdGenerator` singleton·crypto source, 실제 UI token·Page Visibility·reload·Result 저장은 M05·M06, UTC Daily·streak·Archive는 M07에 남아 NFR-ID-001과 FR-CORE-003~007·FR-HINT-001·FR-DAILY-002·NFR-TIME-001·NFR-SCORE-001은 `In Progress`다. Sprint 산식은 M08 범위다.
 
 > **M05 완료 증거 (2026-08-29)**: Theme은 기본 `dark`에서 `dark → light → system → dark`, Motion은 기본 `system`에서 `system ↔ reduced`로 동작하며 custom high-contrast option/token/baseline은 없다. OS forced-colors·`highContrastCells`·legacy `high-contrast → dark` 정규화는 유지한다. focused 7파일/33테스트, global 30파일/180테스트, token 16파일·hardcode 0·예외 13, axe 18/18, local visual 18/18·baseline 9·diff 0, keyboard 3엔진, boundary/static a11y/build가 통과했고 오너가 baseline 9/9를 승인했다. implementation `f039bb8088d35df91ef393a9b226f22481981ca3`, runtime/Pages `1608c26cf4e8d3ca6be2c3765b20fb00bc7b06b9`, CI `33207406441`·Pages `33207406497` success이며 remote visual은 15 PASS+tablet 3 explicit SKIP이다. 공개 Pages 30/30과 `https://jtech-co.github.io/axis-shift/prototypes/rule-proof/` 908단언·외부 요청/콘솔 오류 0을 확인했다. Android·실제 screen reader·200% zoom·color vision은 0/4 `NOT RUN`·`DEFERRED_TO_M10`으로 PASS/면제가 아니다. 이 완료는 M06 이후가 남은 개별 FR/NFR 행을 조기 `Verified`로 승격하지 않는다.
+
+> **M06 구현·자동 검증 체크포인트 (2026-08-30)**: `app/ProductRoutes`·runtime, `features/home`·`tutorial`·`lab`·`game-session`, i18n과 실제 Tutorial/Lab route를 연결했다. 앱 수명 ID singleton·Web Crypto source·hydrate reserve, Page Visibility pause/resume, reload resume, `pulsing` 저장 정규화·중복 completion 방지, Result/Lab best, corrupt storage quarantine·recovery를 구현·검증했다. focused 4파일/27테스트, global 36파일/218테스트, product E2E `26 PASS + 10 intentional skips`, Tutorial 6+Lab 48 canonical 실패 0, actual-route axe `3/3`(serious/critical/external requests 0), verify `12/12`, 기존 visual `18/18`이 PASS다. Pages의 H00 호환 경로와 공개 root 기본 접속을 M06 React 제품으로 전환하고 legacy 공유 링크는 `legacy.html`로 보존하는 로컬 artifact에서 15 files·prototype files 11과 Chromium·Firefox·WebKit 36/36이 PASS다. fixed SHA·원격 CI·공개 배포 증거는 아직 없다. 신규 사용자 n≥5 Tutorial DOD-03은 `NOT RUN`이고 commit·PR·push도 없으므로 M06 완료나 관련 FR/NFR `Verified`를 선언하지 않는다. M07 Daily, M09 locale/PWA/share, M10 실기기·스크린리더·release gate 의존 상태는 유지한다.
 
 ## 4. H00 해커톤 제출 슬라이스 추적
 
@@ -85,10 +89,10 @@
 
 ## 5. 모드별 E2E 추적
 
-| 사용자 흐름 | 주요 요구 | Test file 목표 | Phase |
+| 사용자 흐름 | 주요 요구 | 실제/목표 Test file | Phase |
 |---|---|---|---|
-| 새 사용자 → Tutorial → 첫 Lab | CORE-001~007, LAB-001, A11Y | `tutorial.spec.ts`, `lab.spec.ts` | M06 |
-| Lab 중 reload → Resume | CORE-007, STORAGE | `persistence.spec.ts` | M06 |
+| 새 사용자 → Tutorial → 첫 Lab | CORE-001~007, LAB-001, A11Y | `tests/e2e/tutorial.spec.ts`, `tests/e2e/lab.spec.ts`, `tests/a11y/tutorial-lab.spec.ts` | M06 |
+| Lab 중 reload → Resume | CORE-007, STORAGE, TIME | `tests/e2e/persistence.spec.ts` | M06 |
 | 오늘 Daily → solve → reload | DAILY-001~002, CORE-004 | `daily.spec.ts` | M07 |
 | 과거 Archive direct route | DAILY-001, DEPLOY | `archive.spec.ts` | M07 |
 | 180초 Sprint background/reload | SPRINT-001 | `sprint.spec.ts` | M08 |
@@ -102,14 +106,18 @@
 
 M10 진입 전:
 
-- 모든 v1 FR/NFR 행이 `Planned` 이상이며 phase·test·INV가 비어 있지 않다.
-- `Deferred`는 기술 백서 비목표와 링크된다.
+- M00~M09의 선행 phase DoD가 모두 통과하고, 필수 FR/NFR에 구현 phase·test·INV가 연결된다.
+- 구현이 남아 `Planned`인 필수 행은 0건이다. M10의 production E4·실기기·통합 판정만 남은 행은 `In Progress`일 수 있다.
+- `Deferred`는 기술 백서 비목표와 오너 결정에 링크된다.
 
 M11 진입 전:
 
-- 모든 v1 필수 행이 `Verified`다.
+- 모든 일반 공개 출시 필수 행이 `Verified`이며 특히 NFR-DEPLOY-001·NFR-RELEASE-001의 production 증거가 연결된다.
 - `Blocked` 0건.
+- 프로젝트 오너가 release identifier·출시일·production URL·라이선스를 승인해 기록한다. 결정 전 값은 `TBD`로 유지한다.
 - test file·명령·CI artifact·QA_REPORT 증거를 실제 값으로 연결한다.
+- release manifest의 commit·tag·artifact SHA-256·production URL·배포 run이 서로 일치한다.
+- 실제 production URL의 post-deploy smoke와 마지막 green artifact rollback drill이 통과한다.
 - 코드 검색으로 요구사항 ID의 중복·누락을 검사한다.
 
 ## 7. 변경 규칙

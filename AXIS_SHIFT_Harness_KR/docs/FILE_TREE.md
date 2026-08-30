@@ -1,8 +1,8 @@
 # AXIS//SHIFT 파일 트리·모듈 경계 계약
 
-**버전**: 1.4.0
-**상태**: M01·M02·M03·M04·M05 완료 + 후속 phase 목표 계약
-**최종 갱신**: 2026-08-29
+**버전**: 1.5.0
+**상태**: M01~M05 완료 + M06 Tutorial·Lab 구현 체크포인트 + 후속 phase 목표 계약
+**최종 갱신**: 2026-08-30
 **관련 불변식**: INV-002, INV-003, INV-017, INV-019
 
 ## 1. 목표
@@ -14,7 +14,7 @@
 
 ## 2. 목표 저장소 트리
 
-> **물리 배치 주의 (2026-08-21)**: 아래 트리는 M11까지의 목표 구조이며 모든 항목이 현재 존재한다는 뜻이 아니다. 구현 항목(`prototypes/`, `src/`, `public/`, `tests/`, `scripts/`, 설정 파일)은 부모 `PROJECT_ROOT` 기준이고, phase·ADR·불변식·증거 문서는 개발 중 `PROJECT_ROOT/AXIS_SHIFT_Harness_KR/`에 유지한다. 바로 아래 §2.1~2.5에 M01~M05 실제 범위를 별도로 적는다.
+> **물리 배치 주의 (2026-08-30)**: 아래 트리는 M11까지의 목표 구조이며 모든 항목이 현재 존재한다는 뜻이 아니다. 구현 항목(`prototypes/`, `src/`, `public/`, `tests/`, `scripts/`, 설정 파일)은 부모 `PROJECT_ROOT` 기준이고, phase·ADR·불변식·증거 문서는 개발 중 `PROJECT_ROOT/AXIS_SHIFT_Harness_KR/`에 유지한다. 바로 아래 §2.1~2.6에 M01~M06 실제 범위를 별도로 적는다.
 
 ```text
 axis-shift/
@@ -23,7 +23,7 @@ axis-shift/
 │       ├── ci.yml
 │       └── deploy-pages.yml
 ├── decisions/                       # ADR
-├── docs/                            # 제품 계약·QA·제출 문서
+├── docs/                            # 제품 계약·QA·릴리스 문서
 ├── gates/                           # DoR·DoD 가이드
 ├── phases/                          # M00~M11 실행 파일
 ├── prototypes/
@@ -50,7 +50,10 @@ axis-shift/
 │   ├── app/
 │   │   ├── App.tsx
 │   │   ├── error-boundary.tsx
+│   │   ├── game-copy.ts
+│   │   ├── ProductRoutes.tsx
 │   │   ├── providers.tsx
+│   │   ├── runtime.ts
 │   │   └── router.tsx
 │   ├── assets/
 │   │   └── icons/
@@ -101,6 +104,7 @@ axis-shift/
 │   │   └── tutorial/
 │   ├── i18n/
 │   │   ├── en.ts
+│   │   ├── index.test.ts
 │   │   ├── index.ts
 │   │   └── ko.ts
 │   ├── services/
@@ -123,6 +127,7 @@ axis-shift/
 │   ├── main.tsx
 │   └── vite-env.d.ts
 ├── tests/
+│   ├── a11y/
 │   ├── e2e/
 │   ├── pages/
 │   └── visual/
@@ -289,13 +294,13 @@ vitest.m04.config.ts
 - `domain/session`은 actionId append-only ledger, 원자 PULSE·완료 event, Undo·Reset·Hint, `TIMER_TICK`·visibility 상태를 순수 reducer와 selector로 제공한다. 저장 ledger cardinality는 `moves.length + undoCount`이며 Reset ID의 앱·저장 수명 고유성은 호출자 계약이다.
 - `domain/scoring`은 Par 기반 base grade와 Hint cap, 완료 event에서만 만드는 runtime opaque candidate, `grade → PULSE → active elapsed` best tuple을 제공한다. candidate authenticity는 module-private `WeakSet` provenance가 보장하며 symbol brand만 복사한 객체는 거부한다.
 - `services/clock`만 `Date.now()`와 epoch→canonical UTC ISO 변환을 소유한다. domain은 `Date`를 import하지 않는다.
-- `services/id`는 scope별 issued ledger, hydrated seed, `reserveId()`, invalid·duplicate retry와 exhaustion을 제공한다. M06가 이를 앱 singleton과 crypto-backed source에 연결한다.
+- `services/id`는 scope별 issued ledger, hydrated seed, `reserveId()`, invalid·duplicate retry와 exhaustion을 제공한다. M06 제품 runtime이 이를 앱 수명 singleton, Web Crypto-backed source와 hydrate seed/reserve 흐름에 연결했다.
 - `services/storage`는 settings·progress·session·generator-map 네 v1 root와 `StoragePort`를 제공한다. 시작 전 Hint·visibility는 canonical `ready`, 시작된 미해결 snapshot은 open segment를 한 번 합산하고 `hiddenAtEpochMs === lastObservedEpochMs`인 `paused`로 정규화한다. null-prototype Lab map·year≥1 UTC guard를 적용하고, 손상 raw는 기존 quarantine key를 덮어쓰지 않는 최대 128회 collision 탐색과 backup 성공 뒤에만 제거한다. progress salvage는 제거 성공 뒤 repaired primary로 다시 저장한다. [ADR-0011](../decisions/0011-appearance-cycle-controls.md)에 따라 새 settings 쓰기 theme은 `dark | light | system`·기본 `dark`이고 legacy v1 `high-contrast` 읽기는 `dark`로 정규화한다. OS forced-colors와 별도 `highContrastCells` 필드는 유지한다.
 - v1은 최초 공개 schema이므로 migration registry는 비어 있는 상태가 정상이다. 실제 이전 schema가 생길 때만 순차 단계를 추가한다.
 - `vitest.m04.config.ts`는 M04 핵심 구현 11개 파일마다 branches 95%를 요구한다. 완료 기준선은 focused 12파일/92테스트, M04 S98.90/B98.79/F100/L98.95, per-file branch 11/11·최저 `best-record.ts` 95.45%(selectors 95.65%, repository 97.67%), global 23파일/147테스트 S93.06/B91.81/F97.61/L94.31이다.
 - canonical app build는 기존 `dist`에서 발생한 Vite 8 Windows native cleanup crash를 피하려 `scripts/clean-build-output.ts`가 검증된 `dist`만 preclean하고 Vite는 `emptyOutDir=false`로 실행한다.
 - 공통 `vitest.config.ts`는 Vitest 4의 Windows fork startup 포화를 피하도록 thread pool을 최대 4개로 제한하고, 부하 시 jsdom false-timeout을 피하는 30초 test timeout을 적용한다.
-- production GameScreen/controller, `IdGenerator` singleton·crypto source, Page Visibility dispatch, paused resume, Lab result 저장과 browser reload E2E는 M06에 남아 있다. M05가 제공한 shared UI는 아래 §2.5의 presentational 범위로 제한한다. UTC Daily·streak·Archive는 M07, Sprint 절대 타이머·점수는 M08 범위다.
+- production GameScreen/controller, `IdGenerator` singleton·crypto source, Page Visibility dispatch, paused resume, Lab Result 저장과 browser reload E2E는 아래 §2.6 M06 구현 체크포인트에서 연결했다. M05 shared UI의 presentational 경계는 유지한다. UTC Daily·streak·Archive는 M07, Sprint 절대 타이머·점수는 M08 범위다.
 
 ### 2.5 M05 디자인 시스템의 실제 구현 범위
 
@@ -351,11 +356,66 @@ tests/ui-fixtures/index.html
 ```
 
 - `game-ui.ts`는 reducer·selector 결과에서 만든 `idle`, `selected`, `preview`, `pulsing`, `paused`, `solved`, `error`, `disabled`의 8개 상태 fixture를 제공한다. test-only fixture entry는 production router와 Pages 공개 route에 포함하지 않는다.
-- common·layout·game 컴포넌트는 번역된 문자열, 표시 DTO, callback만 받는 presentational 계층이다. 세션 규칙을 다시 계산하거나 production controller·storage·Page Visibility를 소유하지 않는다. 실제 Result·Lab 저장과 reload orchestration은 M06 범위다.
+- common·layout·game 컴포넌트는 번역된 문자열, 표시 DTO, callback만 받는 presentational 계층이다. 세션 규칙을 다시 계산하거나 production controller·storage·Page Visibility를 소유하지 않는다. 실제 Result·Lab 저장과 reload orchestration은 `features/game-session`과 app runtime이 소유한다.
 - `playwright.ui-fixtures.config.ts`와 `start-ui-fixtures-server.ts`는 axe·키보드·visual fixture를 동일한 test-only Vite entry에서 실행한다. Theme 단일 버튼은 기본 dark에서 dark→light→system→dark로, Motion 단일 버튼은 기본 system에서 system↔reduced로 전환한다. 5개 viewport, dark/light/system, reduced motion, 긴 문자열, 최소 44px target과 overlap을 검사한다.
 - `tests/visual/__snapshots__`의 9개 `*-ui-fixtures-win32.png`는 dark/light/system × mobile/tablet/desktop의 full-fixture Windows canonical test baseline이며 runtime 자산이 아니다. custom high-contrast baseline은 ADR-0011로 제거했고 OS forced-colors 지원은 유지한다.
 - M05 자동 E2/E3는 focused 7파일/33테스트, global 30파일/180테스트, token 16파일·하드코드 0·예외 13, axe 18/18, local visual 18/18·baseline 9·strict diff 0, keyboard 3엔진, boundary/static a11y, build를 통과했다. 프로젝트 오너 baseline 9/9는 승인됐고 수동 E1 0/4는 `DEFERRED_TO_M10`이다. 로컬 Pages artifact는 14 files·353631 bytes·prototypeFiles 10, 3엔진 30/30, H00 browser 908단언이다.
 - implementation `f039bb8088d35df91ef393a9b226f22481981ca3`와 runtime/Pages `1608c26cf4e8d3ca6be2c3765b20fb00bc7b06b9`를 배포했다. CI `33207406441`·Pages `33207406497` success, remote visual 15 PASS+tablet 3 explicit SKIP, 공개 Pages 30/30, `https://jtech-co.github.io/axis-shift/prototypes/rule-proof/` 908단언·external/console 0이다.
+
+### 2.6 M06 Tutorial·Lab 제품 흐름의 실제 구현 범위
+
+2026-08-30 자동 체크포인트 기준 실제 생성·활성화한 production/test 트리는 다음 범위다.
+
+```text
+src/app/
+├── App.{tsx,test.tsx}
+├── ProductRoutes.{tsx,module.css}
+├── game-copy.ts
+├── runtime.ts
+└── router.tsx
+src/features/
+├── home/
+│   ├── HomePage.{tsx,module.css,test.tsx}
+│   ├── RecoveryPage.tsx
+│   └── index.ts
+├── tutorial/
+│   ├── tutorial-policy.{ts,test.ts}
+│   ├── TutorialCoachmark.{tsx,module.css}
+│   └── index.ts
+├── lab/
+│   ├── lab-catalog.{ts,test.ts}
+│   ├── LabPage.{tsx,module.css,test.tsx}
+│   └── index.ts
+└── game-session/
+    ├── GameSessionScreen.tsx
+    ├── game-session.test.tsx
+    ├── presenter.ts
+    ├── runtime.ts
+    ├── use-game-session-controller.ts
+    └── index.ts
+src/i18n/
+├── ko.ts
+├── en.ts
+├── index.ts
+└── index.test.ts
+tests/
+├── a11y/tutorial-lab.spec.ts
+└── e2e/
+    ├── helpers/game-flow.ts
+    ├── tutorial.spec.ts
+    ├── lab.spec.ts
+    └── persistence.spec.ts
+```
+
+- `features/game-session`은 M04 순수 session/scoring과 storage·clock·ID port를 M05 `GameStage` 표시 DTO/callback에 결합한다. 앱 수명 runtime은 Web Crypto ID source, hydrated ID reserve, Page Visibility 구독, autosave·resume·completion 단일 처리와 복구 경고를 제공한다.
+- `app/ProductRoutes.tsx`는 Home first-run/Continue, Tutorial query step, Lab catalog/level allowlist, invalid level 복구, Result replay/next와 progress 저장을 feature public API로 조합한다. app은 `components/game`·`content` 내부를 직접 import하지 않는다.
+- Tutorial은 승인된 6개 레벨 순서와 단계별 학습 selector, skip/back/advance policy를 데이터 기반으로 제공한다. Lab은 `pulse`, `echo`, `rank`, `noise` 4 chapter×12를 모두 자유 접근으로 제공하고 best record를 표시한다.
+- i18n은 Tutorial·Lab·Game·Hint·Reset·Resume·Result와 54개 level title의 ko/en parity를 검사한다. M09의 실제 locale 전환·설정 저장 완료를 대신하지 않는다.
+- browser helper는 canonical solution을 production control로만 실행한다. Tutorial 6의 해결·session clear·다음 이동과 Lab 48의 해결·결과 저장·다음 이동 실패는 0이며 Tutorial level record는 만들지 않는다. first-run·keyboard·rapid input·Hint cap·best merge·Reset focus·360px·reload/pulsing/quarantine를 분리 검증한다.
+- 자동 증거는 focused `4 files / 27 tests`, global `36 files / 218 tests`, M06 E2E `26 PASS + 10 intentional skips`, actual-route axe `3/3`, `verify 12/12`, 기존 M05 visual `18/18` PASS다.
+- 신규 사용자 n≥5의 Tutorial 학습 실효 DOD-03은 `NOT RUN`이다. 이 구현 체크포인트는 M06 완료·릴리스 승인·fixed commit·push 증거가 아니며 commit/PR/push는 없다.
+- UTC Daily·streak·Archive는 M07, Sprint는 M08, 공유·PWA·완성된 locale 설정은 M09, 실기기·스크린리더·zoom·색각과 release gate는 M10 범위다.
+
 ## 3. 계층별 책임
 
 | 계층 | 책임 | 허용되는 부수효과 |
@@ -468,7 +528,7 @@ Date.now, performance.now, setTimeout, crypto.getRandomValues
 - manifest에 포함되지 않은 generated candidate 전체 dump
 - `outputs/m03/` Daily 감사 JSON·Markdown·checksum(phase 문서에는 hash 요약만 보존)
 - OS metadata·editor cache
-- 제출용 대형 영상 원본
+- H00 제출용 대형 영상 원본
 
 CI artifact나 외부 보관 경로를 `PROGRESS.md`에 기록한다.
 

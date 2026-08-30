@@ -1,8 +1,8 @@
 # AXIS//SHIFT 문서 세트
 
 **버전**: 1.0.0  
-**상태**: Pre-Production  
-**최종 갱신**: 2026-08-09
+**상태**: 일반 공개 웹게임 출시 전환 — M06 진행, H00 제출 기록 보존
+**최종 갱신**: 2026-08-30
 
 > 루트 하네스가 “어떻게 진행·검증하는가”를 정의한다면, 이 디렉터리는 “무엇을 만들며 어떤 계약을 지키는가”를 정의한다.
 
@@ -33,11 +33,11 @@ AGENTS.md·HARNESS.md·INVARIANTS.md
 | `ENVIRONMENT.md` | Node·npm·브라우저·CI·Pages 실행 계약 | 개발·배포 | 도구·환경 변경 |
 | `PUZZLE_MATH.md` | `GF(2)` 규칙, Par 증명, canonical factorization, 오라클 | 도메인 개발·검증 | 수학 계약 변경 |
 | `REQUIREMENTS_TRACEABILITY.md` | 요구사항 → phase → 모듈 → 테스트 → INV | PM·QA | 기능·테스트 변경 |
-| `CODEX_COLLABORATION.md` | Codex 기여와 사람 결정을 검증 증거로 기록 | 심사·개발 | 작업 묶음마다 |
+| `CODEX_COLLABORATION.md` | Codex 기여와 사람 결정을 검증 증거로 기록 | 개발·감사 | 작업 묶음마다 |
 | `PLAYTEST_PROTOCOL.md` | 신규 사용자 이해도·완료 시간·공유 의향 측정 | UX·QA | 테스트 전후 |
 | `QA_REPORT.md` | 릴리스 후보의 자동·수동 검증 결과 | QA·릴리스 | M10·M11 |
-| `RELEASE_CHECKLIST.md` | 출시 차단 항목과 최종 승인 | 릴리스 담당 | RC·v1.0 |
-| `SUBMISSION_PACKAGE.md` | 행사 제출 필드, 썸네일, 영상, 최종 대조 | 제출 담당 | M11 |
+| `RELEASE_CHECKLIST.md` | 일반 공개 출시 차단 항목, 배포·롤백·운영 인계와 최종 승인 | 릴리스·운영 담당 | RC·공개 출시 |
+| `SUBMISSION_PACKAGE.md` | 완료된 H00 행사 제출 사실과 폐기된 미래 제출 템플릿의 역사 보관 | 역사 감사 | H00 사실·수치 변경 금지; archival 표식만 허용; 정규 M11 게이트에서 제외 |
 | `ASSET_LICENSES.md` | 자산 출처·저작자·권리·수정·포함 위치 | 개발·법적 검토 | 자산 추가 즉시 |
 | `RELEASE_NOTES.md` | 버전별 기능·제약·빌드·배포 정보 | 사용자·릴리스 | 태그마다 |
 
@@ -55,8 +55,8 @@ AGENTS.md·HARNESS.md·INVARIANTS.md
 | M07 | 기술 §4.4·4.6, ADR-0003 |
 | M08 | 기술 §2.2.5~6. 정확한 점수식은 별도 사람 결정 필요 |
 | M09 | 기술 §4.7~9·5.3~4, 디자인 Share·Settings·About, ADR-0005~0007 |
-| M10 | `REQUIREMENTS_TRACEABILITY.md`, `QA_REPORT.md`, `RELEASE_CHECKLIST.md` |
-| M11 | `SUBMISSION_PACKAGE.md`, `CODEX_COLLABORATION.md`, `ASSET_LICENSES.md`, `RELEASE_NOTES.md` |
+| M10 | `REQUIREMENTS_TRACEABILITY.md`, `QA_REPORT.md`, `RELEASE_CHECKLIST.md`, `ENVIRONMENT.md` |
+| M11 | `RELEASE_CHECKLIST.md`, `QA_REPORT.md`, `CODEX_COLLABORATION.md`, `ASSET_LICENSES.md`, `RELEASE_NOTES.md`, `ENVIRONMENT.md` |
 
 ## 4. 상태 표기
 
@@ -65,7 +65,13 @@ AGENTS.md·HARNESS.md·INVARIANTS.md
 - **실행 기록**: 명령·수치·환경을 포함하는 결과 문서.
 - **템플릿**: 실제 값을 채우기 전에는 통과 근거가 아님.
 
-현재 기술·디자인 백서는 v1.0 제품 계약 초안이며, M00 Scope Lock과 각 ADR을 통해 공개 계약을 확정한다. `QA_REPORT.md`와 제출·릴리스 문서는 아직 미실행 템플릿이다.
+현재 기술·디자인 백서는 정규 제품 계약 초안이며, M00 Scope Lock과 각 ADR을 통해 공개 계약을 확정한다. `QA_REPORT.md`와 일반 출시용 `RELEASE_CHECKLIST.md`·`RELEASE_NOTES.md`는 실제 RC 증거를 채우기 전에는 미실행 템플릿이다. `SUBMISSION_PACKAGE.md`는 완료된 H00 행사 제출의 보관 기록이며 일반 공개 출시의 입력·DoR·DoD·승인 근거로 사용하지 않는다.
+
+### 일반 공개 출시 문서 계약
+
+- 출시 버전·날짜·채널·canonical URL 또는 도메인·라이선스는 프로젝트 오너가 승인해 기록하기 전까지 `TBD`다. 문서가 값을 추정하거나 임의 생성하지 않는다.
+- M10은 고정 commit의 전체 QA와 실제 배포 후 smoke를, M11은 오너 승인 RC freeze·artifact manifest·rollback 검증·support/feedback·privacy/rights·운영 인계를 닫는다.
+- H00의 행사명, 공식 양식, 200자 소개, 최대 3분 영상, 제출 마감, tag·SHA·URL·검증 결과는 역사 기록으로만 보존한다. 정규 릴리스 요구로 승격하거나 현재 제품 완료 증거로 재사용하지 않는다.
 
 ## 5. 갱신 규율
 

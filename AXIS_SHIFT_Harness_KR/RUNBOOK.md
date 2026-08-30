@@ -43,7 +43,7 @@
 | 29 | E2E가 간헐적으로 실패 | 실시간 날짜·모션·SW·랜덤 시드·비동기 폰트 | Clock/seed 주입 → reduced motion 테스트 → service worker를 테스트별 명시 제어 → locator 기반 대기 | INV-008, INV-018 |
 | 30 | 번들에 외부 네트워크 요청이 생김 | CDN 폰트, analytics, third-party icon | Playwright request allowlist 검사 → 자산 로컬화 또는 제거 → 필요 시 ADR·사용자 승인 | INV-017 |
 | 31 | asset license가 불명확 | 생성 출처·수정 이력 미기록 | 자산 사용 중단 → 원본·저작자·라이선스 확인 → `docs/ASSET_LICENSES.md` 등록 전 재도입 금지 | INV-019 |
-| 32 | 실제 배포는 열리나 심사위원이 코어를 못 찾음 | 온보딩 CTA 약함, 라우트 오류, 안내 누락 | incognito에서 2클릭 내 튜토리얼/Daily 확인 → README와 인게임 조작법 → M11 3분 시연 리허설 | INV-020 |
+| 32 | 실제 배포는 열리나 신규 사용자가 코어 플레이를 못 찾음 | 온보딩 CTA 약함, 라우트 오류, 안내 누락 | 새 프로필에서 2클릭 내 Tutorial/Daily 진입 확인 → README와 인게임 조작법 대조 → M11 post-deploy first-run smoke | INV-020 |
 
 ## 행 추가 형식
 

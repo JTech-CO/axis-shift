@@ -180,7 +180,7 @@ Playwright 브라우저 설치 비용 때문에 `test:e2e`와 `test:a11y`는 로
 
 ```text
 환경: Pixel 8 / Android / Chrome xx / 360×800 CSS px
-빌드: v1.0.0-rc.1, commit abc1234
+빌드: <owner-approved-rc-id>, commit abc1234
 절차:
 1. 새 프로필에서 URL 접속
 2. 키보드 또는 터치로 Tutorial 시작

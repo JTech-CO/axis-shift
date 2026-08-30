@@ -1,13 +1,20 @@
-# AXIS//SHIFT — OpenAI Game Builders Seoul 제출 패키지
+# AXIS//SHIFT — H00 OpenAI Game Builders Seoul 제출 패키지 (Archived)
 
 **문서 버전**: 1.0.0  
-**상태**: H00 v0.1 공식 양식 제출 완료 — 프로젝트 오너 확인, 제출 메타데이터 미제공
+**상태**: `ARCHIVED` — H00 v0.1 공식 양식 제출 완료 사실 보존 / 미사용 미래 제출 템플릿 `RETIRED` / 정규 M11 제외
 **공식 안내 확인일**: 2026-08-21
 **제출 상태 기록 갱신**: 2026-08-26
+**보관 분류 갱신**: 2026-08-30
 **제출 접수 종료**: 2026-08-26  
 **공식 안내**: `https://openaigame2026.com/#main`
 
-> H00 기록은 2026-08-21에 실제 공식 양식을 다시 확인한 결과다. Google 계정 인증, 팀·연락처 정보, 동의 확인과 최종 `Submit`은 프로젝트 오너가 직접 수행했고 이후 제출 완료를 확인했다. Codex는 해당 행위를 수행하지 않았다. 정확한 제출 시각·접수 ID·확인 화면은 제공되지 않아 기록하거나 추정하지 않는다. 아래 M11 v1.0 템플릿은 향후 별도 릴리스를 위해 보존하며 H00 제출 완료와 혼동하지 않는다.
+> H00 기록은 2026-08-21에 실제 공식 양식을 다시 확인한 결과다. Google 계정 인증, 팀·연락처 정보, 동의 확인과 최종 `Submit`은 프로젝트 오너가 직접 수행했고 이후 제출 완료를 확인했다. Codex는 해당 행위를 수행하지 않았다. 정확한 제출 시각·접수 ID·확인 화면은 제공되지 않아 기록하거나 추정하지 않는다.
+
+보관 계약:
+
+- 이 문서는 완료된 H00 행사 제출의 역사 증거이며 tag·SHA·URL·검증 수치·제출 사실을 이후 일반 릴리스 값으로 덮어쓰지 않는다.
+- 아래 미사용 미래 제출 템플릿은 H00 시기의 계획 흔적을 보존한 `RETIRED` 부록이다. 공식 양식·200자 소개·3분 영상·마감은 일반 공개 웹게임 M10/M11의 DoR·DoD·승인 조건이 아니다.
+- 정규 M11은 `RELEASE_CHECKLIST.md`, `QA_REPORT.md`, `RELEASE_NOTES.md`, `ASSET_LICENSES.md`, `CODEX_COLLABORATION.md`, `ENVIRONMENT.md`를 사용한다. 이 문서를 활성 gate나 release manifest로 참조하지 않는다.
 
 ## H00 v0.1 submission-ready 패키지
 
@@ -67,11 +74,15 @@
 
 `submission-package-review.png`와 최종 tag·run·archive를 담은 `release-package-review.png`를 1920×1080에서 육안 검토했다. primary `.private/submission/H00`와 secondary `<USER_DOCUMENTS>/AXIS_SHIFT_H00_Backup/v0.1.0-hackathon`은 각 15 files이며 hash delta는 0이다. 공식 양식의 최종 제출은 Google 계정, 개인·팀 정보, 약관·개인정보·국외 이전 동의를 포함하므로 프로젝트 오너가 직접 수행했고 이후 완료를 확인했다. 정확한 제출 시각, submission ID, 확인 화면은 제공되지 않았다. 비공개 원자료는 Git에 포함하지 않으며, 제출 완료로 정리 조건은 충족했지만 삭제 권한은 별도로 부여되지 않았으므로 오너의 명시적 정리 결정 전까지 기존 두 위치에 보존한다.
 
-## 1. M11 v1.0 공식 제출 필드 스냅샷 — H00 미사용 템플릿
+## RETIRED H00-era template §1 — 미사용 미래 공식 제출 필드 스냅샷
 
 2026-08-09 확인 기준:
 
-> 이 절과 아래 §2~§12는 모두 향후 M11 v1.0 템플릿이다. H00 제출 문구·완료 주장·자산 경로로 사용하지 않는다.
+> 이 절과 아래 retired §2~§12는 H00 시기에 작성했으나 사용하지 않은 미래 행사 제출 템플릿이다. 현재 M11·일반 공개 릴리스·운영 인계에서는 폐기됐으며 체크하거나 값을 채우지 않는다.
+
+- 아래 게임 소개 200자, 16:9 제출 썸네일, 최대 3분 영상, 양식 필드, 계정·마감 절차는 H00 행사 맥락의 역사적 요구다.
+- 아래 `v1.0.0` 파일명과 placeholder는 당시 계획 예시일 뿐 현재 release version·date·channel·domain·license를 정하지 않는다.
+- 일반 공개 릴리스 식별은 전부 프로젝트 오너 승인 전 `TBD`이며 `RELEASE_CHECKLIST.md`에서만 해소한다.
 
 | 필드 | 필수 | 현재 계약 |
 |---|---:|---|
@@ -92,22 +103,22 @@ Release Potential
 Presentation
 ```
 
-## 2. 최종 필드 원본
+## RETIRED H00-era template §2 — 최종 필드 원본
 
 | 필드 | 최종 값 | 검증자 | 검증 일시 |
 |---|---|---|---|
 | Title | AXIS//SHIFT — A Daily Tensor Puzzle | — | — |
-| Repository | M11에서 입력 | — | — |
-| Gameplay URL | M11에서 입력 | — | — |
-| Release tag | M11에서 입력 | — | — |
-| Commit SHA | M11에서 입력 | — | — |
-| Thumbnail | M11에서 입력 | — | — |
-| Demo video | M11에서 입력 | — | — |
+| Repository | RETIRED placeholder | — | — |
+| Gameplay URL | RETIRED placeholder | — | — |
+| Release tag | RETIRED placeholder | — | — |
+| Commit SHA | RETIRED placeholder | — | — |
+| Thumbnail | RETIRED placeholder | — | — |
+| Demo video | RETIRED placeholder | — | — |
 | Codex process text | 아래 최종본으로 교체 | — | — |
-| Submission timestamp | M11에서 입력 | — | — |
-| Confirmation evidence | M11에서 입력 | — | — |
+| Submission timestamp | RETIRED placeholder | — | — |
+| Confirmation evidence | RETIRED placeholder | — | — |
 
-## 3. 200자 소개문 초안
+## RETIRED H00-era template §3 — 200자 소개문 초안
 
 ### 한국어 초안 A — 규칙 중심 (현재 101자)
 
@@ -123,9 +134,9 @@ Presentation
 
 > Select rows and columns to flip their intersections. Restore the target in the provable minimum number of pulses, solve the same daily puzzle, and share a spoiler-free signal card in this 1–3 minute logic game.
 
-영문이 공식 필수가 아니라면 저장소·영상 자막·OG 설명에 사용한다.
+이는 당시 행사 제출용 참고 문구이며 현재 README·OG·일반 출시 카피로 자동 승격하지 않는다.
 
-## 4. Gameplay URL 승인 기준
+## RETIRED H00-era template §4 — Gameplay URL 승인 기준
 
 - 로그인·초대·비밀번호 없음
 - 새 browser profile에서 첫 화면 로드
@@ -145,11 +156,11 @@ Final smoke:
 npm run smoke:production -- --url "$PRODUCTION_URL"
 ```
 
-외부 네트워크와 QR/제출 미리보기 링크에서도 한 번 더 확인한다.
+당시 템플릿은 외부 네트워크와 QR/제출 미리보기 링크 재확인을 요구했다. 현재 일반 출시 smoke 계약은 `RELEASE_CHECKLIST.md`와 M10/M11 phase를 따른다.
 
-## 5. 썸네일 사양
+## RETIRED H00-era template §5 — 제출 썸네일 사양
 
-### 제출본
+### Retired 제출본 예시
 
 - 비율: 16:9
 - 권장 작업 크기: 1920×1080
@@ -177,7 +188,7 @@ npm run smoke:production -- --url "$PRODUCTION_URL"
 - 미등록 외부 로고·폰트·이미지
 - 게임 UI와 다른 색·컴포넌트
 
-## 6. 최대 3분 데모 영상
+## RETIRED H00-era template §6 — 최대 3분 데모 영상
 
 ### 권장 타임라인
 
@@ -194,7 +205,7 @@ npm run smoke:production -- --url "$PRODUCTION_URL"
 
 ### 영상 게이트
 
-- 실제 v1.0.0 production build 사용
+- 당시 계획한 production build 사용
 - 길이 3:00 이하
 - 1080p 이상 권장
 - 커서·터치가 action을 가리지 않음
@@ -204,7 +215,7 @@ npm run smoke:production -- --url "$PRODUCTION_URL"
 - 설명 수치가 QA_REPORT와 일치
 - public 또는 심사자가 접근 가능한 권한
 
-## 7. Codex 활용 설명 초안 골격
+## RETIRED H00-era template §7 — Codex 활용 설명 초안 골격
 
 최종본은 `CODEX_COLLABORATION.md`의 실제 로그로만 채운다.
 
@@ -223,11 +234,11 @@ Sprint 점수와 최종 릴리스 승인을 유지했습니다.
 관련 commit/문서: [실제 링크]
 ```
 
-실제 구현 전 현재 초안을 제출하지 않는다.
+현재 일반 출시나 외부 제출에 이 초안을 사용하지 않는다.
 
-## 8. 저장소 공개 상태
+## RETIRED H00-era template §8 — 저장소 공개 상태
 
-M11 확인:
+당시 미래 제출 확인 항목:
 
 - repository visibility: public
 - default branch: main
@@ -240,7 +251,7 @@ M11 확인:
 - `CODEX_COLLABORATION.md` 공개 가능한 내용만 포함
 - 해커톤용 임시 access token 없음
 
-## 9. 제출 전 독립 대조표
+## RETIRED H00-era template §9 — 제출 전 독립 대조표
 
 | 항목 | 1차 확인 | 2차 확인 | 최종 |
 |---|---|---|---|
@@ -254,9 +265,9 @@ M11 확인:
 | Contact/account | — | — | — |
 | 제출 마감·timezone | — | — | — |
 
-가능하면 한 번은 제출 작성자와 다른 사람이 검토한다. 단독 작업이면 브라우저 세션을 닫고 `SUBMISSION_PACKAGE.md` 원본과 다시 대조한다.
+위 표는 당시 행사 제출용 retired 검토표이며 일반 출시에는 사용하지 않는다.
 
-## 10. 제출 당일 절차
+## RETIRED H00-era template §10 — 제출 당일 절차
 
 1. 공식 페이지의 마감·필드·파일 제한 재확인.
 2. final production smoke 실행.
@@ -269,7 +280,7 @@ M11 확인:
 9. confirmation 화면·메일·submission ID 저장.
 10. 제출 시각과 final values를 이 문서에 기록.
 
-## 11. 백업 패키지
+## RETIRED H00-era template §11 — 제출 백업 패키지 예시
 
 ```text
 submission/
@@ -286,7 +297,9 @@ submission/
 
 두 위치 이상에 저장하되 공개하면 안 되는 계정·연락정보는 package와 분리한다.
 
-## 12. 제출 후 기록
+위 파일명·버전은 retired 예시다. 일반 공개 release manifest·source archive·artifact backup은 `RELEASE_CHECKLIST.md`의 실제 owner-approved release identity를 사용한다.
+
+## RETIRED H00-era template §12 — 제출 후 기록
 
 | 항목 | 값 |
 |---|---|
@@ -300,4 +313,4 @@ submission/
 | Post-submit smoke | — |
 | Allowed edit window | — |
 
-제출 당시 증거를 이후 release로 덮어쓰지 않는다.
+H00 제출 당시 증거를 이후 일반 release로 덮어쓰지 않는다. 이 retired template의 빈칸은 계속 비워 둔다.

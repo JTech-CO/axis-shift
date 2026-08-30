@@ -1,8 +1,8 @@
 # AXIS//SHIFT 개발·검증·배포 환경 계약
 
-**버전**: 1.2.0
-**상태**: M01~M05 완료; M05 원격 CI·Pages·공개 제출 URL smoke 통과, 수동 E1 0/4는 M10 release-blocking gate로 이관
-**최종 갱신**: 2026-08-29
+**버전**: 1.3.0
+**상태**: M01~M05 완료 + M06 Tutorial·Lab 구현 체크포인트; M06 DOD-03 `NOT RUN`, M10 수동 E1 release-blocking gate 유지
+**최종 갱신**: 2026-08-30
 
 ## 1. 기준 환경
 
@@ -77,6 +77,21 @@ token 예외 13개는 CSS custom property를 사용할 수 없는 media query �
 자동 증거와 수동 E1을 분리한다. ADR-0011 변경분을 포함한 자동 E2/E3, 오너 baseline 9/9, 고정 SHA 원격 CI·Pages와 실제 공개 제출 URL smoke를 확보해 M05를 완료했다. 실제 Android Chrome, NVDA/VoiceOver 동등 스크린리더, 200% zoom, 색각 검토는 0/4 `NOT RUN`이며 ADR-0012로 M10에 이관했다. 이는 PASS나 면제가 아니다.
 
 strict 0-pixel visual 재실행에서는 transparent backdrop blur가 rounded button corner 한 color channel을 비결정적으로 바꿔 mobile 2/18, 이어 tablet 3/18 실패했다. toolbar를 opaque canvas token background로 고정하고 baseline을 재생성한 뒤 동일 no-update가 18/18, `maxDiffPixels=0`, threshold 0, diff 0으로 통과했다.
+
+### M06 Tutorial·Lab 구현 체크포인트
+
+| 항목 | 실제 기준 |
+|---|---|
+| Phase/evidence | 구현·자동 검증 체크포인트; 신규 사용자 n≥5 Tutorial DOD-03 `NOT RUN`; fixed SHA·commit·PR·push 없음 |
+| Product routes | 홈, `/#/tutorial`, `/#/lab`, `/#/lab/:id`, unknown-route recovery |
+| Runtime | 앱 수명 `IdGenerator` singleton + Web Crypto source, hydrate reserve, Page Visibility pause/resume, completion 단일 처리 |
+| Focused / global unit | 4파일 / 27테스트 PASS; 36파일 / 218테스트 PASS |
+| Product E2E | Chromium·Firefox·WebKit `26 PASS + 10 intentional skips`; Tutorial 6+Lab 48 canonical 실패 0 |
+| Persistence E2E | reload resume, `pulsing` 정규화·중복 completion 방지, corrupt storage quarantine·recovery 3-engine PASS |
+| Actual-route axe | `3/3` PASS; serious 0, critical 0, external requests 0 |
+| Full verify / visual | verify `12/12`; 기존 M05 visual `18/18` PASS |
+| Pages artifact | root·H00 호환 base M06 제품 + legacy shared-link 보존 계약; 로컬 route/artifact E2E 3-engine PASS(고정 테스트 개수 미기재) |
+
 ## 2. 지원 개발 OS
 
 - Windows 10/11 + PowerShell 7 또는 Git Bash
@@ -150,6 +165,13 @@ npm run test:visual -- --project=ui-fixtures
 npm run test:e2e -- tests/e2e/keyboard-core.spec.ts
 ```
 
+M06 제품 흐름·실제 route 접근성 canonical 명령은 다음과 같다.
+
+```bash
+npm run test:a11y -- --grep "Tutorial|Lab"
+npm run test:e2e -- tests/e2e/tutorial.spec.ts tests/e2e/lab.spec.ts tests/e2e/persistence.spec.ts
+```
+
 M03 종료 재검증에서 기본 `npm run generate:level-candidates -- --seed axis-shift-curation-v1`는 full manifest·순서 있는 catalog·human 필드를 정규화한 machine scaffold의 approval fingerprint exact match에서 승인 evidence를 byte-preserve하고 `curation=preserved`를 출력했다. catalog·manifest·scaffold 변경은 `PENDING` 재생성, 같은 fingerprint의 machine 편집은 fail-closed한다. `--reset-curation`은 사람 승인을 명시적으로 폐기하므로 closure 명령에 포함하지 않는다.
 
 후속 phase에서 추가할 권장 script:
@@ -207,19 +229,21 @@ $env:VITE_BASE_PATH = '/axis-shift/'
 npm run build
 ```
 
-M01 필수 확인:
+M06 제품 route 확인:
 
 ```text
 /axis-shift/#/
-/axis-shift/#/daily
+/axis-shift/#/tutorial
+/axis-shift/#/lab
+/axis-shift/#/lab/:id
 /axis-shift/#/unknown
 ```
 
 - 모두 서버 404 없이 app shell을 받는다.
 - unknown route는 앱 내부 복구 화면을 보인다.
-- `npm run test:e2e`는 위 세 route와 44px AppShell 상호작용 타깃을 Chromium·Firefox·WebKit에서 검사한다.
+- `npm run test:e2e`는 위 M06 route, 44px 상호작용 타깃, Tutorial·Lab 제품 흐름을 Chromium·Firefox·WebKit에서 검사한다.
 
-`/#/tutorial`은 M06, `/#/daily/YYYY-MM-DD`는 M07, manifest `start_url/scope`와 worker scope는 M09에서 이 목록에 추가한다. M01은 PWA나 아직 없는 route를 통과했다고 주장하지 않는다.
+`/#/daily`·`/#/daily/YYYY-MM-DD`·Archive는 M07, manifest `start_url/scope`와 worker scope는 M09에서 이 목록에 추가한다. M06 체크포인트는 PWA나 아직 없는 route를 통과했다고 주장하지 않는다.
 
 ## 7. 테스트 환경 고정
 
@@ -275,7 +299,9 @@ checkout
 → build
 → Chromium·Firefox·WebKit 설치
 → M05 axe fixture
+→ M06 Tutorial·Lab actual-route axe
 → M05 keyboard core 3엔진
+→ M06 Tutorial·Lab·persistence product flow 3엔진
 → non-root route core E2E
 → M03 PRNG·Daily browser parity 3엔진
 ```
@@ -309,9 +335,9 @@ checkout
 → Pages artifact upload/deploy
 ```
 
-Pages도 정적 접근성 검사를 browser 설치 전에 수행하고, axe는 Chromium 설치 뒤 수행한다. 자동 E2/E3가 통과해도 실제 Android Chrome·스크린리더·200% zoom·색각 검토의 수동 E1 4개를 CI 성공으로 대체하지 않는다.
+Pages도 정적 접근성 검사를 browser 설치 전에 수행하고, axe는 Chromium 설치 뒤 수행한다. 자동 E2/E3가 통과해도 신규 사용자 n≥5 Tutorial DOD-03이나 실제 Android Chrome·스크린리더·200% zoom·색각 검토의 수동 E1 4개를 CI 성공으로 대체하지 않는다.
 
-workflow는 `node-version-file: .nvmrc`, npm cache와 `package-lock.json`, `npm ci`를 사용한다. `.nvmrc=24`와 `package.json#engines`도 Node 24로 일치한다. 품질 CI는 Chromium core E2E 뒤 M03 parity를 Chromium·Firefox·WebKit에서 실행하고, Pages workflow는 호환 artifact Chromium smoke와 공식 upload/deploy를 유지한다.
+workflow는 `node-version-file: .nvmrc`, npm cache와 `package-lock.json`, `npm ci`를 사용한다. `.nvmrc=24`와 `package.json#engines`도 Node 24로 일치한다. 품질 CI는 M06 actual-route axe와 product flow 뒤 M03 parity를 Chromium·Firefox·WebKit에서 실행하고, Pages workflow는 호환 artifact smoke와 공식 upload/deploy를 유지한다.
 ## 9. GitHub Pages 배포
 
 2026-08-14 원격 Pages를 legacy branch source에서 공식 artifact workflow로 전환했다. 배포 SHA는 `93a4359b5cbe1b45f8ed1fe0ee4a984003e8191c`이며 `build_type=workflow`·`status=built`다. 전환 전 SHA `576e6dbac1938652ba892539c91a1fa07f4d2cf7`는 `backup/pages-legacy-20260814`에 보존했다.
@@ -323,14 +349,15 @@ workflow는 `node-version-file: .nvmrc`, npm cache와 `package-lock.json`, `npm 
 - 공개 Chromium artifact smoke: 8/8
 - 공개 M00 전체 회귀: 573단언, 320/360/960px, console 오류 0
 
-M01 전환 artifact 계약:
+현재 M06 artifact 계약:
 
 - `npm run build:pages` 출력은 `pages-dist/`이며 commit하지 않는다.
-- 공개 루트와 기존 stage/seed query는 M00 `prototypes/rule-proof/`로 연결한다.
-- `/#/`, `/#/daily`, 알 수 없는 hash route는 M01 Hash Router로 제공한다.
+- 공개 루트와 H00 호환 base `/prototypes/rule-proof/`는 동일한 M06 React 제품 entry로 연결한다.
+- `/#/`, `/#/tutorial`, `/#/lab`, `/#/lab/:id`, 알 수 없는 hash route는 M06 Hash Router로 제공한다.
+- 기존 `stage`·`signal`·`seed` query와 `#controls` 공유 링크는 `legacy.html`에서 보존한다.
 - 정적 접근성·Chromium core E2E와 Chromium artifact smoke를 배포 job 안에서 모두 통과한 artifact만 업로드한다.
 - upload는 숨김 파일 포함을 명시해 `.nojekyll`을 로컬 검증 artifact와 동일하게 보존한다.
-- Chromium·Firefox·WebKit 로컬 artifact E2E 24/24와 asset HTTP 200을 별도 회귀 기준으로 유지한다.
+- Chromium·Firefox·WebKit 로컬 artifact E2E 3-engine PASS와 asset HTTP 200을 별도 회귀 기준으로 유지하며 고정 테스트 개수는 Pages 결과 합류 전에 선기재하지 않는다.
 - 실패 시 전환 직전 SHA의 legacy 백업 branch를 Pages source로 지정해 복구한다.
 
 M10 목표 계약:

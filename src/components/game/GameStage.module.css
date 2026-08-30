@@ -120,7 +120,8 @@
   z-index: var(--z-sticky);
   grid-area: action;
   align-self: start;
-  bottom: 0;
+  inset-block-end: var(--pulse-sticky-bottom, 0);
+  inset-block-start: var(--pulse-sticky-top, auto);
   width: min(100%, var(--game-action-max));
   padding: var(--space-2) var(--space-2) calc(var(--space-2) + env(safe-area-inset-bottom));
   border: var(--border-width) solid var(--color-border);

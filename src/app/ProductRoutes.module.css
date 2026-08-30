@@ -1,0 +1,65 @@
+.gameRoute {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.resultActions,
+.warning {
+  display: flex;
+  width: min(100%, var(--game-width));
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: end;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  margin-inline: auto;
+  background: var(--color-surface);
+}
+
+.resultActions a {
+  display: inline-flex;
+  min-height: var(--control-min);
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-width) solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.warning {
+  justify-content: space-between;
+  border-color: var(--color-warning);
+}
+
+.unknown {
+  display: grid;
+  max-width: 40rem;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: var(--border-width) solid var(--color-danger);
+  border-radius: var(--radius-lg);
+  margin-inline: auto;
+  background: var(--color-surface);
+}
+
+@media (max-width: 47.99rem) {
+  .resultActions,
+  .warning {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .resultActions > *,
+  .warning > * {
+    width: 100%;
+  }
+  .tutorialRoute {
+    --pulse-sticky-bottom: auto;
+    --pulse-sticky-top: calc(var(--viewport-dynamic-block) - var(--sticky-action-height));
+  }
+}

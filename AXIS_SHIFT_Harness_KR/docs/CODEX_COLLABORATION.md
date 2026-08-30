@@ -2,11 +2,11 @@
 
 **버전**: 1.0.0  
 **상태**: 기록 중  
-**최종 갱신**: 2026-08-26
+**최종 갱신**: 2026-08-30
 
 ## 1. 목적
 
-OpenAI Game Builders Seoul에서 Codex 활용은 “코드 대부분을 AI가 작성했다”는 주장보다, 어떤 문제를 Codex와 해결했고 사람이 어떤 결정을 유지했으며 결과를 어떻게 검증했는지를 보여주는 것이 중요하다. 이 문서는 프롬프트 원문 보관소가 아니라 **결정·변경·검증의 감사 로그**다.
+OpenAI Game Builders Seoul 제출에서 시작한 Codex 협업은 해커톤 종료 뒤에도 계속된다. 중요한 것은 “코드 대부분을 AI가 작성했다”는 주장이 아니라, 어떤 문제를 Codex와 해결했고 사람이 어떤 결정을 유지했으며 결과를 어떻게 검증했는지다. 이 문서는 프롬프트 원문 보관소가 아니라 **결정·변경·검증의 감사 로그**다.
 
 ## 2. 역할 경계
 
@@ -39,7 +39,7 @@ OpenAI Game Builders Seoul에서 Codex 활용은 “코드 대부분을 AI가 �
 - 브랜드·모션·사운드 강도
 - P2 waiver와 출시 차단 판단
 - LICENSE·외부 자산 사용 권리
-- 제출 설명·영상의 사실성
+- 공개 설명·릴리스 노트·홍보 자료의 사실성
 
 ## 5. 작업 로그 작성 규칙
 
@@ -108,6 +108,8 @@ Codex가 제안·생성·수정한 항목
 | CX-M05-001 | 2026-08-26 | M05 | shared Design System·게임 UI fixture 초기 checkpoint | working tree; commit/PR 없음 | focused 6/30, global 30/179, axe 18/18, visual 18/18·baseline 9, keyboard 3엔진 9/9 | 오너가 M05 착수; 초기 high-contrast 행렬은 후속 ADR-0011로 대체 | 역사적 자동 checkpoint / 현행 아님 |
 | CX-M05-002 | 2026-08-26 | M05 | Theme·Motion 단일 순환 버튼과 appearance 계약 정정 | [ADR-0011](../decisions/0011-appearance-cycle-controls.md); 당시 working tree·commit/PR 없음 | global 30/180, token 16/0/13, axe 18/18, visual no-update 18/18·diff 0·baseline 9, keyboard 3엔진 9/9, verify 12/12 | 오너가 dark 기본·custom high-contrast 제거를 확정; 당시 실제 수동·baseline 전체 승인은 미제공 | 역사적 pre-approval checkpoint / 후속 CX-M05-003으로 대체 |
 | CX-M05-003 | 2026-08-29 | M05 | Design System checkpoint·제출 URL appearance adapter 공개 종료 | implementation `f039bb8`; runtime `1608c26`; CI `33207406441`; Pages `33207406497` | local strict visual 18/18; remote 15 PASS+3 SKIP; public Pages 30/30·prototype 908 | 오너 baseline 9/9 승인; manual 0/4는 NOT RUN·M10 이관 | Accepted / M05 complete |
+| CX-M06-001 | 2026-08-29~30 | M06 | Tutorial 6·Lab 48 production flow와 session/storage UI 통합 | working tree; commit/PR/push 없음 | E2E 26 PASS+10 intentional skips, canonical 54 failures 0; axe 3/3; focused 4/27; global 36/218; verify 12/12; visual 18/18; Pages 36/36 | 오너가 M06 착수 승인; 신규 사용자 DOD-03은 미실행 | 자동 checkpoint PASS / DOD-03 NOT RUN |
+| CX-ROADMAP-001 | 2026-08-30 | 전역·M06~M11 | 해커톤 lane 종료와 일반 공개 출시 복귀 | [ADR-0013](../decisions/0013-post-hackathon-production-launch.md)·phase·release 문서 | H00 증거 보존, M06 차단 gate 유지, M10/M11 launch 계약 교차검토 | 오너가 본선 미진출 결과와 정상 배포·런칭 목표를 확정 | Accepted / 문서 전환 |
 
 ## 8. 상세 로그 템플릿
 
@@ -457,6 +459,39 @@ Codex가 제안·생성·수정한 항목
 - Codex/사람 경계: Codex는 코드·테스트·배포 검증과 증거 기록을 담당했다. 디자인 방향·baseline 9종 승인·수동 E1 이관은 프로젝트 오너 결정이다.
 - 남은 위험·인계: M06는 M05 선행 조건만 충족했다. production controller·session/storage/reload 연결은 M06, 이관한 수동 접근성 4종은 M10에서 완료해야 한다.
 
+### CX-M06-001 — Tutorial·Lab production flow 자동 checkpoint
+
+- 날짜: 2026-08-29~30
+- Phase / DoD: M06 / DOD-01~02·04~12 자동 증거 확보, DOD-03 `NOT RUN`, DOD-13 문서 동기화
+- 관련 INV / ADR: INV-003~007·010~012·015·016·018 / ADR-0001·0002·0005
+- 사람 결정: 프로젝트 오너가 M06 착수를 승인했다. Tutorial의 수동 학습 실효를 판정할 신규 사용자 5명 이상 모집·실행·집계는 제공하지 않았으므로 Codex는 DOD-03을 PASS·면제·기존 M00 표본 재사용으로 처리하지 않는다.
+- Codex 역할:
+  - `GameSessionScreen`과 주입 가능한 browser runtime을 통해 M04 reducer·clock·ID·storage와 M05 presentational UI를 연결했다. 앱 수명 `IdGenerator` singleton, Web Crypto ID source, hydrate ID reserve, Page Visibility pause/resume, autosave와 복구 경고를 실제 route에서 조합했다.
+  - Home first-run/Continue, Tutorial 6단계의 명시적 학습 selector·skip/back/advance 정책, Lab 4 chapter×12 자유 접근, invalid-level 복구, Hint 1~3, Undo, Reset confirm, Result focus·재플레이·다음 레벨, Lab best tuple 저장을 구현했다.
+  - `ProductRoutes`, runtime·copy adapter, ko/en 전체 key parity와 54 title key, Tutorial/Lab/persistence E2E helper·canonical runner·실제 route axe를 추가하고 CI에 M06 product-flow와 axe 명령을 연결했다.
+- 실패·수정 기록:
+  - 실제 Lab catalog axe에서 light/system의 작은 `.levelMeta` 48개가 `color-contrast` serious로 재현돼 semantic text token으로 교체한 뒤 Tutorial·Lab catalog·Lab game 3/3, serious/critical/external/page error 0으로 닫았다.
+  - reload·pulsing·손상 JSON fixture를 실제 LocalStorage에 주입해 board/move/timer/hint/선택 보존, 마지막 안정 상태 정규화, 완료 record 단일성, quarantine backup과 새 playable session을 3개 엔진에서 확인했다.
+  - 54개 browser runner는 승인된 데이터 순서의 canonical solution으로 Tutorial 6의 해결·session clear·다음 이동과 Lab 48의 해결·결과 저장·다음 이동을 완료해 실패 0을 기록했다. Tutorial level record는 만들지 않는다. 비대상 browser의 exhaustive/keyboard·scoring·reset 테스트는 의도적 skip으로 분리했다.
+- 자동 검증:
+  - focused Tutorial/Lab/game-session: `4 files / 27 tests` PASS; global unit/component: `36 files / 218 tests` PASS
+  - M06 browser flow: `26 PASS + 10 intentional skips`; canonical Tutorial 6 + Lab 48 `failures=0`; reload/pulsing/quarantine persistence는 Chromium·Firefox·WebKit `9/9 PASS`
+  - actual-route axe: Tutorial step·Lab catalog·Lab game `3/3 PASS`, serious/critical/external requests/page errors `0/0/0/0`
+  - `npm run verify`: script contract missing 0, `12/12` PASS; 기존 M05 canonical visual no-update `18/18` PASS
+- 변경 파일: `src/app/{ProductRoutes,game-copy,runtime,router,App}`, `src/features/{home,tutorial,lab,game-session}`, `src/i18n/{ko,en,index.test}`, `tests/e2e/{tutorial,lab,persistence,helpers/game-flow}`, `tests/a11y/tutorial-lab.spec.ts`, CI와 M06 하네스 문서
+- Commit / PR / push: 없음. 현재 M06 working tree 자동 checkpoint이며 fixed-SHA·원격 CI·배포 증거가 아니다.
+- Pages 경계: H00 호환 base와 공개 root 기본 접속을 M06 React 제품으로 전환하고 기존 `stage`·`signal`·`seed`·hash control 공유 링크를 `legacy.html`로 보존했다. 로컬 artifact는 15 files·prototype files 11, Chromium·Firefox·WebKit 36/36 PASS다. fixed SHA·원격 CI·공개 배포 증거는 아직 없다.
+- 남은 위험·인계: M06 DOD-03 신규 사용자 E1은 미실행이다. Daily·UTC date/streak/Archive는 M07, 공유·PWA·완성된 locale 설정은 M09, 이관된 실기기·스크린리더·zoom·색각과 production release gate는 M10에 남는다. 따라서 M06 완료·릴리스 승인·관련 FR/NFR의 조기 `Verified`를 주장하지 않는다.
+
+### CX-ROADMAP-001 — 일반 공개 출시 로드맵 복귀
+
+- 사람 결정: 프로젝트 오너가 해커톤 본선 미진출 결과를 알리고, 행사용 추가 제출이 아닌 마일스톤별 제품 구축·정상 배포·런칭을 새 목표로 확정했다.
+- Codex 역할: H00 제출 증거를 역사 기록으로 보존하면서 활성 `PROGRESS`, M10·M11, 릴리스 체크리스트와 README의 목표·게이트를 감사하고 [ADR-0013](../decisions/0013-post-hackathon-production-launch.md)으로 계약화했다.
+- 유지한 차단 조건: M06 DOD-03 신규 사용자 E1, M10 실기기·실제 스크린리더·200% zoom·색각 검토, P0/P1 0건, fixed-SHA CI·실제 URL·rollback 증거는 해커톤 종료를 이유로 완화하지 않는다.
+- 보류한 사람 결정: 일반 출시 버전·날짜·채널·최종 도메인·공개 라이선스는 각 DoR 승인 전 `TBD`이며 Codex가 임의로 만들지 않는다.
+- 범위 밖: 이 결정만으로 백엔드·계정·분석·광고·수익화·앱 스토어 패키징을 추가하지 않는다.
+- Commit / PR / push: 없음. 현재 작업은 기존 M06 working tree 위의 문서 계약 전환이며 별도 출시·배포 증거가 아니다.
+
 ## 9. 품질 분류
 
 Codex 산출물은 다음 중 하나로 분류한다.
@@ -469,9 +504,9 @@ Codex 산출물은 다음 중 하나로 분류한다.
 | Experimental | branch/fixture에서만 검토 | production 미포함 명시 |
 | Reverted | 채택 후 회귀로 되돌림 | 원인·revert commit·새 gate 기록 |
 
-## 10. 제출용 협업 요약 골격
+## 10. 공개용 협업 요약 골격
 
-M11에서 실제 로그만으로 다음을 작성한다.
+M11 공개 런칭 시 실제 로그만으로 다음을 작성한다.
 
 ```text
 Codex는 순수 GF(2) 게임 코어, 결정적 Daily 생성기, 자동 검증과

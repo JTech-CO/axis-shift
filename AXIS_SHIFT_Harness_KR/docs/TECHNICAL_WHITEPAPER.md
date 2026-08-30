@@ -3,7 +3,8 @@
 **버전**: 1.0.0-draft  
 **작성일**: 2026년 8월 9일  
 **작성자**: JTech-CO / Bryan  
-**문서 상태**: Pre-Production / OpenAI Game Builders Seoul 예선 빌드 기준  
+**문서 상태**: Pre-Production / M06 Tutorial·Lab 구현 체크포인트(DOD-03 미실행)
+**최종 수정일**: 2026년 8월 30일
 **참고 문서**: AXIS//SHIFT 기획 정의 v0.1, AXIS//SHIFT 디자인 백서 v1.0, QA 및 릴리스 체크리스트(추후 작성)
 
 ---
@@ -87,7 +88,7 @@ AXIS//SHIFT는 텐서와 이진 행렬의 연산 원리를 일반 사용자가 �
 
 > **Daily 범위 경계**: `A Daily Tensor Puzzle`과 Daily Signal은 대표적인 재방문 모드와 날짜별 동일 퍼즐 계약을 뜻한다. 날짜당 한 문제 제한은 Daily 모드에만 적용하며, 제품 전체는 Tutorial·다단계 Lab·Sprint·Archive와 완료 퍼즐 재도전을 상시 제공한다.
 
-> **출시 완성도 기준**: v1.0은 웹 게임의 콘텐츠·UX·접근성·저장·오프라인·QA가 상용 배포 수준으로 닫힌 상태를 의미한다. Play Store 패키징은 게임 완성도와 별개인 유통 채널 래핑 작업으로 분리하며, 예선 제출 빌드의 범위를 축소하는 근거로 사용하지 않는다.
+> **출시 완성도 기준**: 정식 일반 공개 릴리스는 웹 게임의 콘텐츠·UX·접근성·저장·오프라인·QA가 production 배포 수준으로 닫힌 상태를 의미한다. Play Store 패키징은 게임 완성도와 별개인 유통 채널 래핑 작업이며, 완료된 H00 해커톤 빌드는 이 범위를 축소하는 근거로 사용하지 않는다. 실제 release version은 프로젝트 오너 승인 전 `TBD`다.
 
 ---
 
@@ -115,7 +116,7 @@ GitHub Pages의 직접 경로 404를 피하기 위해 Hash Router를 기본으�
 /#/                          홈
 /#/tutorial                  첫 사용자 튜토리얼
 /#/lab                       Lab 챕터 목록
-/#/lab/:levelId              개별 Lab 퍼즐
+/#/lab/:id                   개별 Lab 퍼즐
 /#/daily                     오늘의 Daily Signal
 /#/daily/:yyyy-mm-dd         아카이브 Daily
 /#/sprint                    180초 Sprint
@@ -123,6 +124,8 @@ GitHub Pages의 직접 경로 404를 피하기 위해 Hash Router를 기본으�
 /#/settings                  설정
 /#/about                     규칙·수학·크레딧
 ```
+
+M06 구현 체크포인트는 홈·`/#/tutorial`·`/#/lab`·`/#/lab/:id`를 실제 제품 route로 연결했다. Daily·Sprint·Archive·Settings·About의 완성은 각각 후속 phase 계약에 남아 있다.
 
 - 존재하지 않는 라우트는 홈으로 강제 이동하지 않고 오류 안내와 복구 버튼을 제공한다.
 - `:levelId`와 날짜 파라미터는 허용 형식만 파싱하며 문자열을 HTML로 삽입하지 않는다.
@@ -383,7 +386,7 @@ export interface GameSession {
 }
 ```
 
-`acceptedPulseActionIds.length === moves.length + undoCount`는 현재 move와 Undo된 수락 action을 합친 exact persisted invariant다. `services/id`의 `IdGenerator`는 hydrated ID seed, `reserveId()`, scope 검증, invalid·duplicate retry와 exhaustion을 제공한다. Reset `sessionId`를 앱·저장 수명 동안 재사용하지 않는 것은 호출자 계약이며 M06가 singleton·crypto-backed source로 연결한다.
+`acceptedPulseActionIds.length === moves.length + undoCount`는 현재 move와 Undo된 수락 action을 합친 exact persisted invariant다. `services/id`의 `IdGenerator`는 hydrated ID seed, `reserveId()`, scope 검증, invalid·duplicate retry와 exhaustion을 제공한다. M06 앱 runtime은 이를 앱 수명 singleton과 Web Crypto-backed source에 연결하고 hydrate된 ID를 reserve해 Reset `sessionId`가 앱·저장 수명 동안 재사용되지 않게 했다.
 
 #### 2.3.4. 기록과 설정
 
@@ -565,7 +568,7 @@ axis-shift:generator-map:v1
 ### 3.3. 의존성 및 버전 정책
 
 - `package.json`의 버전 범위와 별개로 `package-lock.json`을 반드시 커밋한다.
-- 예선 제출 72시간 전부터 기능 의존성 업그레이드를 동결한다.
+- M10에서 프로젝트 오너가 production RC를 승인하면 기능·대형 의존성 업그레이드를 동결한다.
 - 빌드 시점의 정확한 버전은 `docs/RELEASE_NOTES.md`에 기록한다.
 - 런타임 의존성은 가능한 5개 이하로 유지한다.
 - UI 아이콘은 범용 아이콘 패키지 대신 프로젝트 전용 SVG를 사용한다.
@@ -959,7 +962,7 @@ PRNG       = Mulberry32(prngSeed)
 M00 폐기형 프로토타입의 반복 목표는 프로덕션 Daily 생성기가 아니다. 규칙·난도 구조·반복 UX를 검증하기 위한 `m00-seeded-v1` 생성기로 다음 경계를 고정한다.
 
 - seed 문자열은 NFKC 정규화한 뒤 profile ID·generator version과 함께 32비트 결정적 PRNG의 입력으로 사용한다. 같은 `stage`·`seed`는 같은 initial·target·canonical factorization을 만든다.
-- 플레이 가능한 profile은 Easy 4×4, Normal 4×4·5×5, Hard 4×4·5×5·6×6의 여섯 조합이다. Full Rank 4×4는 난도 stage가 아닌 대조군이며 legacy `?stage=hard`는 이 대조군 alias로만 남긴다.
+- 플레이 가능한 profile은 Easy 4×4, Normal 4×4·5×5, Hard 4×4·5×5·6×6의 여섯 조합이다. Full Rank 4×4는 난도 stage가 아닌 대조군이며 legacy `?stage=hard`는 이 대조군 alias로만 남긴다. 이 query 계약은 M06 제품 Hash Router가 아니라 `legacy.html`에서만 보존한다.
 - 각 profile은 고정 Par와 `compressionGap` 조건, 목표 밀도 22%~68%, 비영 축 조건을 검증한다. 최대 512회 생성 실패 뒤에는 validator를 통과한 정적 fallback을 사용하며, golden vector와 fallback round-trip을 verifier에서 고정한다.
 - Hard 4×4는 initial 밀도 25%~50%의 결정적 비영 노이즈를 사용해 initial이 항상 0인 Easy와 시각적으로 구분한다. 차이 행렬의 Par 2·gap 2 구조는 유지되지만, 이 조치는 정식 사람 대상 Hard 승인이나 난도 확정을 뜻하지 않는다.
 - 브라우저는 Web Crypto로 새 seed를 만들고 `?stage=<id>&seed=<seed>`를 URL에 기록한다. Web Crypto를 사용할 수 없는 환경의 로컬 fallback seed도 URL에 기록하므로 생성된 링크의 reload 결과는 재현된다.
@@ -977,7 +980,7 @@ M00 폐기형 프로토타입의 반복 목표는 프로덕션 Daily 생성기�
 - validator는 manifest 54 ID exact set/order·canonical physical profile order와 section별 board·판정, progression/completion 각 5행 exact order, metadata/catalog hash/approval fingerprint binding, normalized machine scaffold exact comparison을 22개 self-check와 함께 검증한다. 객관 조건과 사람 E1 gate는 분리해 기록한다.
 - 프로젝트 오너는 2026-08-26 `evidence/M03/content-curation-v1.md`의 54개 패턴과 progression 5행을 전체 승인했다. metadata는 `프로젝트 오너` / `2026-08-26T00:20:42+09:00` / `APPROVED`, evidence SHA-256은 `B81406D8…0214F`다.
 - 일반 validator는 승인 metadata·approval fingerprint·machine scaffold가 어긋나면 실패한다. 후보 작업 중 객관 검증만 명시적 `--allow-pending-curation`으로 허용한다.
-- DOD-04 사람 승인과 DOD-10 candidate exact-SHA 감사 2회가 모두 통과해 M03을 완료했다. 이는 데이터·생성 pipeline 완료이며 프로덕션 플레이 화면 연결은 여전히 M06·M07 범위다.
+- DOD-04 사람 승인과 DOD-10 candidate exact-SHA 감사 2회가 모두 통과해 M03을 완료했다. M06은 이 데이터의 Tutorial 6개와 Lab 48개를 제품 화면·진행 기록에 연결했다. UTC Daily 생성·Archive 연결은 M07 범위다.
 - 레벨 ID는 한번 배포하면 변경·재사용하지 않는다.
 
 ```text
@@ -992,16 +995,17 @@ noise:    lab-04-noise-01 ... lab-04-noise-12
 
 1. `error` 외 논리 세션은 저장할 수 있다. 시작 전 Hint·visibility 상태는 hint level을 보존한 canonical `ready`와 null clock으로 정규화한다. `PULSE_COMMIT` 직후의 `pulsing`도 이미 적용된 board·move를 보존하며 애니메이션 진행도 자체는 저장하지 않는다.
 2. 시작된 미해결 세션은 저장 guard에서 열린 구간 `lastObservedEpochMs - activeSinceEpochMs`를 정확히 한 번 `activeElapsedMs`에 더하고 `paused` snapshot으로 정규화한다.
-3. 해당 snapshot은 `activeSinceEpochMs=null`, `hiddenAtEpochMs === lastObservedEpochMs`를 강제해 reload와 오프라인 구간을 active time에 포함하지 않는다. M06 controller가 현재 주입 시각으로 visible resume를 dispatch한다.
+3. 해당 snapshot은 `activeSinceEpochMs=null`, `hiddenAtEpochMs === lastObservedEpochMs`를 강제해 reload와 오프라인 구간을 active time에 포함하지 않는다. M06 controller는 Page Visibility를 구독하고 현재 주입 시각으로 visible resume를 dispatch한다.
 4. 해결된 세션은 progress record와 분리해 resumable session에서는 `null`로 정규화한다.
 5. reader는 JSON parse, schema version, exact field·범위, 퍼즐 존재, `acceptedPulseActionIds.length === moves.length + undoCount`, move replay·board 일치, canonical UTC year `1..9999`를 검사한다. `labRecords`는 null-prototype map으로 재구성해 `__proto__` key도 prototype을 변경하지 못하게 한다.
 6. M04에는 serialized JSON byte 제한이 구현되지 않았다. 저장 용량 상한은 실제 payload 계측과 브라우저 quota 회귀를 갖춘 후속 storage-budget 정책에서 고정한다.
 7. settings·progress·session·generator-map 네 root를 독립 복구한다. 손상 raw는 빈 quarantine key를 최대 128회 탐색해 기존 backup을 덮어쓰지 않고, backup 성공 뒤에만 primary에서 제거한다. ID 고갈·backup 실패 시 primary raw를 보존하며, progress 부분 복구는 제거 성공 뒤 salvage한 record를 repaired primary에 다시 저장한다.
 8. Private Browsing·quota·read/write 예외에서는 메모리 모드로 계속하며 경고는 repository 인스턴스의 `keyKind+code`당 한 번이다.
 9. 설정 변경은 즉시 저장하고 진행도 쓰기는 완료·PULSE 후에 수행한다. Reset은 session root만 교체하며 별도 progress root의 Daily best를 보존한다. 세션 복구 안내는 진행 중 퍼즐이 있을 때만 홈에 표시한다.
-10. M04 `IdGenerator`는 issued ledger·seed·reserve·retry·exhaustion을 검증했다. 앱 singleton·crypto source와 hydrate seed/reserve 연결은 M06 범위다.
-11. M04는 reducer·clock·ID·storage 계약까지만 닫는다. M05는 selector 결과·표시 DTO·번역된 문자열·callback만 받는 presentational shared UI와 `paused`·Result를 포함한 상태 fixture를 제공하며 production controller나 저장 orchestration을 소유하지 않는다.
-12. 실제 Page Visibility dispatch, Result·Lab 기록 저장과 browser reload E2E는 M06 범위다. UTC Daily·streak·Archive는 M07 범위다.
+10. M04 `IdGenerator`의 issued ledger·seed·reserve·retry·exhaustion 위에 M06 앱 singleton·Web Crypto source와 hydrate seed/reserve 연결을 구현했다.
+11. M06 production controller는 M04 reducer·clock·ID·storage 계약과 M05 presentational UI를 결합하되 session 규칙은 feature runtime에 유지한다. 완료 이벤트는 한 번만 처리하고 Result와 Lab best를 저장하며, replay·next·resume 흐름을 같은 경계에서 조정한다.
+12. `tests/e2e/persistence.spec.ts`가 3개 브라우저 엔진에서 reload resume, `pulsing` fixture 정규화와 중복 completion 방지, 손상 storage quarantine·복구를 통과했다. UTC Daily·streak·Archive는 M07 범위다.
+13. 신규 사용자 n≥5의 Tutorial 학습 실효를 확인하는 M06 DOD-03은 `NOT RUN`이며 이 자동 체크포인트만으로 M06 완료를 선언하지 않는다.
 
 ### 4.7. 공유 파이프라인 (Sharing Pipeline)
 
@@ -1418,6 +1422,8 @@ axis-shift/
 3. Hash Router를 사용하여 새로고침 404를 방지한다.
 4. manifest의 `start_url`, `scope`, 아이콘 경로를 base path와 일치시킨다.
 5. PR 미리보기와 프로덕션 배포의 base path 차이를 자동 테스트한다.
+6. 배포 root와 H00 호환 base `/prototypes/rule-proof/`는 같은 M06 React 제품 entry를 제공한다.
+7. 기존 `stage`·`signal`·`seed` query와 `#controls` 공유 링크는 `legacy.html`로 보존해 과거 링크를 깨뜨리지 않는다.
 
 ### 7.5. 브라우저·장치 예외
 
@@ -1487,6 +1493,8 @@ axis-shift/
 - Reduced Motion 상태
 - 한·영 문자열 누락 검사
 
+M06 자동 체크포인트는 Home·Tutorial·Lab·game-session·i18n을 포함한 focused `4 files / 27 tests`, global `36 files / 218 tests`를 통과했다. 사람 대상 Tutorial DOD-03과 M10의 실기기·스크린리더 검증은 별도다.
+
 ### 8.3. E2E 테스트
 
 1. 최초 사용자: 홈 → 튜토리얼 → 첫 Lab 완료
@@ -1499,6 +1507,8 @@ axis-shift/
 8. GitHub Pages base path와 Hash Router
 9. 360px·768px·1440px 레이아웃
 10. 키보드 전용 전체 흐름
+
+M06에서는 실제 `/#/tutorial`·`/#/lab`·`/#/lab/:id` route와 reload persistence를 Chromium·Firefox·WebKit에서 검증해 `26 PASS + 10 intentional skips`를 기록했다. canonical Tutorial 6+Lab 48 해결 실패는 0이며 Daily·Sprint·Share·Offline·PWA 시나리오는 후속 phase에 남아 있다.
 
 ### 8.4. 시각·접근성 테스트
 
@@ -1537,7 +1547,7 @@ install
 - `main`: 항상 배포 가능한 상태
 - `develop`은 장기 유지하지 않고 기능 브랜치 → PR → main 흐름을 권장한다.
 - 기능 브랜치 예시: `feat/daily-generator`, `feat/share-card`, `fix/ios-safe-area`
-- 릴리스 태그: `v1.0.0-preview.1`, `v1.0.0-rc.1`, `v1.0.0`
+- 릴리스 식별자·태그: 프로젝트 오너가 승인한 version을 immutable commit·artifact와 연결하며, 승인 전에는 `TBD`로 유지한다.
 
 ### 9.2. CI/CD
 
@@ -1546,6 +1556,7 @@ install
 - 배포 artifact는 CI에서 생성하며 로컬 빌드 결과를 직접 커밋하지 않는다.
 - canonical app build는 기존 `dist`에서 발생한 Vite 8 Windows native cleanup crash를 피하려 `scripts/clean-build-output.ts`가 검증된 `<PROJECT_ROOT>/dist`만 preclean한 뒤 `vite build --emptyOutDir=false`를 실행한다.
 - 배포 후 실제 URL의 manifest, service worker, 주요 라우트, Daily 실행을 smoke test한다.
+- M06 checkpoint CI는 Tutorial·Lab product-flow와 actual-route axe를 별도 명령으로 실행한다. 현재 자동 증거는 product E2E 3-engine PASS, axe `3/3`, verify `12/12`, visual `18/18` PASS다.
 
 ### 9.3. 로그와 분석
 
@@ -1637,7 +1648,7 @@ Codex가 제안하거나 생성한 변경
 - [ ] manifest, 아이콘, 설치, service worker 업데이트가 검증된다.
 - [ ] README에 게임 소개·조작·기술·실행·배포 방법이 있다.
 - [ ] LICENSE와 ASSET_LICENSES가 완성된다.
-- [ ] 릴리스 태그와 최종 커밋 해시가 제출 문서에 기록된다.
+- [ ] 오너 승인 release identifier, 최종 commit·artifact hash와 production URL이 launch manifest·release notes에 동일하게 기록된다.
 
 ---
 
@@ -1657,6 +1668,8 @@ Codex가 제안하거나 생성한 변경
 - 저장·Undo·Hint·등급
 - 반응형 게임 화면
 
+M06 구현 체크포인트에서 위 세 항목의 production route·controller·저장 E2E를 연결했다. 다만 Tutorial 사람 대상 DOD-03은 `NOT RUN`이고, UTC Daily·streak·Archive는 M07이므로 Phase 1 전체 완료 표시는 보류한다.
+
 ### Phase 2 — Retention & Sharing
 
 - Daily, Archive, Sprint
@@ -1668,7 +1681,7 @@ Codex가 제안하거나 생성한 변경
 - PWA·오프라인
 - 사운드·햅틱·설정
 - 접근성·한영화·QA 자동화
-- 데모 영상·제출 자료
+- release 문서·production post-deploy smoke·rollback·운영 인계
 
 ### Post-v1
 
